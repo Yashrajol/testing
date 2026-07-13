@@ -38,7 +38,25 @@ root installs everything.
 
 ---
 
-## 2. Prerequisites
+## 2. Access you'll need from the team
+
+Everything in this guide runs **fully locally** — you can build features without any of
+the below. You only need these for the things listed:
+
+| Access | Needed for | Ask for |
+| :--- | :--- | :--- |
+| **GitHub repo** | Anything. Pushing branches, opening PRs. | Collaborator invite. |
+| **Live demo logins** | Signing in to the deployed demo at vedhkrit-web.vercel.app. | The demo password (shared privately — it is deliberately **not** in this repo). |
+| **Render dashboard** | Seeing API logs, env vars, restarting the deployed API. | Team invite on Render. |
+| **Vercel dashboard** | Frontend deploys and build logs. | Team invite on Vercel. |
+
+**Secrets are never committed to this repo** — no production passwords, database URLs,
+or JWT secrets are in git, and they must not be added. If you need one, ask for it
+directly. Local development uses throwaway defaults (see `apps/platform/.env.example`).
+
+---
+
+## 3. Prerequisites
 
 | Tool | Version | Notes |
 | :--- | :--- | :--- |
@@ -50,7 +68,7 @@ You do **not** need to install PostgreSQL. Docker provides it.
 
 ---
 
-## 3. First-time setup
+## 4. First-time setup
 
 ```bash
 git clone https://github.com/SARTHAKSONAWANE01/VEDHKRIT.git
@@ -129,7 +147,7 @@ against a non-local database without them.
 
 ---
 
-## 4. Day-to-day commands
+## 5. Day-to-day commands
 
 All of these run against the containers, so you don't need Node locally.
 
@@ -163,7 +181,7 @@ TypeScript types won't match the database.
 
 ---
 
-## 5. Running without Docker (optional)
+## 6. Running without Docker (optional)
 
 Only Postgres genuinely needs Docker. If you prefer running the apps natively:
 
@@ -179,7 +197,7 @@ Requires Node 22 LTS. The `.env` you created in Step 1 already points at
 
 ---
 
-## 6. Environment variables
+## 7. Environment variables
 
 | Variable | Where | What it does |
 | :--- | :--- | :--- |
@@ -195,7 +213,7 @@ add it to `apps/platform/.env.example` too so the rest of the team knows it exis
 
 ---
 
-## 7. Team workflow
+## 8. Team workflow
 
 `main` is the deployed branch — **pushing to it redeploys production** (Vercel + Render
 auto-deploy on push).
@@ -223,7 +241,7 @@ cd apps/web && npx tsc --noEmit
 
 ---
 
-## 8. Known gaps & gotchas
+## 9. Known gaps & gotchas
 
 Things that will confuse you if nobody tells you:
 
@@ -252,7 +270,7 @@ Things that will confuse you if nobody tells you:
 
 ---
 
-## 9. Deploying
+## 10. Deploying
 
 `main` auto-deploys. The full deployment setup (Vercel + Render + Postgres, env vars,
 seeding a remote database) is in **[deployment.md](./deployment.md)**.
@@ -268,7 +286,7 @@ seeding a remote database) is in **[deployment.md](./deployment.md)**.
 
 ---
 
-## 10. Troubleshooting
+## 11. Troubleshooting
 
 **`docker compose up` fails with "env file ... not found"**
 You skipped Step 1. Run `cp apps/platform/.env.example apps/platform/.env`.
