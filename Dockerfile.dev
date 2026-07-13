@@ -1,0 +1,22 @@
+FROM node:20-alpine
+
+RUN apk add --no-cache openssl
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+COPY apps/platform/package.json apps/platform/package.json
+COPY apps/web/package.json apps/web/package.json
+COPY packages/database/package.json packages/database/package.json
+COPY packages/eslint-config/package.json packages/eslint-config/package.json
+COPY packages/typescript-config/package.json packages/typescript-config/package.json
+
+RUN npm ci
+
+COPY . .
+
+RUN npm run db:generate --workspace=@vedhkrit/database
+
+EXPOSE 5000 8080
+
+CMD ["npm", "run", "dev"]

@@ -1,0 +1,387 @@
+// packages/database/prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  STUDENT
+  PARENT
+  SCHOOL_ADMIN
+  MENTOR
+  TEACHER
+  ADMIN
+  SUPERADMIN
+}
+
+enum AccountStatus {
+  PENDING_VERIFICATION
+  ONBOARDING
+  PENDING_APPROVAL
+  ACTIVE
+  SUSPENDED
+}
+
+enum ApprovalStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum SubscriptionStatus {
+  INACTIVE
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  phoneNumber   String?        @unique
+  name          String
+  passwordHash  String
+  role          Role
+  status        AccountStatus  @default(PENDING_VERIFICATION)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  studentProfile StudentProfile?
+  parentProfile  ParentProfile?
+  schoolProfile  SchoolProfile?
+  mentorProfile  MentorProfile?
+  teacherProfile TeacherProfile?
+  
+  auditLogs     AuditLog[]
+  sessions      Session[]
+  otpRecords    UserOTP[]
+}
+
+model UserOTP {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  otpCode     String
+  expiresAt   DateTime
+  verifiedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String   @unique
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+}
+
+model StudentProfile {
+  id              String         @id @default(uuid())
+  userId          String         @unique
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grade           String
+  schoolName      String?
+  parentLinkId    String?
+  parent          ParentProfile? @relation(fields: [parentLinkId], references: [id], onDelete: SetNull)
+  membershipId    String?
+  membership      Membership?    @relation(fields: [membershipId], references: [id])
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  assessmentResults AssessmentResult[]
+  goals             Goal[]
+  badges            Badge[]
+  mentorSessions    MentorSession[]
+  academicRecords   AcademicRecord[]
+  consentRecords    ConsentRecord[]
+  studentAnswers    StudentAnswer[]
+
+  @@index([parentLinkId])
+  @@index([membershipId])
+}
+
+model ParentProfile {
+  id          String           @id @default(uuid())
+  userId      String           @unique
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  children    StudentProfile[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model SchoolProfile {
+  id              String         @id @default(uuid())
+  userId          String         @unique
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  board           String         // CBSE, ICSE, IB, STATE
+  address         String
+  licenseDocUrl   String?
+  approvalStatus  ApprovalStatus @default(PENDING_REVIEW)
+  approvedAt      DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model MentorProfile {
+  id              String         @id @default(uuid())
+  userId          String         @unique
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expertise       String[]
+  resumeUrl       String?
+  approvalStatus  ApprovalStatus @default(PENDING_REVIEW)
+  approvedAt      DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  mentorSessions  MentorSession[]
+}
+
+model PricingPlan {
+  id            String        @id @default(uuid())
+  name          String        
+  priceINR      Float
+  billingCycle  String        // MONTHLY, ANNUALLY
+  features      String[]
+  isActive      Boolean       @default(true)
+  memberships   Membership[]
+  transactions  Transaction[]
+}
+
+model Membership {
+  id            String             @id @default(uuid())
+  planId        String
+  plan          PricingPlan        @relation(fields: [planId], references: [id])
+  status        SubscriptionStatus @default(INACTIVE)
+  startedAt     DateTime?
+  expiresAt     DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  students      StudentProfile[]
+  
+  @@index([planId])
+}
+
+model Transaction {
+  id            String      @id @default(uuid())
+  orderId       String      @unique 
+  paymentId     String?     @unique 
+  planId        String
+  plan          PricingPlan @relation(fields: [planId], references: [id])
+  amount        Float
+  currency      String      @default("INR")
+  status        String      // PENDING, SUCCESSFUL, FAILED, REFUNDED
+  rawPayload    Json?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([planId])
+}
+
+model CmsPage {
+  id             String       @id @default(uuid())
+  slug           String       @unique // e.g. "homepage", "about"
+  title          String
+  metaTitle      String?
+  metaDesc       String?
+  sections       CmsSection[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model CmsSection {
+  id          String    @id @default(uuid())
+  pageId      String
+  page        CmsPage   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  sectionName String    // HERO, PILLARS, PATHWAYS, STEPS, SEC_COE, logo_groups, NEWSLETTER, FOOTER
+  layoutIndex Int       @default(0)
+  title       String?
+  subtitle    String?
+  desc        String?   @db.Text
+  ctaLabel    String?
+  ctaLink     String?
+  cards       Json?     
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([pageId])
+}
+
+model ContactQuery {
+  id          String    @id @default(uuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String?
+  message     String    @db.Text
+  isResolved  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      String   
+  ipAddress   String?
+  payload     Json?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ----------------------------------------------------------------------
+// NEW STUDENT PORTAL MODELS
+// ----------------------------------------------------------------------
+
+model AssessmentResult {
+  id              String         @id @default(uuid())
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title           String
+  overallScore    Float
+  dimensions      Json?          // e.g., { "problemSolving": 80, "analytical": 75 }
+  status          String         @default("COMPLETED") // PENDING, COMPLETED
+  takenAt         DateTime       @default(now())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([studentId])
+}
+
+model Goal {
+  id              String         @id @default(uuid())
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title           String
+  description     String?
+  targetDate      DateTime?
+  progress        Float          @default(0) // 0 to 100
+  status          String         @default("ON_TRACK") // ON_TRACK, AT_RISK, COMPLETED
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([studentId])
+}
+
+model Badge {
+  id              String         @id @default(uuid())
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title           String
+  imageUrl        String?
+  earnedAt        DateTime       @default(now())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([studentId])
+}
+
+model MentorSession {
+  id              String         @id @default(uuid())
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  mentorId        String
+  mentor          MentorProfile  @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  topic           String
+  scheduledAt     DateTime
+  status          String         @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  notes           String?        @db.Text
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([studentId])
+  @@index([mentorId])
+}
+
+model AcademicRecord {
+  id              String         @id @default(uuid())
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject         String
+  grade           String?
+  score           Float
+  term            String?
+  year            Int
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([studentId])
+}
+
+model TeacherProfile {
+  id              String         @id @default(uuid())
+  userId          String         @unique
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subjects        String[]       // e.g. ["Mathematics", "Science"]
+  approvalStatus  ApprovalStatus @default(PENDING_REVIEW)
+  approvedAt      DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model QuestionBank {
+  id             String       @id @default(uuid())
+  title          String
+  description    String?
+  questions      Question[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Question {
+  id             String         @id @default(uuid())
+  bankId         String
+  bank           QuestionBank   @relation(fields: [bankId], references: [id], onDelete: Cascade)
+  text           String
+  options        Json           // Array of choices, e.g. ["A", "B", "C", "D"]
+  correctAnswer  String
+  difficulty     String         @default("MEDIUM") // EASY, MEDIUM, HARD
+  studentAnswers StudentAnswer[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([bankId])
+}
+
+model StudentAnswer {
+  id             String         @id @default(uuid())
+  studentId      String
+  student        StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  questionId     String
+  question       Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedAnswer String
+  isCorrect      Boolean
+  answeredAt     DateTime       @default(now())
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([studentId])
+  @@index([questionId])
+}
+
+model ConsentRecord {
+  id             String         @id @default(uuid())
+  studentId      String
+  student        StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  type           String         // e.g., "AUDIO_RECORDING", "VIDEO_TELEMETRY", "EYE_GAZE_TRACKING"
+  granted        Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([studentId])
+}
+

@@ -1,0 +1,24 @@
+{
+  "name": "vedhkrit-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-Grade VEDKHRIT Learner Development Platform Monorepo Workspace",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\""
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5",
+    "turbo": "^1.13.0"
+  }
+}
