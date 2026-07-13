@@ -1,6 +1,31 @@
 # VEDHKRIT Platform Technical Documentation Hub
 
-Welcome to the central technical documentation repository for the **Vedhkrit Learner Development Platform**. This directory contains the complete system design, subdomain routing rules, scaling benchmarks, actor workflows, and data relationships for Stage 1.
+Central technical documentation for the **Vedhkrit Learner Development Platform**.
+
+> ⚠️ **Read this first.** These documents fall into two very different categories:
+>
+> **What actually exists** — describes the system as it is built today:
+> * **[Developer Setup Guide](./development-setup.md)** — start here on a new machine.
+> * **[Deployment Guide](./deployment.md)** — how the live demo is hosted.
+>
+> **Target architecture (not built)** — `architecture_scale.md`, `subdomains_routing.md`,
+> and `security_performance.md` describe AWS ECS, per-role subdomains, Redis, BullMQ,
+> PgBouncer and a 5,000 RPS design. **None of that infrastructure exists.** Treat them as
+> a destination to aim at, not a description of the current system. The platform today is
+> a single NestJS API + one PostgreSQL database + a TanStack Start frontend.
+
+---
+
+## Start Here
+
+### 0. [Developer Setup Guide](./development-setup.md)
+* Complete local setup for a new machine: database, backend, frontend.
+* Daily commands, team/branch workflow, and troubleshooting.
+* An honest list of what's built vs. what's still mock data.
+
+### 0b. [Deployment Guide](./deployment.md)
+* How the live demo is deployed (Vercel + Render + managed Postgres).
+* Environment variables, and how to seed a remote database safely.
 
 ---
 
