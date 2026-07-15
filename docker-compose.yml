@@ -1,4 +1,5 @@
 version: '3.8'
+name: vedhkrit-yash
 
 x-app-build: &app-build
   context: .
@@ -18,13 +19,13 @@ x-app-volumes: &app-volumes
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: vedhkrit-db
+    container_name: vedhkrit-db-yash
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: vedhkrit
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: always
@@ -37,13 +38,13 @@ services:
   api:
     build: *app-build
     image: vedhkrit-app:dev
-    container_name: vedhkrit-api
+    container_name: vedhkrit-api-yash
     command: npm run dev --workspace=@vedhkrit/platform
     env_file:
       - apps/platform/.env
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/vedhkrit?schema=public
-      WEB_ORIGIN: http://localhost:8080
+      WEB_ORIGIN: http://localhost:8081
       CHOKIDAR_USEPOLLING: "true"
       TSC_WATCHFILE: PriorityPollingInterval
       TSC_WATCHDIRECTORY: DynamicPriorityPolling
@@ -51,7 +52,7 @@ services:
       # leave it off so the real OTP flow stays exercised.
       DEMO_MODE: "${DEMO_MODE:-false}"
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes: *app-volumes
     depends_on:
       postgres:
@@ -61,10 +62,13 @@ services:
   web:
     build: *app-build
     image: vedhkrit-app:dev
-    container_name: vedhkrit-web
+    container_name: vedhkrit-web-yash
     command: npm run dev --workspace=@vedhkrit/web
+    environment:
+      VITE_API_URL: http://localhost:5001
+      CHOKIDAR_USEPOLLING: "true"
     ports:
-      - "8080:8080"
+      - "8081:8080"
     volumes: *app-volumes
     depends_on:
       - api
