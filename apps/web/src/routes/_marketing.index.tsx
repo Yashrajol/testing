@@ -541,7 +541,7 @@ function HomePage() {
       </section>
 
       {/* Vector Illustrations background applied below Hero Section */}
-      <div className="relative overflow-x-hidden">
+      <div className="relative overflow-x-hidden home-sections-scaled">
         <TechBackgroundDecorator />
 
         {/* 2. THE VEDHKRIT JOURNEY */}

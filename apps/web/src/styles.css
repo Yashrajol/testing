@@ -292,3 +292,10 @@ html.lenis body {
     --spacing-16: 2.8rem;
   }
 }
+
+/* Scale down homepage sections below hero by 5% on desktop viewports */
+@media (min-width: 1024px) {
+  .home-sections-scaled {
+    zoom: 0.95;
+  }
+}
