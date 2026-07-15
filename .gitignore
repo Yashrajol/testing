@@ -5,3 +5,7 @@ node_modules
 apps/web/.output
 apps/web/.wrangler
 .vercel/
+dist/
+.turbo/
+*.tsbuildinfo
+*.log
