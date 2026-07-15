@@ -1,37 +1,48 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GlassCard } from "@/components/glass-card";
-import { 
-  Check, 
-  Lock, 
-  Sparkles, 
-  ArrowRight, 
-  Calendar, 
-  ListTodo, 
-  Award, 
-  CheckSquare, 
-  Square, 
-  BookOpen, 
-  Clock, 
-  Users, 
-  Flame, 
-  Book, 
-  Compass, 
-  FileText, 
-  Download, 
-  HelpCircle, 
-  Video, 
-  AlertCircle, 
-  Play, 
-  GraduationCap, 
-  Activity, 
+import {
+  Check,
+  Lock,
+  Sparkles,
+  ArrowRight,
+  Calendar,
+  ListTodo,
+  Award,
+  CheckSquare,
+  Square,
+  BookOpen,
+  Clock,
+  Users,
+  Flame,
+  Book,
+  Compass,
+  FileText,
+  Download,
+  HelpCircle,
+  Video,
+  AlertCircle,
+  Play,
+  GraduationCap,
+  Activity,
   UserCheck,
-  ChevronRight 
+  ChevronRight,
+  ClipboardCheck
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
 import { useStudentOverview } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useAssessmentStatus } from "@/lib/assessment-status";
+import { studentAvatar } from "@/lib/avatars";
+import { SelfAssessmentModal } from "@/components/self-assessment";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/dashboard/student/")({
   component: StudentDashboardOverview,
@@ -51,6 +62,16 @@ function StudentDashboardOverview() {
   ]);
   const [pomoTime, setPomoTime] = useState(1500); // 25 mins
   const [pomoRunning, setPomoRunning] = useState(false);
+  const { done: assessmentDone, markDone } = useAssessmentStatus();
+  const [showAssessmentPrompt, setShowAssessmentPrompt] = useState(false);
+  const [showSelfAssessment, setShowSelfAssessment] = useState(false);
+
+  useEffect(() => {
+    if (!assessmentDone) {
+      const t = setTimeout(() => setShowAssessmentPrompt(true), 600);
+      return () => clearTimeout(t);
+    }
+  }, [assessmentDone]);
 
   useEffect(() => {
     let interval: any = null;
@@ -129,10 +150,10 @@ function StudentDashboardOverview() {
   };
 
   return (
-    <motion.div 
-      variants={containerVariants} 
-      initial="hidden" 
-      animate="show" 
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
       className="space-y-6 text-left"
     >
       {/* Top Section: Hero Banner & Vedhkrit Index */}
@@ -144,11 +165,11 @@ function StudentDashboardOverview() {
               <h2 className="font-display text-3xl font-extrabold text-text-heading flex items-center gap-2">
                 Good Morning, {userName.split(' ')[0]}! 👋
               </h2>
-              <p className="text-xs text-text-muted">Let's make today another step towards excellence.</p>
+              <p className="text-xs text-text-muted">Let's make today another great day of learning. You've got this! 💪</p>
             </div>
-            
-            {/* Student metadata tags */}
-            <div className="z-10 grid grid-cols-2 sm:grid-cols-3 gap-y-3 gap-x-4 pt-6 border-t border-slate-100/60 mt-4 text-[11px] font-medium text-text-muted">
+
+            {/* Student metadata tags — kept to the left so they never overlap the portrait */}
+            <div className="z-10 grid grid-cols-2 gap-y-3 gap-x-4 pt-6 border-t border-slate-100/60 mt-4 text-[11px] font-medium text-text-muted max-w-[62%]">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-blue-50 text-brand-blue"><BookOpen className="h-3.5 w-3.5" /></div>
                 <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">School</span>Delhi Public School</div>
@@ -172,54 +193,123 @@ function StudentDashboardOverview() {
             </div>
 
             {/* Student Portrait Image */}
-            <div className="absolute right-6 bottom-0 top-6 w-1/3 flex items-end justify-end pointer-events-none z-0">
-              <img 
-                src="https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=220&auto=format&fit=crop" 
-                className="h-full object-cover object-top opacity-90 mix-blend-multiply select-none pointer-events-none rounded-2xl" 
-                alt="" 
+            <div className="absolute right-6 bottom-0 top-8 w-[28%] flex items-end justify-end pointer-events-none z-0">
+              <img
+                src={studentAvatar(0, 400)}
+                className="h-[85%] object-cover object-top opacity-90 mix-blend-multiply select-none pointer-events-none rounded-2xl"
+                alt=""
               />
             </div>
           </div>
         </motion.div>
 
-        {/* Vedhkrit Index Card */}
+        {/* Vedhkrit Index Card — or the self-assessment highlight for accounts that haven't taken it yet */}
         <motion.div variants={itemVariants} className="lg:col-span-1">
-          <GlassCard className="p-6 border border-slate-100 bg-white h-full flex flex-col justify-between">
-            <div className="flex justify-between items-start">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Vedhkrit Index™</span>
-                <h3 className="font-display text-4xl font-black text-brand-orange mt-1.5 flex items-baseline gap-1">
-                  82<span className="text-sm font-semibold text-text-muted">/100</span>
-                </h3>
-                <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-md mt-1 inline-block">
-                  Great Progress
-                </span>
+          {assessmentDone ? (
+            <GlassCard className="p-6 border border-slate-100 bg-white h-full flex flex-col justify-between">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Vedhkrit Index™</span>
+                  <h3 className="font-display text-4xl font-black text-brand-orange mt-1.5 flex items-baseline gap-1">
+                    82<span className="text-sm font-semibold text-text-muted">/100</span>
+                  </h3>
+                  <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-md mt-1 inline-block">
+                    Great Progress
+                  </span>
+                </div>
+                {/* Mini Sparkline Chart */}
+                <div className="w-20 h-12 pt-2">
+                  <svg className="w-full h-full" viewBox="0 0 100 40">
+                    <path
+                      d="M0,35 Q15,20 30,28 T60,12 T90,5 L100,5"
+                      fill="none"
+                      stroke="var(--brand-orange)"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                    />
+                    <circle cx="90" cy="5" r="3" fill="var(--brand-orange)" />
+                  </svg>
+                </div>
               </div>
-              {/* Mini Sparkline Chart */}
-              <div className="w-20 h-12 pt-2">
-                <svg className="w-full h-full" viewBox="0 0 100 40">
-                  <path
-                    d="M0,35 Q15,20 30,28 T60,12 T90,5 L100,5"
-                    fill="none"
-                    stroke="var(--brand-orange)"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  />
-                  <circle cx="90" cy="5" r="3" fill="var(--brand-orange)" />
-                </svg>
-              </div>
-            </div>
 
-            <Link 
-              to="/dashboard/student/skills"
-              className="mt-6 w-full rounded-2xl bg-brand-blue text-white hover:bg-brand-navy py-3 text-center text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm"
+              <Link
+                to="/dashboard/student/skills"
+                className="mt-6 w-full rounded-2xl bg-brand-blue text-white hover:bg-brand-navy py-3 text-center text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                View Full Report
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </GlassCard>
+          ) : (
+            <motion.div
+              animate={{ boxShadow: ["0 0 0 0 rgba(249,115,22,0.35)", "0 0 0 10px rgba(249,115,22,0)", "0 0 0 0 rgba(249,115,22,0)"] }}
+              transition={{ duration: 2.2, repeat: Infinity }}
+              className="h-full rounded-2xl"
             >
-              View Full Report
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </GlassCard>
+              <GlassCard className="p-6 border-2 border-brand-orange/40 bg-gradient-to-br from-orange-50/60 to-white h-full flex flex-col justify-between">
+                <div>
+                  <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-brand-orange bg-white border border-brand-orange/20 px-2 py-1 rounded-full">
+                    <Sparkles className="h-3 w-3" /> Unlock Your Dashboard
+                  </span>
+                  <h3 className="font-display text-lg font-black text-text-heading mt-3 leading-snug">
+                    Take Your Self-Assessment First
+                  </h3>
+                  <p className="text-[11px] text-text-muted mt-1.5 leading-relaxed">
+                    Finish your self-assessment to see your Index score and open up everything on your dashboard.
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setShowSelfAssessment(true)}
+                  className="mt-6 w-full rounded-2xl bg-brand-orange text-white hover:bg-orange-600 py-3 text-center text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
+                >
+                  Start Self-Assessment
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </GlassCard>
+            </motion.div>
+          )}
         </motion.div>
       </div>
+
+      {/* Unlock popup — shown once per session for accounts that haven't completed their self-assessment yet */}
+      <Dialog open={showAssessmentPrompt} onOpenChange={setShowAssessmentPrompt}>
+        <DialogContent className="max-w-md text-left">
+          <DialogHeader>
+            <div className="h-12 w-12 rounded-2xl bg-brand-orange/10 text-brand-orange flex items-center justify-center mb-2">
+              <ClipboardCheck className="h-6 w-6" />
+            </div>
+            <DialogTitle> ✨ Discover. Learn. Grow. </DialogTitle>
+            <DialogDescription>Start your Self-Assessment.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col sm:flex-row gap-2.5 mt-2">
+            <button
+              onClick={() => {
+                setShowAssessmentPrompt(false);
+                setShowSelfAssessment(true);
+              }}
+              className="flex-1 rounded-xl bg-brand-orange text-white hover:bg-orange-600 py-2.5 text-center text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+            >
+              Start Self-Assessment
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => setShowAssessmentPrompt(false)}
+              className="flex-1 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 py-2.5 text-center text-xs font-bold text-text-heading transition-all cursor-pointer"
+            >
+              Maybe Later
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* The real 5-question self-assessment that unlocks the dashboard */}
+      <SelfAssessmentModal
+        open={showSelfAssessment}
+        onOpenChange={setShowSelfAssessment}
+        onComplete={markDone}
+      />
 
       {/* Row 2: Today's Schedule, Continue Learning, and Your Progress / Profile */}
       <div className="grid gap-6 lg:grid-cols-3">
@@ -245,8 +335,8 @@ function StudentDashboardOverview() {
                     <div className="flex flex-col items-center shrink-0">
                       <div className={cn(
                         "h-3 w-3 rounded-full border-2 bg-white z-10",
-                        item.live ? "border-brand-orange bg-brand-orange animate-ping" : 
-                        item.deadline ? "border-red-500" : "border-brand-blue"
+                        item.live ? "border-brand-orange bg-brand-orange animate-ping" :
+                          item.deadline ? "border-red-500" : "border-brand-blue"
                       )} />
                       {idx < 3 && <div className="w-[1.5px] bg-slate-100 flex-grow h-14" />}
                     </div>
@@ -350,7 +440,7 @@ function StudentDashboardOverview() {
               <h3 className="font-display text-xs font-bold text-text-heading">Profile Completion</h3>
               <span className="text-xs font-bold text-brand-blue">85% Complete</span>
             </div>
-            
+
             <div className="space-y-2 text-[10px] font-semibold text-text-body">
               {[
                 { label: "Basic Information", met: true },
@@ -386,7 +476,7 @@ function StudentDashboardOverview() {
                 <CheckSquare className="h-4.5 w-4.5 text-brand-blue" />
                 Daily Planner Workspace
               </h3>
-              
+
               {/* Daily Streak flame badge */}
               <div className="flex items-center gap-1.5 px-3 py-1 bg-orange-50 border border-brand-orange/20 rounded-xl text-brand-orange text-xs font-bold animate-pulse">
                 <Flame className="h-4 w-4 fill-brand-orange" />
@@ -398,7 +488,7 @@ function StudentDashboardOverview() {
               {/* Timetable schedule */}
               <div className="space-y-4">
                 <h4 className="font-display text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Timetable</h4>
-                
+
                 <div className="space-y-3">
                   {[
                     { time: "09:00 AM - 10:00 AM", title: "Mathematics", desc: "Linear Equations word sums", live: true },
@@ -424,7 +514,7 @@ function StudentDashboardOverview() {
               {/* Checklists */}
               <div className="space-y-4">
                 <h4 className="font-display text-xs font-bold text-slate-400 uppercase tracking-wider">Homework Checklist</h4>
-                
+
                 <div className="space-y-2.5">
                   {homeworkCheck.map((item) => (
                     <button
@@ -449,7 +539,7 @@ function StudentDashboardOverview() {
                 </div>
 
                 <h4 className="font-display text-xs font-bold text-slate-400 uppercase tracking-wider pt-2">Revision Goals</h4>
-                
+
                 <div className="space-y-2.5">
                   {revisionGoals.map((item) => (
                     <button
@@ -484,19 +574,19 @@ function StudentDashboardOverview() {
             <h3 className="font-display text-xs font-bold text-slate-450 uppercase tracking-wider flex items-center justify-center gap-1.5">
               <Clock className="h-4.5 w-4.5 text-brand-blue animate-pulse" /> Focus Pomodoro Timer
             </h3>
-            
+
             <div className="text-3xl font-mono font-black text-text-heading py-2 tracking-widest">
               {Math.floor(pomoTime / 60).toString().padStart(2, '0')}:{(pomoTime % 60).toString().padStart(2, '0')}
             </div>
 
             <div className="flex justify-center gap-2.5">
-              <button 
+              <button
                 onClick={() => setPomoRunning(!pomoRunning)}
                 className="py-1.5 px-4 bg-brand-blue text-white font-bold rounded-lg text-xs hover:bg-brand-navy cursor-pointer transition-colors shadow-xs"
               >
                 {pomoRunning ? "Pause" : "Play"}
               </button>
-              <button 
+              <button
                 onClick={() => { setPomoTime(1500); setPomoRunning(false); }}
                 className="py-1.5 px-4 bg-slate-50 border border-slate-100 hover:bg-slate-100 text-text-heading font-bold rounded-lg text-xs cursor-pointer transition-colors"
               >
@@ -522,7 +612,7 @@ function StudentDashboardOverview() {
               <Users className="h-4.5 w-4.5" />
               <span className="text-[10px] uppercase tracking-wider font-black block">Mentor Task of the Day</span>
             </div>
-            
+
             <div className="bg-white border border-brand-orange/10 rounded-2xl p-4 text-xs shadow-2xs relative">
               <div className="absolute top-4 left-0 w-1 h-8 bg-brand-orange rounded-r-md"></div>
               <p className="text-text-body pl-2.5 leading-relaxed font-semibold italic">
