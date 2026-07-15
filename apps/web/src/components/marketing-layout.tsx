@@ -112,7 +112,7 @@ export function MarketingLayout() {
   };
 
   const navLinkClass = (toPath: string) => cn(
-    "rounded px-2.5 py-1.5 text-xs font-bold transition-all duration-200",
+    "rounded px-2 py-1.5 text-[11px] font-bold transition-all duration-200 whitespace-nowrap",
     isTransparentHeader
       ? (pathname === toPath
           ? "text-brand-navy bg-slate-200/50"
@@ -123,14 +123,14 @@ export function MarketingLayout() {
   );
 
   const getDropdownBtnClass = () => cn(
-    "flex items-center gap-1 rounded px-2.5 py-1.5 text-xs font-bold transition-all duration-200",
+    "flex items-center gap-1 rounded px-2 py-1.5 text-[11px] font-bold transition-all duration-200 whitespace-nowrap",
     isTransparentHeader
       ? "text-slate-800 hover:text-brand-blue hover:bg-slate-100/50"
       : "text-text-body hover:text-brand-blue hover:bg-bg-secondary"
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary text-text-body font-sans">
+    <div className="min-h-screen flex flex-col bg-bg-primary text-text-body font-sans overflow-x-hidden">
       {/* 1. HEADER (Frosted Liquid Glassmorphism) */}
       <header className={cn(
         "fixed top-0 left-0 right-0 z-40 transition-all duration-300",
@@ -138,7 +138,7 @@ export function MarketingLayout() {
           ? "bg-transparent border-b border-transparent shadow-none text-text-body lg:text-white"
           : "bg-white/70 border-b border-border-default/30 backdrop-blur-lg backdrop-saturate-150 shadow-sm text-text-body"
       )}>
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 relative">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-2 xl:gap-3 px-4 sm:px-6 lg:px-8 relative">
           {/* Left Slot Group: Hamburger menu + Logo Bookmark */}
           <div className="flex items-center gap-2 sm:gap-3 z-50">
             {/* Mobile menu trigger (Circular style matching reference) */}
@@ -217,7 +217,7 @@ export function MarketingLayout() {
           </nav>
 
           {/* Desktop Right Actions (10% brand accents) */}
-          <div className="hidden items-center gap-2 xl:flex">
+          <div className="hidden items-center gap-2 xl:flex shrink-0">
             <Link
               to="/login"
               className={cn(
@@ -359,7 +359,7 @@ export function MarketingLayout() {
 
             {/* Ecosystem Column */}
             <div className="lg:col-span-2 text-left">
-              <h5 className="font-bold text-slate-800 mb-2.5">Ecosystem Portals</h5>
+              <h5 className="font-bold text-slate-800 mb-2.5">Ecosystem (Demo)</h5>
               <ul className="space-y-1.5 text-slate-500">
                 <li><Link to="/dashboard/student" className="hover:text-brand-blue transition-colors">Student Portal</Link></li>
                 <li><Link to="/dashboard/parent" className="hover:text-brand-blue transition-colors">Parent Portal</Link></li>

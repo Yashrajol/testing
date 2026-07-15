@@ -541,7 +541,7 @@ function HomePage() {
       </section>
 
       {/* Vector Illustrations background applied below Hero Section */}
-      <div className="relative">
+      <div className="relative overflow-x-hidden">
         <TechBackgroundDecorator />
 
         {/* 2. THE VEDHKRIT JOURNEY */}
@@ -558,7 +558,7 @@ function HomePage() {
               {/* Desktop background connecting line */}
               <div className="absolute top-[44px] left-[6%] right-[6%] h-1 bg-gradient-to-r from-blue-500 via-indigo-500 via-purple-500 via-orange-500 via-teal-500 via-blue-600 to-teal-600 z-0 rounded-full opacity-50 shadow-[0_0_8px_rgba(59,130,246,0.2)]" />
               
-              <div className="relative z-10 grid grid-cols-7 gap-3 lg:gap-4">
+              <div className="relative z-10 grid grid-cols-4 lg:grid-cols-7 gap-3 lg:gap-4">
                 {journey.map((step, i) => (
                   <div
                     key={step.label}
@@ -824,7 +824,7 @@ function HomePage() {
                   </linearGradient>
                 </defs>
               </svg>
-              <div className="p-5 sm:p-6 relative z-10">
+              <div className="p-5 sm:p-6 relative z-10 flex flex-col">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="h-8 w-8 rounded-xl bg-brand-teal/20 border border-brand-teal/30 flex items-center justify-center">
                     <BarChart3 className="h-4 w-4 text-brand-teal" />
@@ -881,6 +881,10 @@ function HomePage() {
                     ))}
                   </div>
                 </div>
+                {/* CTA */}
+                <Link to="/register" className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-teal hover:bg-teal-600 px-4 py-2.5 rounded-xl transition-all shadow-sm hover:-translate-y-0.5 active:scale-95 w-fit">
+                  Take Free Assessment <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
               </div>
             </div>
           </div>
@@ -957,7 +961,7 @@ function HomePage() {
                   Explore All Paths <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
-              <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-11 gap-2.5">
+              <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-11 gap-2">
                 {paths.map((p) => (
                   <div
                     key={p.label}
@@ -990,7 +994,7 @@ function HomePage() {
         <FadeIn>
         <section id="parents" className="scroll-mt-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 z-10 relative">
           <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-            <div className="grid lg:grid-cols-12 bg-gradient-to-br from-[#031530] via-[#051c42] to-[#04122d] relative items-stretch">
+            <div className="grid lg:grid-cols-12 bg-gradient-to-br from-[#031530] via-[#051c42] to-[#04122d] relative items-stretch overflow-hidden">
               <div className="absolute -top-24 -left-24 w-64 h-64 bg-brand-teal/10 rounded-full blur-[80px] pointer-events-none" />
               <div className="absolute -bottom-24 right-0 w-72 h-72 bg-brand-blue/10 rounded-full blur-[80px] pointer-events-none" />
 
@@ -1029,7 +1033,7 @@ function HomePage() {
                 <motion.div
                   animate={{ y: [-8, 8, -8] }}
                   transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-[240px] h-[460px] rounded-[2.5rem] bg-slate-950 border-[10px] border-slate-900 shadow-2xl relative overflow-hidden shrink-0 flex flex-col"
+                  className="w-[220px] h-[420px] rounded-[2.5rem] bg-slate-950 border-[10px] border-slate-900 shadow-2xl relative overflow-hidden shrink-0 flex flex-col"
                 >
                   {/* Dynamic Island / Notch */}
                   <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-24 h-4 bg-black rounded-full z-30 flex items-center justify-between px-2.5">
@@ -1168,12 +1172,12 @@ function HomePage() {
         <section className="py-12 bg-gradient-to-br from-[#031530] via-[#052261] to-[#04122d] text-white relative overflow-hidden z-10 border-t border-white/10">
           
           {/* Background image covering full screen on mobile, right 2/3rds on desktop */}
-          <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 z-0 overflow-hidden">
             <img
               src="/assets/images/final-cta-v2.png"
               alt="Student Success CTA Backdrop"
-              className="absolute right-0 top-0 bottom-0 h-full w-full lg:w-2/3 object-cover object-right-top lg:object-top opacity-90 lg:opacity-100"
-              loading="lazy"
+              className="absolute right-0 top-0 bottom-0 h-full w-full lg:w-2/3 object-cover object-right-top lg:object-top opacity-90 lg:opacity-100 max-w-none"
+              loading="eager"
             />
           </div>
           
