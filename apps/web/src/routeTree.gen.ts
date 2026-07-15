@@ -45,7 +45,10 @@ import { Route as DashboardSuperActivityRouteImport } from './routes/dashboard.s
 import { Route as DashboardStudentSkillsRouteImport } from './routes/dashboard.student.skills'
 import { Route as DashboardStudentSessionsRouteImport } from './routes/dashboard.student.sessions'
 import { Route as DashboardStudentReportsRouteImport } from './routes/dashboard.student.reports'
+import { Route as DashboardStudentProfileRouteImport } from './routes/dashboard.student.profile'
 import { Route as DashboardStudentPortfolioRouteImport } from './routes/dashboard.student.portfolio'
+import { Route as DashboardStudentPlannerRouteImport } from './routes/dashboard.student.planner'
+import { Route as DashboardStudentMentorRouteImport } from './routes/dashboard.student.mentor'
 import { Route as DashboardStudentGoalsRouteImport } from './routes/dashboard.student.goals'
 import { Route as DashboardStudentCareerRouteImport } from './routes/dashboard.student.career'
 import { Route as DashboardStudentAssessmentsRouteImport } from './routes/dashboard.student.assessments'
@@ -252,12 +255,27 @@ const DashboardStudentReportsRoute = DashboardStudentReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => DashboardStudentRoute,
 } as any)
+const DashboardStudentProfileRoute = DashboardStudentProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => DashboardStudentRoute,
+} as any)
 const DashboardStudentPortfolioRoute =
   DashboardStudentPortfolioRouteImport.update({
     id: '/portfolio',
     path: '/portfolio',
     getParentRoute: () => DashboardStudentRoute,
   } as any)
+const DashboardStudentPlannerRoute = DashboardStudentPlannerRouteImport.update({
+  id: '/planner',
+  path: '/planner',
+  getParentRoute: () => DashboardStudentRoute,
+} as any)
+const DashboardStudentMentorRoute = DashboardStudentMentorRouteImport.update({
+  id: '/mentor',
+  path: '/mentor',
+  getParentRoute: () => DashboardStudentRoute,
+} as any)
 const DashboardStudentGoalsRoute = DashboardStudentGoalsRouteImport.update({
   id: '/goals',
   path: '/goals',
@@ -430,7 +448,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/student/assessments': typeof DashboardStudentAssessmentsRoute
   '/dashboard/student/career': typeof DashboardStudentCareerRoute
   '/dashboard/student/goals': typeof DashboardStudentGoalsRoute
+  '/dashboard/student/mentor': typeof DashboardStudentMentorRoute
+  '/dashboard/student/planner': typeof DashboardStudentPlannerRoute
   '/dashboard/student/portfolio': typeof DashboardStudentPortfolioRoute
+  '/dashboard/student/profile': typeof DashboardStudentProfileRoute
   '/dashboard/student/reports': typeof DashboardStudentReportsRoute
   '/dashboard/student/sessions': typeof DashboardStudentSessionsRoute
   '/dashboard/student/skills': typeof DashboardStudentSkillsRoute
@@ -487,7 +508,10 @@ export interface FileRoutesByTo {
   '/dashboard/student/assessments': typeof DashboardStudentAssessmentsRoute
   '/dashboard/student/career': typeof DashboardStudentCareerRoute
   '/dashboard/student/goals': typeof DashboardStudentGoalsRoute
+  '/dashboard/student/mentor': typeof DashboardStudentMentorRoute
+  '/dashboard/student/planner': typeof DashboardStudentPlannerRoute
   '/dashboard/student/portfolio': typeof DashboardStudentPortfolioRoute
+  '/dashboard/student/profile': typeof DashboardStudentProfileRoute
   '/dashboard/student/reports': typeof DashboardStudentReportsRoute
   '/dashboard/student/sessions': typeof DashboardStudentSessionsRoute
   '/dashboard/student/skills': typeof DashboardStudentSkillsRoute
@@ -551,7 +575,10 @@ export interface FileRoutesById {
   '/dashboard/student/assessments': typeof DashboardStudentAssessmentsRoute
   '/dashboard/student/career': typeof DashboardStudentCareerRoute
   '/dashboard/student/goals': typeof DashboardStudentGoalsRoute
+  '/dashboard/student/mentor': typeof DashboardStudentMentorRoute
+  '/dashboard/student/planner': typeof DashboardStudentPlannerRoute
   '/dashboard/student/portfolio': typeof DashboardStudentPortfolioRoute
+  '/dashboard/student/profile': typeof DashboardStudentProfileRoute
   '/dashboard/student/reports': typeof DashboardStudentReportsRoute
   '/dashboard/student/sessions': typeof DashboardStudentSessionsRoute
   '/dashboard/student/skills': typeof DashboardStudentSkillsRoute
@@ -615,7 +642,10 @@ export interface FileRouteTypes {
     | '/dashboard/student/assessments'
     | '/dashboard/student/career'
     | '/dashboard/student/goals'
+    | '/dashboard/student/mentor'
+    | '/dashboard/student/planner'
     | '/dashboard/student/portfolio'
+    | '/dashboard/student/profile'
     | '/dashboard/student/reports'
     | '/dashboard/student/sessions'
     | '/dashboard/student/skills'
@@ -672,7 +702,10 @@ export interface FileRouteTypes {
     | '/dashboard/student/assessments'
     | '/dashboard/student/career'
     | '/dashboard/student/goals'
+    | '/dashboard/student/mentor'
+    | '/dashboard/student/planner'
     | '/dashboard/student/portfolio'
+    | '/dashboard/student/profile'
     | '/dashboard/student/reports'
     | '/dashboard/student/sessions'
     | '/dashboard/student/skills'
@@ -735,7 +768,10 @@ export interface FileRouteTypes {
     | '/dashboard/student/assessments'
     | '/dashboard/student/career'
     | '/dashboard/student/goals'
+    | '/dashboard/student/mentor'
+    | '/dashboard/student/planner'
     | '/dashboard/student/portfolio'
+    | '/dashboard/student/profile'
     | '/dashboard/student/reports'
     | '/dashboard/student/sessions'
     | '/dashboard/student/skills'
@@ -1021,11 +1057,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardStudentReportsRouteImport
       parentRoute: typeof DashboardStudentRoute
     }
+    '/dashboard/student/profile': {
+      id: '/dashboard/student/profile'
+      path: '/profile'
+      fullPath: '/dashboard/student/profile'
+      preLoaderRoute: typeof DashboardStudentProfileRouteImport
+      parentRoute: typeof DashboardStudentRoute
+    }
     '/dashboard/student/portfolio': {
       id: '/dashboard/student/portfolio'
       path: '/portfolio'
       fullPath: '/dashboard/student/portfolio'
       preLoaderRoute: typeof DashboardStudentPortfolioRouteImport
+      parentRoute: typeof DashboardStudentRoute
+    }
+    '/dashboard/student/planner': {
+      id: '/dashboard/student/planner'
+      path: '/planner'
+      fullPath: '/dashboard/student/planner'
+      preLoaderRoute: typeof DashboardStudentPlannerRouteImport
+      parentRoute: typeof DashboardStudentRoute
+    }
+    '/dashboard/student/mentor': {
+      id: '/dashboard/student/mentor'
+      path: '/mentor'
+      fullPath: '/dashboard/student/mentor'
+      preLoaderRoute: typeof DashboardStudentMentorRouteImport
       parentRoute: typeof DashboardStudentRoute
     }
     '/dashboard/student/goals': {
@@ -1309,7 +1366,10 @@ interface DashboardStudentRouteChildren {
   DashboardStudentAssessmentsRoute: typeof DashboardStudentAssessmentsRoute
   DashboardStudentCareerRoute: typeof DashboardStudentCareerRoute
   DashboardStudentGoalsRoute: typeof DashboardStudentGoalsRoute
+  DashboardStudentMentorRoute: typeof DashboardStudentMentorRoute
+  DashboardStudentPlannerRoute: typeof DashboardStudentPlannerRoute
   DashboardStudentPortfolioRoute: typeof DashboardStudentPortfolioRoute
+  DashboardStudentProfileRoute: typeof DashboardStudentProfileRoute
   DashboardStudentReportsRoute: typeof DashboardStudentReportsRoute
   DashboardStudentSessionsRoute: typeof DashboardStudentSessionsRoute
   DashboardStudentSkillsRoute: typeof DashboardStudentSkillsRoute
@@ -1322,7 +1382,10 @@ const DashboardStudentRouteChildren: DashboardStudentRouteChildren = {
   DashboardStudentAssessmentsRoute: DashboardStudentAssessmentsRoute,
   DashboardStudentCareerRoute: DashboardStudentCareerRoute,
   DashboardStudentGoalsRoute: DashboardStudentGoalsRoute,
+  DashboardStudentMentorRoute: DashboardStudentMentorRoute,
+  DashboardStudentPlannerRoute: DashboardStudentPlannerRoute,
   DashboardStudentPortfolioRoute: DashboardStudentPortfolioRoute,
+  DashboardStudentProfileRoute: DashboardStudentProfileRoute,
   DashboardStudentReportsRoute: DashboardStudentReportsRoute,
   DashboardStudentSessionsRoute: DashboardStudentSessionsRoute,
   DashboardStudentSkillsRoute: DashboardStudentSkillsRoute,

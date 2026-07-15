@@ -1,107 +1,413 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/dashboard-shell";
 import { GlassCard } from "@/components/glass-card";
-import { Calendar, Video, Clock, FileText, UserCheck, ChevronRight } from "lucide-react";
+import { 
+  Video, 
+  Clock, 
+  Download, 
+  HelpCircle, 
+  Calendar, 
+  Search, 
+  ArrowRight, 
+  Play, 
+  CheckCircle2, 
+  Filter, 
+  Users, 
+  FileText, 
+  Award, 
+  ChevronRight, 
+  ListTodo, 
+  AlertCircle 
+} from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/dashboard/student/sessions")({
-  component: SessionsPage,
+  component: LiveClassesPage,
+  head: () => ({ meta: [{ title: "Live Classes — Vedhkrit" }] }),
 });
 
-const upcoming = [
-  { mentor: "Dr. Emily Chen", role: "Career Coach", date: "Tomorrow, 2:00 PM", topic: "Resume Review", type: "Video Call", img: "https://i.pravatar.cc/150?u=a042581f4e29026704d" }
+interface LiveClass {
+  id: string;
+  subject: string;
+  teacher: string;
+  topic: string;
+  duration: string;
+  time: string;
+  status: "live" | "upcoming" | "recorded" | "completed";
+  date: string; // ISO date string or simple representation
+}
+
+const initialClassesData: LiveClass[] = [
+  { id: "class-1", subject: "Mathematics", teacher: "Neha Ma'am", topic: "Linear Equations - Word Problems", duration: "60 mins", time: "09:00 AM", status: "live", date: "Today" },
+  { id: "class-2", subject: "Science", teacher: "Rohit Sir", topic: "Chemical Reactions & Equations", duration: "60 mins", time: "11:00 AM", status: "upcoming", date: "Today" },
+  { id: "class-3", subject: "English", teacher: "Priya Ma'am", topic: "Active and Passive Voice Rules", duration: "45 mins", time: "02:00 PM", status: "upcoming", date: "Today" },
+  { id: "class-4", subject: "Science", teacher: "Rohit Sir", topic: "Chapter 8: Basics of Motion", duration: "60 mins", time: "11:00 AM", status: "recorded", date: "Yesterday" },
+  { id: "class-5", subject: "Mathematics", teacher: "Neha Ma'am", topic: "Angles and Intersecting Lines", duration: "60 mins", time: "09:00 AM", status: "recorded", date: "Yesterday" },
+  { id: "class-6", subject: "Social Science", teacher: "Ankit Sir", topic: "Resources and Development", duration: "60 mins", time: "04:00 PM", status: "completed", date: "2 Days Ago" }
 ];
 
-const past = [
-  { mentor: "James Wilson", role: "Tech Lead", date: "Oct 15, 2026", topic: "System Design Prep", notes: "Reviewed basic architecture patterns. Need to practice load balancing concepts." },
-  { mentor: "Dr. Emily Chen", role: "Career Coach", date: "Sep 28, 2026", topic: "Mock Interview", notes: "Strong communication skills. Suggested using STAR method for behavioral questions." }
+const weeklyTimetable = [
+  { day: "Mon", slots: ["Math (09:00 AM)", "Science (11:00 AM)", "English (02:00 PM)"] },
+  { day: "Tue", slots: ["Math (09:00 AM)", "Science (11:00 AM)", "Social Sci (04:00 PM)"] },
+  { day: "Wed", slots: ["Math (09:00 AM)", "Science (11:00 AM)", "Hindi (03:00 PM)"] },
+  { day: "Thu", slots: ["Math (09:00 AM)", "Science (11:00 AM)", "Computer (10:00 AM)"] },
+  { day: "Fri", slots: ["Math (09:00 AM)", "Science (11:00 AM)", "English (02:00 PM)"] },
+  { day: "Sat", slots: ["Weekly Quiz (10:00 AM)", "Mentor Meet (05:00 PM)", "Self Study"] }
 ];
 
-function SessionsPage() {
-  return (
-    <>
-      <PageHeader title="Mentor Sessions" subtitle="Manage your one-on-one expert advice and structured sessions." />
+function LiveClassesPage() {
+  const [classes] = useState(initialClassesData);
+  const [activeTab, setActiveTab] = useState<"live" | "upcoming" | "recorded" | "completed">("live");
+  
+  // Filter States
+  const [subjectFilter, setSubjectFilter] = useState("All");
+  const [teacherFilter, setTeacherFilter] = useState("All");
+  const [dateFilter, setDateFilter] = useState("All");
+
+  // Countdown timer state
+  const [countdown, setCountdown] = useState({ mins: 14, secs: 52 });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev.secs > 0) {
+          return { ...prev, secs: prev.secs - 1 };
+        } else if (prev.mins > 0) {
+          return { mins: prev.mins - 1, secs: 59 };
+        } else {
+          clearInterval(timer);
+          return { mins: 0, secs: 0 };
+        }
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleDownloadNotes = (subject: string) => {
+    toast.success(`Notes downloaded successfully!`, {
+      description: `Complete PDF notes for ${subject} are now saved locally.`,
+      icon: <Download className="h-5 w-5 text-brand-blue" />
+    });
+  };
+
+  const handleAskDoubts = (topic: string) => {
+    toast.info(`Deep-linking to VedhAI Assistant...`, {
+      description: `Opening tutor window for topic: ${topic}.`
+    });
+  };
+
+  const filteredClasses = classes.filter(cls => {
+    const matchesTab = activeTab === "live" 
+      ? cls.status === "live" 
+      : activeTab === "upcoming" 
+      ? cls.status === "upcoming" 
+      : activeTab === "recorded" 
+      ? cls.status === "recorded" 
+      : cls.status === "completed";
       
-      <div className="grid gap-6 lg:grid-cols-12 mt-6">
-        {/* Upcoming Sessions */}
-        <div className="lg:col-span-5 space-y-6">
-          <GlassCard className="p-6 border-brand-blue/20 bg-linear-to-b from-brand-blue/5 to-bg-primary">
-            <h3 className="text-lg font-bold text-text-heading flex items-center gap-2 mb-6">
-              <Calendar className="h-5 w-5 text-brand-blue" />
-              Upcoming Sessions
-            </h3>
-            
-            {upcoming.map((session, i) => (
-              <div key={i} className="bg-white rounded-xl p-5 border border-border-default shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-brand-blue"></div>
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-bold text-brand-blue bg-brand-blue/10 px-2 py-1 rounded-md flex items-center gap-1">
-                    <Video className="h-3 w-3" /> {session.type}
-                  </span>
-                  <span className="text-xs font-semibold text-text-muted flex items-center gap-1">
-                    <Clock className="h-3 w-3" /> {session.date}
-                  </span>
-                </div>
-                
-                <div className="flex items-center gap-4 mb-4">
-                  <img src={session.img} alt={session.mentor} className="w-12 h-12 rounded-full object-cover border-2 border-brand-blue/20" />
-                  <div>
-                    <h4 className="font-bold text-text-heading text-lg">{session.mentor}</h4>
-                    <p className="text-xs text-text-muted">{session.role}</p>
-                  </div>
-                </div>
-                
-                <div className="bg-bg-secondary/50 rounded-lg p-3 mb-4">
-                  <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Topic</p>
-                  <p className="text-sm font-medium text-text-body">{session.topic}</p>
-                </div>
-                
-                <button className="w-full py-2.5 bg-brand-blue text-white font-bold rounded-lg text-sm shadow-md shadow-brand-blue/20 hover:bg-brand-navy transition-colors flex items-center justify-center gap-2">
-                  <Video className="h-4 w-4" /> Join Session Now
-                </button>
+    const matchesSubject = subjectFilter === "All" || cls.subject === subjectFilter;
+    const matchesTeacher = teacherFilter === "All" || cls.teacher === teacherFilter;
+    const matchesDate = dateFilter === "All" || cls.date === dateFilter;
+
+    return matchesTab && matchesSubject && matchesTeacher && matchesDate;
+  });
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.05 } }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 15 },
+    show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
+  };
+
+  const CircularProgress = ({ percent }: { percent: number }) => {
+    const radius = 22;
+    const circumference = radius * 2 * Math.PI;
+    const offset = circumference - (percent / 100) * circumference;
+
+    return (
+      <div className="relative flex items-center justify-center shrink-0 w-12 h-12">
+        <svg width="48" height="48" className="transform -rotate-90">
+          <circle className="text-slate-100" strokeWidth="4" stroke="currentColor" fill="transparent" r={radius} cx="24" cy="24" />
+          <circle className="text-brand-blue" strokeWidth="4" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" stroke="currentColor" fill="transparent" r={radius} cx="24" cy="24" />
+        </svg>
+        <span className="absolute text-[10px] font-black text-text-heading">{percent}%</span>
+      </div>
+    );
+  };
+
+  return (
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="space-y-6 text-left"
+    >
+      <PageHeader title="Live Classes" subtitle="Attend live interactive sessions, watch recordings, and browse study materials." />
+
+      {/* Top Hero Banner */}
+      <motion.div variants={itemVariants}>
+        <div className="rounded-3xl border border-slate-100 bg-linear-to-r from-brand-blue to-brand-navy p-6 text-white relative overflow-hidden flex flex-col md:flex-row justify-between items-center shadow-lg shadow-brand-blue/15 min-h-48">
+          <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-[url('https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=350&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay opacity-20 pointer-events-none z-0" />
+          
+          <div className="z-10 text-left space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-200 bg-white/10 px-3 py-1 rounded-full border border-white/10">
+              Today's Live Sessions
+            </span>
+            <h2 className="font-display text-2xl font-black max-w-lg leading-tight">
+              Mathematics Live Class is currently active with Neha Ma'am.
+            </h2>
+            <div className="flex items-center gap-6 text-xs text-blue-100">
+              <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> Next Class starts in:</span>
+              <div className="flex items-baseline gap-1 font-mono font-black text-lg text-white">
+                <span>{countdown.mins.toString().padStart(2, '0')}</span>
+                <span className="text-[10px] font-bold text-blue-200 font-sans">m</span>
+                <span>:</span>
+                <span>{countdown.secs.toString().padStart(2, '0')}</span>
+                <span className="text-[10px] font-bold text-blue-200 font-sans">s</span>
               </div>
-            ))}
-            
-            <button className="w-full mt-4 py-2.5 border-2 border-border-default text-text-heading font-bold rounded-lg text-sm hover:border-brand-blue hover:text-brand-blue transition-colors flex items-center justify-center gap-2">
-              Book New Session
-            </button>
+            </div>
+          </div>
+
+          <button 
+            onClick={() => toast.success("Redirecting to Virtual Class Engine...")}
+            className="z-10 mt-6 md:mt-0 px-8 py-3.5 bg-white text-brand-blue rounded-2xl font-bold hover:scale-105 transition-transform flex items-center gap-2 shadow-md cursor-pointer text-xs shrink-0 self-start md:self-center"
+          >
+            <Video className="h-4.5 w-4.5" /> Join Live Room
+          </button>
+        </div>
+      </motion.div>
+
+      {/* Row 2: Filtering and Interactive Tabs */}
+      <div className="grid gap-6 lg:grid-cols-4">
+        {/* Sidebar Filters */}
+        <div className="lg:col-span-1 space-y-5">
+          <GlassCard className="p-5 border border-slate-100 bg-white space-y-4">
+            <h3 className="font-display text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-50 pb-2">
+              <Filter className="h-4 w-4" /> Filter Classes
+            </h3>
+
+            {/* Subject Filter */}
+            <div className="space-y-1.5 text-xs">
+              <label className="font-bold text-text-heading">Subject</label>
+              <select 
+                value={subjectFilter}
+                onChange={(e) => setSubjectFilter(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-150 rounded-xl focus:outline-none focus:border-brand-blue font-semibold text-text-body"
+              >
+                <option value="All">All Subjects</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Science">Science</option>
+                <option value="English">English</option>
+                <option value="Social Science">Social Science</option>
+              </select>
+            </div>
+
+            {/* Teacher Filter */}
+            <div className="space-y-1.5 text-xs">
+              <label className="font-bold text-text-heading">Teacher</label>
+              <select
+                value={teacherFilter}
+                onChange={(e) => setTeacherFilter(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-150 rounded-xl focus:outline-none focus:border-brand-blue font-semibold text-text-body"
+              >
+                <option value="All">All Teachers</option>
+                <option value="Neha Ma'am">Neha Ma'am</option>
+                <option value="Rohit Sir">Rohit Sir</option>
+                <option value="Priya Ma'am">Priya Ma'am</option>
+                <option value="Ankit Sir">Ankit Sir</option>
+              </select>
+            </div>
+
+            {/* Date Filter */}
+            <div className="space-y-1.5 text-xs">
+              <label className="font-bold text-text-heading">Date</label>
+              <select
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-150 rounded-xl focus:outline-none focus:border-brand-blue font-semibold text-text-body"
+              >
+                <option value="All">All Days</option>
+                <option value="Today">Today</option>
+                <option value="Yesterday">Yesterday</option>
+                <option value="2 Days Ago">Previous Days</option>
+              </select>
+            </div>
           </GlassCard>
         </div>
 
-        {/* Past Sessions Notes */}
-        <div className="lg:col-span-7">
-          <GlassCard className="p-6 h-full">
-            <h3 className="text-lg font-bold text-text-heading flex items-center gap-2 mb-6">
-              <FileText className="h-5 w-5 text-brand-teal" />
-              Past Session Notes
+        {/* Main Tabs and Classes Grid */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Tabs bar */}
+          <div className="flex items-center gap-1 border-b border-slate-100 pb-1 overflow-x-auto">
+            {["live", "upcoming", "recorded", "completed"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab as any)}
+                className={cn(
+                  "px-4 py-2 text-xs font-bold capitalize transition-colors border-b-2 -mb-[1.5px] whitespace-nowrap cursor-pointer",
+                  activeTab === tab 
+                    ? "border-brand-blue text-brand-blue font-extrabold" 
+                    : "border-transparent text-text-muted hover:text-text-heading"
+                )}
+              >
+                {tab === "live" ? "Today's Classes" : tab}
+              </button>
+            ))}
+          </div>
+
+          {/* Cards Queue */}
+          <div className="space-y-4">
+            {filteredClasses.length > 0 ? (
+              filteredClasses.map((item, idx) => (
+                <div 
+                  key={idx} 
+                  className="p-5 rounded-2xl border border-slate-100 bg-white hover:border-slate-200 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                >
+                  <div className="text-left space-y-1 flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[9px] font-bold text-brand-blue bg-blue-50 px-2 py-0.5 rounded-md">
+                        {item.subject}
+                      </span>
+                      <span className="text-[9px] font-bold text-slate-400">
+                        {item.teacher}
+                      </span>
+                    </div>
+                    
+                    <h4 className="font-bold text-sm text-text-heading leading-tight truncate">{item.topic}</h4>
+                    
+                    <div className="flex items-center gap-3.5 text-[10px] text-text-muted font-semibold pt-1">
+                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {item.duration}</span>
+                      <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {item.time} ({item.date})</span>
+                    </div>
+                  </div>
+
+                  {/* Actions based on Tab */}
+                  <div className="shrink-0 self-start sm:self-center flex flex-wrap gap-2 text-xs font-bold">
+                    {item.status === "live" && (
+                      <button 
+                        onClick={() => toast.success("Joining Live Lecture Room...")}
+                        className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-xs transition-colors flex items-center gap-1 cursor-pointer"
+                      >
+                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-ping shrink-0" />
+                        Join Live Now
+                      </button>
+                    )}
+
+                    {item.status === "upcoming" && (
+                      <span className="text-[10px] font-bold text-brand-orange bg-orange-50 border border-brand-orange/20 px-3 py-2 rounded-xl">
+                        Starts {item.time}
+                      </span>
+                    )}
+
+                    {(item.status === "recorded" || item.status === "completed") && (
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => toast.info(`Playing lecture stream: ${item.topic}`)}
+                          className="h-8.5 px-3.5 bg-brand-blue hover:bg-brand-navy text-white rounded-xl transition-colors shadow-xs cursor-pointer flex items-center gap-1"
+                        >
+                          <Play className="h-3.5 w-3.5 fill-white" /> Watch Recording
+                        </button>
+                        
+                        <button 
+                          onClick={() => handleDownloadNotes(item.subject)}
+                          className="h-8.5 px-3 bg-slate-50 border border-slate-100 hover:bg-slate-100 text-text-heading rounded-xl transition-colors flex items-center gap-1"
+                          title="Download Notes"
+                        >
+                          <Download className="h-3.5 w-3.5" /> Notes
+                        </button>
+
+                        <Link 
+                          to="/dashboard/student/ai"
+                          className="h-8.5 px-3 bg-slate-50 border border-slate-100 hover:bg-slate-100 text-text-heading rounded-xl transition-colors flex items-center justify-center gap-1"
+                        >
+                          <HelpCircle className="h-3.5 w-3.5" /> Doubts
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="py-12 text-center text-xs font-semibold text-text-muted space-y-2 border border-slate-100 rounded-3xl bg-white/50">
+                <AlertCircle className="h-8 w-8 mx-auto text-slate-350 animate-pulse" />
+                <p>No live classes match your subject or teacher filters.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Row 3: Timetable, Calendar, and Attendance Analytics */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Weekly Timetable */}
+        <motion.div variants={itemVariants} className="lg:col-span-2">
+          <GlassCard className="p-5 border border-slate-100 bg-white">
+            <h3 className="font-display text-sm font-bold text-text-heading flex items-center gap-2 mb-4">
+              <Calendar className="h-4 w-4 text-brand-blue" />
+              Weekly Timetable
             </h3>
             
-            <div className="space-y-4">
-              {past.map((session, i) => (
-                <div key={i} className="border border-border-default rounded-xl p-5 hover:bg-bg-secondary/30 transition-colors">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-full bg-brand-teal/10 flex items-center justify-center text-brand-teal">
-                        <UserCheck className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-text-heading">{session.mentor}</h4>
-                        <p className="text-xs text-text-muted">{session.date} • {session.topic}</p>
-                      </div>
-                    </div>
-                    <button className="text-brand-blue text-xs font-bold hover:underline flex items-center">
-                      View full <ChevronRight className="h-3 w-3" />
-                    </button>
-                  </div>
-                  <div className="bg-white border border-border-default rounded-lg p-4 mt-3 relative">
-                    <div className="absolute top-4 left-0 w-1 h-8 bg-brand-orange rounded-r-md"></div>
-                    <p className="text-sm text-text-body pl-3 italic">"{session.notes}"</p>
+            <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
+              {weeklyTimetable.map((day, idx) => (
+                <div key={idx} className="p-3 bg-slate-50/50 border border-slate-100 rounded-2xl text-left space-y-2.5 min-h-36">
+                  <span className="font-black text-xs text-text-heading block border-b border-slate-100 pb-1">{day.day}</span>
+                  <div className="space-y-1.5 text-[8.5px] font-bold text-text-muted">
+                    {day.slots.map((slot, sIdx) => (
+                      <span key={sIdx} className="block bg-white p-1 rounded border border-slate-100/60 truncate" title={slot}>
+                        {slot}
+                      </span>
+                    ))}
                   </div>
                 </div>
               ))}
             </div>
           </GlassCard>
-        </div>
+        </motion.div>
+
+        {/* Live Attendance & Calendar Stats */}
+        <motion.div variants={itemVariants} className="lg:col-span-1 space-y-6">
+          {/* Attendance */}
+          <GlassCard className="p-5 border border-slate-100 bg-white flex items-center gap-4">
+            <CircularProgress percent={96} />
+            <div className="text-left text-xs font-semibold text-text-body min-w-0">
+              <h4 className="font-bold text-text-heading text-sm leading-tight">Live Attendance</h4>
+              <p className="text-[10px] text-text-muted mt-0.5 leading-normal">You attended 24 out of 25 classes this month. Outstanding commitment!</p>
+            </div>
+          </GlassCard>
+
+          {/* Calendar Grid View */}
+          <GlassCard className="p-5 border border-slate-100 bg-white text-left space-y-3">
+            <h4 className="text-xs font-bold text-text-heading uppercase tracking-wider text-slate-400">Class Calendar View</h4>
+            <div className="grid grid-cols-7 gap-1 text-center font-bold text-[8.5px] text-text-muted">
+              {["S","M","T","W","T","F","S"].map((d, i) => (
+                <span key={i} className="py-1 text-slate-350">{d}</span>
+              ))}
+              {Array.from({ length: 30 }, (_, i) => {
+                const dayNum = i + 1;
+                const hasClass = dayNum % 3 === 0;
+                return (
+                  <span 
+                    key={i} 
+                    className={cn(
+                      "py-1.5 rounded-lg font-bold flex items-center justify-center shrink-0",
+                      dayNum === 14 ? "bg-brand-blue text-white" : 
+                      hasClass ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-slate-50 text-slate-500"
+                    )}
+                  >
+                    {dayNum}
+                  </span>
+                );
+              })}
+            </div>
+          </GlassCard>
+        </motion.div>
       </div>
-    </>
+    </motion.div>
   );
 }

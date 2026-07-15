@@ -37,7 +37,7 @@ The architecture uses **AWS Route 53** for DNS resolution, forwarding queries to
             | (Host: api.*)               | (Host: student.*, parent.*, etc.)
             v                             v
   [ NestJS ECS Cluster ]        [ TanStack Start ECS Cluster ]
-  - Container Port: 5000        - Container Port: 3000
+  - Container Port: 5000        - Container Port: 8080 (Docker) / 3000 (Native)
   - Autoscale: CPU > 70%        - Autoscale: CPU > 70%
 ```
 
@@ -84,7 +84,7 @@ server {
     server_name vedhkrit.local *.vedhkrit.local;
 
     location / {
-        proxy_pass http://web:3000;
+        proxy_pass http://web:8080;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-Host $host;
