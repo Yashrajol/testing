@@ -1172,11 +1172,11 @@ function HomePage() {
         <section className="py-12 bg-gradient-to-br from-[#031530] via-[#052261] to-[#04122d] text-white relative overflow-hidden z-10 border-t border-white/10">
           
           {/* Background image covering full screen on mobile, right 2/3rds on desktop */}
-          <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute inset-0 z-0">
             <img
               src="/assets/images/final-cta-v2.png"
               alt="Student Success CTA Backdrop"
-              className="absolute right-0 top-0 bottom-0 h-full w-full lg:w-2/3 object-cover object-right-top lg:object-top opacity-90 lg:opacity-100 max-w-none"
+              className="absolute inset-y-0 right-0 w-full lg:w-2/3 h-full object-cover object-right lg:object-top opacity-90 lg:opacity-100"
               loading="eager"
             />
           </div>
