@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { BANNER_PHOTOS } from "@/lib/avatars";
 
 export const Route = createFileRoute("/dashboard/student/sessions")({
   component: LiveClassesPage,
@@ -94,8 +95,8 @@ function LiveClassesPage() {
   };
 
   const handleAskDoubts = (topic: string) => {
-    toast.info(`Deep-linking to VedhAI Assistant...`, {
-      description: `Opening tutor window for topic: ${topic}.`
+    toast.info(`Opening Veda, your AI mentor...`, {
+      description: `Starting a tutor session on: ${topic}.`
     });
   };
 
@@ -153,7 +154,7 @@ function LiveClassesPage() {
       {/* Top Hero Banner */}
       <motion.div variants={itemVariants}>
         <div className="rounded-3xl border border-slate-100 bg-linear-to-r from-brand-blue to-brand-navy p-6 text-white relative overflow-hidden flex flex-col md:flex-row justify-between items-center shadow-lg shadow-brand-blue/15 min-h-48">
-          <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-[url('https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=350&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay opacity-20 pointer-events-none z-0" />
+          <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-cover bg-center mix-blend-overlay opacity-20 pointer-events-none z-0" style={{ backgroundImage: `url('${BANNER_PHOTOS.mentor}')` }} />
           
           <div className="z-10 text-left space-y-3">
             <span className="text-[10px] font-bold uppercase tracking-wider text-blue-200 bg-white/10 px-3 py-1 rounded-full border border-white/10">

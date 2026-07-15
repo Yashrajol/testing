@@ -355,7 +355,7 @@ function AcademicsPage() {
                       to="/dashboard/student/ai"
                       className="py-2 bg-slate-50 border border-slate-100 hover:bg-slate-100 text-text-heading text-center font-bold rounded-xl transition-colors flex items-center justify-center gap-0.5"
                     >
-                      Ask VedhAI
+                      Ask Veda
                     </Link>
                   </div>
                 </GlassCard>
@@ -564,7 +564,7 @@ function AcademicsPage() {
                   {/* TAB 6: PRACTICE QUESTIONS */}
                   {activeTab === "Practice Questions" && (
                     <GlassCard className="p-6 bg-white border border-slate-100 text-left space-y-4">
-                      <h4 className="font-display text-sm font-bold text-text-heading mb-2">Subject Aptitude Practice</h4>
+                      <h4 className="font-display text-sm font-bold text-text-heading mb-2">Subject Practice</h4>
                       
                       <div className="space-y-4 text-xs font-semibold">
                         <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">

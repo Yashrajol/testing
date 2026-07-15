@@ -23,6 +23,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { studentAvatar } from "@/lib/avatars";
 
 export const Route = createFileRoute("/dashboard/student/profile")({
   component: ProfileManagementPage,
@@ -45,7 +46,7 @@ function ProfileManagementPage() {
       name: "Yash Rajole",
       email: "yash.rajole@example.com",
       phone: "+91 98765 43210",
-      avatar: "https://images.unsplash.com/photo-1544717305-2782549b5136?q=80&w=220&auto=format&fit=crop",
+      avatar: studentAvatar(0, 220),
       fatherName: "Rajesh Rajole",
       motherName: "Suneeta Rajole",
       guardianName: "N/A",

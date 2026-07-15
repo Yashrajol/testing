@@ -15,9 +15,10 @@ import {
   Sparkles, 
   Flame, 
   BookOpen, 
-  Trophy, 
-  UserCheck 
+  Trophy,
+  UserCheck
 } from "lucide-react";
+import { studentAvatar } from "@/lib/avatars";
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -105,11 +106,11 @@ const initialAchievements: Achievement[] = [
 ];
 
 const mockLeaderboard = [
-  { rank: 1, name: "Rahul K.", points: "1,560 XP", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=120&auto=format&fit=crop" },
-  { rank: 2, name: "Sneha V.", points: "1,480 XP", avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=120&auto=format&fit=crop" },
-  { rank: 3, name: "Aarav Sharma (You)", points: "1,420 XP", avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=120&auto=format&fit=crop", highlight: true },
-  { rank: 4, name: "Dev M.", points: "1,310 XP", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=120&auto=format&fit=crop" },
-  { rank: 5, name: "Tanya S.", points: "1,250 XP", avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=120&auto=format&fit=crop" }
+  { rank: 1, name: "Rahul K.", points: "1,560 XP", avatar: studentAvatar(10) },
+  { rank: 2, name: "Sneha V.", points: "1,480 XP", avatar: studentAvatar(11) },
+  { rank: 3, name: "Aarav Sharma (You)", points: "1,420 XP", avatar: studentAvatar(0), highlight: true },
+  { rank: 4, name: "Dev M.", points: "1,310 XP", avatar: studentAvatar(12) },
+  { rank: 5, name: "Tanya S.", points: "1,250 XP", avatar: studentAvatar(13) }
 ];
 
 function AchievementsPage() {

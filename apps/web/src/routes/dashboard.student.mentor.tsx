@@ -24,6 +24,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { mentorAvatar } from "@/lib/avatars";
 
 export const Route = createFileRoute("/dashboard/student/mentor")({
   component: StudentMentorPage,
@@ -79,7 +80,7 @@ function StudentMentorPage() {
   const sessions: MentorSession[] = [
     { id: "s-1", topic: "Goal Setting & Study Planning", date: "Today, 14 Jul 2026", time: "05:00 PM", duration: "45 mins", status: "upcoming", meetingLink: "https://meet.google.com/abc-defg-hij" },
     { id: "s-2", topic: "Stream Selection & Core Assessment", date: "24 Jul 2026", time: "04:30 PM", duration: "45 mins", status: "upcoming" },
-    { id: "s-3", topic: "Introductory Mapping & Aptitude Review", date: "02 Jul 2026", time: "05:00 PM", duration: "30 mins", status: "past", notes: "Reviewed cognitive skill profile. Aarav has exceptional spatial analytics. Recommended debaters club." }
+    { id: "s-3", topic: "First Meeting & Skills Review", date: "02 Jul 2026", time: "05:00 PM", duration: "30 mins", status: "past", notes: "Looked at Aarav's thinking skills. He is very good with shapes and space. Suggested joining the debate club." }
   ];
 
   const actionPlans = [
@@ -149,7 +150,7 @@ function StudentMentorPage() {
           {/* Left: Mentor Details */}
           <div className="flex flex-col sm:flex-row items-center gap-5 z-10 text-center sm:text-left">
             <img
-              src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=180&auto=format&fit=crop"
+              src={mentorAvatar(2, 180)}
               alt="Neha Mahta"
               className="w-20 h-20 rounded-full object-cover border-4 border-brand-orange/20 shadow-xs"
             />

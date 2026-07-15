@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/dashboard-shell";
 import { GlassCard } from "@/components/glass-card";
 import { StatCard } from "@/components/stat-card";
-import { Users, GraduationCap, BarChart3, UserCog } from "lucide-react";
+import { Users, GraduationCap, UserCog, ClipboardCheck, AlertCircle } from "lucide-react";
 import { students, mentors, monthlyGrowth } from "@/lib/mock-data";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, PieChart, Pie, Cell, Legend } from "recharts";
 
@@ -19,15 +19,48 @@ const distribution = [
 ];
 
 function AdminDashboardOverview() {
+  const assessmentCompletionRate = Math.round((students.filter((s) => s.assessmentDone).length / students.length) * 100);
+  // Students who still need to complete their self-assessment, highest-risk first — the school's follow-up list.
+  const needsAttention = students
+    .filter((s) => !s.assessmentDone)
+    .sort((a, b) => {
+      const rank = { high: 0, medium: 1, low: 2 } as const;
+      return rank[a.riskLevel as keyof typeof rank] - rank[b.riskLevel as keyof typeof rank];
+    })
+    .slice(0, 6);
+
   return (
     <>
-      <PageHeader title="DPS Bangalore" subtitle="500 students • 42 teachers • 12 mentors" />
+      <PageHeader title="DPS Bangalore — School Dashboard" subtitle="500 students • 42 teachers • 12 mentors" />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={Users} label="Students" value="500" trend="▲ 24" accent="primary" />
         <StatCard icon={GraduationCap} label="Teachers" value="42" accent="accent" />
         <StatCard icon={UserCog} label="Mentors" value="12" accent="primary" />
-        <StatCard icon={BarChart3} label="Avg. Growth" value="+22%" trend="▲ 5.4" accent="warning" />
+        <StatCard icon={ClipboardCheck} label="Self-Assessment Completion" value={`${assessmentCompletionRate}%`} trend="▲ 5.4" accent="warning" />
       </div>
+
+      {needsAttention.length > 0 && (
+        <GlassCard className="mt-6 border border-destructive/20 bg-destructive/5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 font-display text-base font-bold text-destructive">
+              <AlertCircle className="h-4.5 w-4.5" /> Students Needing Attention
+            </div>
+            <span className="text-xs text-muted-foreground">Self-assessment not yet completed — school follow-up list</span>
+          </div>
+          <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+            {needsAttention.map((s) => (
+              <div key={s.id} className="flex items-center gap-2.5 rounded-xl border border-border/60 bg-white/60 p-2.5">
+                <img src={s.avatar} alt="" className="h-8 w-8 rounded-full bg-muted object-cover" />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-xs font-semibold">{s.name}</div>
+                  <div className="text-[10px] text-muted-foreground">Grade {s.grade}-{s.section} • Mentor {s.mentorId}</div>
+                </div>
+                <span className={`rounded-full px-2 py-0.5 text-[9px] font-semibold shrink-0 ${s.riskLevel === "high" ? "bg-destructive/15 text-destructive" : s.riskLevel === "medium" ? "bg-warning/15 text-warning" : "bg-success/15 text-success"}`}>{s.riskLevel}</span>
+              </div>
+            ))}
+          </div>
+        </GlassCard>
+      )}
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <GlassCard className="lg:col-span-2">

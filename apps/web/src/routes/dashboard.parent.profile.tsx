@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "motion/react";
+import { studentAvatar } from "@/lib/avatars";
 
 export const Route = createFileRoute("/dashboard/parent/profile")({
   component: ParentProfilePage,
@@ -224,7 +225,7 @@ function ParentProfilePage() {
             
             <div className="text-center pb-4 border-b border-slate-100">
               <img 
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=0" 
+                src={studentAvatar(0)}
                 alt="Child Avatar" 
                 className="h-16 w-16 mx-auto rounded-full object-cover bg-slate-50 border border-slate-150" 
               />

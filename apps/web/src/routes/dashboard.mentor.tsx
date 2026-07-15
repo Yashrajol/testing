@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { DashboardShell } from "@/components/dashboard-shell";
-import { LayoutDashboard, Users, Calendar, AlertTriangle, ClipboardList, TrendingUp } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, AlertTriangle, ClipboardList, TrendingUp, ClipboardCheck } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/mentor")({
   component: MentorDashboardLayout,
@@ -10,6 +10,7 @@ export const Route = createFileRoute("/dashboard/mentor")({
 const items = [
   { to: "/dashboard/mentor", label: "Overview", icon: LayoutDashboard },
   { to: "/dashboard/mentor/students", label: "Assigned Students", icon: Users },
+  { to: "/dashboard/mentor/assessments", label: "Assessment Reports", icon: ClipboardCheck },
   { to: "/dashboard/mentor/sessions", label: "Sessions", icon: Calendar },
   { to: "/dashboard/mentor/plans", label: "Action Plans", icon: ClipboardList },
   { to: "/dashboard/mentor/progress", label: "Progress", icon: TrendingUp },

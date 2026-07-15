@@ -130,7 +130,7 @@ const careerDetails: Record<string, {
       { name: "Current affairs reading habit", met: false },
       { name: "Essay writing and articulation", met: true },
       { name: "NCERT Social Science concepts", met: true },
-      { name: "Analytical reasoning", met: false },
+      { name: "Logical reasoning", met: false },
     ],
     activities: [
       { title: "Start a current affairs journal", type: "Habit", icon: BookOpen },
@@ -159,7 +159,7 @@ const careerDetails: Record<string, {
     ],
     skills: [
       { name: "Physics — Mechanics & Aerodynamics basics", met: false },
-      { name: "Strong Mathematical aptitude", met: true },
+      { name: "Strong at Maths", met: true },
       { name: "Good English communication", met: true },
       { name: "Medical fitness (DGCA Class I)", met: false },
     ],

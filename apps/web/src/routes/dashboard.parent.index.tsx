@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GlassCard } from "@/components/glass-card";
-import { 
-  User, Calendar, CheckCircle2, Clock, MessageSquare, 
+import {
+  User, Calendar, CheckCircle2, Clock, MessageSquare,
   BookOpen, Sparkles, ChevronRight, Award, FileText, ArrowRight,
-  TrendingUp, Star, Video
+  TrendingUp, Star, Video, ClipboardCheck, Bell
 } from "lucide-react";
 import { useParentOverview } from "@/lib/api";
+import { studentAvatar, mentorAvatar } from "@/lib/avatars";
 
 export const Route = createFileRoute("/dashboard/parent/")({
   component: ParentDashboardOverview,
@@ -29,10 +30,11 @@ function ParentDashboardOverview() {
     name: "Yash Rajole",
     grade: "10th Grade",
     school: "Delhi Public School Bangalore",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=0",
+    avatar: studentAvatar(0),
     vedhkritIndex: 82,
     attendance: 94,
     academicAvg: 85,
+    assessmentDone: true,
   };
 
   const activities = [
@@ -81,6 +83,10 @@ function ParentDashboardOverview() {
                 <span className="bg-slate-200/50 px-2 py-0.5 rounded-sm">Sec: A</span>
                 <span className="bg-slate-200/50 px-2 py-0.5 rounded-sm">Roll: 24</span>
                 <span className="bg-slate-200/50 px-2 py-0.5 rounded-sm">AY: 2025-26</span>
+                <span className={`flex items-center gap-1 px-2 py-0.5 rounded-sm ${child.assessmentDone ? "bg-emerald-100 text-emerald-700" : "bg-orange-100 text-brand-orange"}`}>
+                  <ClipboardCheck className="h-3 w-3" />
+                  {child.assessmentDone ? "Self-Assessment Done" : "Self-Assessment Pending"}
+                </span>
               </div>
             </div>
             <Link 
@@ -216,7 +222,12 @@ function ParentDashboardOverview() {
 
           {/* Recent Activity Timeline */}
           <GlassCard className="p-5 border border-slate-100 bg-white shadow-card">
-            <h3 className="font-display text-sm font-bold text-text-heading mb-5">Recent Activity</h3>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-display text-sm font-bold text-text-heading">Recent Activity</h3>
+              <span className="flex items-center gap-1 text-[9px] font-bold text-brand-orange uppercase tracking-wider">
+                <Bell className="h-3 w-3" /> Live Updates
+              </span>
+            </div>
             <div className="relative pl-6 border-l border-slate-100 space-y-5">
               {activities.map((act, idx) => (
                 <div key={idx} className="relative text-left">
@@ -231,6 +242,13 @@ function ParentDashboardOverview() {
                 </div>
               ))}
             </div>
+            <Link
+              to="/dashboard/parent/reports"
+              className="mt-5 w-full rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100 py-2.5 text-center text-xs font-bold text-text-heading transition-colors flex items-center justify-center gap-1.5"
+            >
+              View All Activities & Updates
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </GlassCard>
         </div>
 
@@ -247,10 +265,10 @@ function ParentDashboardOverview() {
               </div>
 
               <div className="flex items-center gap-3 text-left border-b border-slate-100 pb-4">
-                <img 
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=120&auto=format&fit=crop" 
-                  alt="Mentor Photo" 
-                  className="h-12 w-12 rounded-2xl object-cover bg-slate-100 border border-slate-150" 
+                <img
+                  src={mentorAvatar(2, 120)}
+                  alt="Mentor Photo"
+                  className="h-12 w-12 rounded-2xl object-cover bg-slate-100 border border-slate-150"
                 />
                 <div>
                   <h4 className="font-bold text-xs text-text-heading leading-tight">Priya Iyer</h4>
