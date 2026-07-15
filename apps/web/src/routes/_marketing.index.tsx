@@ -114,7 +114,7 @@ const decoratorIcons = [
   { Icon: Lightbulb, top: "14%", left: "8%", rotate: "40deg", color: "text-brand-blue", size: "h-11 w-11" },
   { Icon: Bot, top: "17%", right: "12%", rotate: "-20deg", color: "text-brand-orange", size: "h-10 w-10" },
   { Icon: Lightbulb, top: "20%", left: "32%", rotate: "10deg", color: "text-brand-blue", size: "h-10 w-10" },
-  
+
   // Section 2
   { Icon: Compass, top: "23%", left: "50%", rotate: "30deg", color: "text-brand-teal", size: "h-11 w-11" },
   { Icon: GraduationCap, top: "26%", left: "12%", rotate: "-15deg", color: "text-brand-purple", size: "h-10 w-10" },
@@ -194,7 +194,7 @@ function Preloader() {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-bg-primary overflow-hidden select-none">
-      
+
       {/* Properly visible scattered backdrop illustrations */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         {preloaderIcons.map((item, idx) => (
@@ -228,26 +228,26 @@ function Preloader() {
         <div className="relative flex items-center justify-center h-44 w-44 mb-6">
           {/* Glowing backdrop halo */}
           <div className="absolute h-28 w-28 rounded-full bg-brand-blue/10 animate-pulse blur-xl" />
-          
+
           {/* Orbiting Ring 1 (Clockwise) */}
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ repeat: Infinity, duration: 2.2, ease: "linear" }}
             className="absolute h-32 w-32 rounded-full border-2 border-t-brand-orange border-r-brand-teal border-b-transparent border-l-transparent"
           />
-          
+
           {/* Orbiting Ring 2 (Counter-Clockwise) */}
           <motion.div
             animate={{ rotate: -360 }}
             transition={{ repeat: Infinity, duration: 3.5, ease: "linear" }}
             className="absolute h-38 w-38 rounded-full border-2 border-t-transparent border-r-transparent border-b-brand-teal border-l-brand-orange"
           />
-          
+
           {/* Logo center container */}
           <motion.div
             initial={{ scale: 0.7, opacity: 0 }}
             animate={{ scale: [1, 1.03, 1], opacity: 1 }}
-            transition={{ 
+            transition={{
               scale: { repeat: Infinity, duration: 2, ease: "easeInOut" },
               opacity: { duration: 0.8 }
             }}
@@ -260,7 +260,7 @@ function Preloader() {
             />
           </motion.div>
         </div>
-        
+
         {/* Animated Brand Titles */}
         <h3 className="text-sm font-black tracking-[0.25em] text-brand-navy uppercase">
           VEDHKRIT
@@ -268,7 +268,7 @@ function Preloader() {
         <p className="mt-1 text-[10px] text-brand-teal font-extrabold tracking-wider">
           DISCOVER • DEVELOP • DESIGN
         </p>
-  
+
         {/* Sleek loading progress bar */}
         <div className="mt-6 h-[4px] w-36 overflow-hidden rounded-full bg-slate-200">
           <motion.div
@@ -344,7 +344,7 @@ function HomePage() {
     <div className="relative bg-bg-primary text-text-body font-sans antialiased overflow-x-hidden">
       {/* 1. DESKTOP HERO SECTION (Light-themed matching reference image with bottom-left quadrant alignment) */}
       <section className="hidden lg:flex relative border-b border-slate-100 h-dvh items-center overflow-hidden bg-white z-10">
-        
+
         {/* Full-bleed Background Image with transitions */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <AnimatePresence mode="popLayout">
@@ -364,7 +364,7 @@ function HomePage() {
         {/* Content Container (aligned to bottom-left quadrant, styled to one-third rule width) */}
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 relative z-20 h-full flex flex-col justify-end pb-16 lg:pb-20 pt-28">
           <div className="w-full lg:max-w-[34%] xl:max-w-[32%] text-left flex flex-col justify-end items-start mb-4">
-            
+
             {/* Dynamic branded pill badge */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -443,9 +443,8 @@ function HomePage() {
                 <button
                   key={i}
                   onClick={() => setActiveBanner(i)}
-                  className={`transition-all duration-300 rounded-full h-2 ${
-                    activeBanner === i ? "w-6 bg-brand-orange" : "w-2 bg-slate-300 hover:bg-slate-400"
-                  }`}
+                  className={`transition-all duration-300 rounded-full h-2 ${activeBanner === i ? "w-6 bg-brand-orange" : "w-2 bg-slate-300 hover:bg-slate-400"
+                    }`}
                   aria-label={`Go to slide ${i + 1}`}
                 />
               ))}
@@ -457,7 +456,7 @@ function HomePage() {
 
       {/* 1. MOBILE HERO SECTION (Light-themed matching reference image) */}
       <section className="lg:hidden relative h-dvh min-h-[600px] w-full overflow-hidden z-10 border-b border-slate-100 bg-white">
-        
+
         {/* Full-bleed Background Image with transitions */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           <AnimatePresence mode="popLayout">
@@ -480,7 +479,7 @@ function HomePage() {
 
         {/* Content Wrapper */}
         <div className="mx-auto w-full max-w-sm h-full flex flex-col justify-between pt-28 pb-8 relative z-20 text-center px-5">
-          
+
           {/* Top Group: Text with proper dark colors */}
           <div className="flex flex-col items-center">
             {/* Branded pill badge */}
@@ -510,9 +509,8 @@ function HomePage() {
                 <button
                   key={i}
                   onClick={() => setActiveBanner(i)}
-                  className={`transition-all duration-300 rounded-full h-1.5 ${
-                    activeBanner === i ? "w-5 bg-brand-orange" : "w-1.5 bg-slate-300 hover:bg-slate-400"
-                  }`}
+                  className={`transition-all duration-300 rounded-full h-1.5 ${activeBanner === i ? "w-5 bg-brand-orange" : "w-1.5 bg-slate-300 hover:bg-slate-400"
+                    }`}
                   aria-label={`Go to slide ${i + 1}`}
                 />
               ))}
@@ -541,7 +539,7 @@ function HomePage() {
       </section>
 
       {/* Vector Illustrations background applied below Hero Section */}
-      <div className="relative overflow-x-hidden home-sections-scaled">
+      <div className="relative overflow-x-clip home-sections-scaled">
         <TechBackgroundDecorator />
 
         {/* 2. THE VEDHKRIT JOURNEY */}
@@ -557,7 +555,7 @@ function HomePage() {
             <div className="relative mt-10 hidden md:block">
               {/* Desktop background connecting line */}
               <div className="absolute top-[44px] left-[6%] right-[6%] h-1 bg-gradient-to-r from-blue-500 via-indigo-500 via-purple-500 via-orange-500 via-teal-500 via-blue-600 to-teal-600 z-0 rounded-full opacity-50 shadow-[0_0_8px_rgba(59,130,246,0.2)]" />
-              
+
               <div className="relative z-10 grid grid-cols-4 lg:grid-cols-7 gap-3 lg:gap-4">
                 {journey.map((step, i) => (
                   <div
@@ -599,7 +597,7 @@ function HomePage() {
             <div className="relative mt-8 md:hidden px-2">
               {/* Vertical line running down */}
               <div className="absolute left-6 top-3 bottom-3 w-0.5 bg-gradient-to-b from-blue-500 via-indigo-500 via-purple-500 via-orange-500 via-teal-500 via-blue-600 to-teal-600 opacity-30 rounded-full" />
-              
+
               <div className="space-y-4">
                 {journey.map((step, i) => (
                   <div key={step.label} className="relative flex gap-4 pl-10 items-start">
@@ -763,408 +761,464 @@ function HomePage() {
 
         {/* 4. DIGITAL TWIN & SNAPSHOT */}
         <FadeIn>
-        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 z-10 relative">
-          <div className="grid lg:grid-cols-2 gap-5">
+          <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 z-10 relative">
+            <div className="grid lg:grid-cols-2 gap-5">
 
-            {/* ── DIGITAL TWIN: dark left panel + white right panel ── */}
-            <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm group">
-              <div className="flex flex-col sm:flex-row h-full">
-                {/* Left light accent strip */}
-                <div className="sm:w-40 lg:w-44 shrink-0 bg-gradient-to-b from-teal-50 via-white to-blue-50 border-r border-slate-100 flex flex-col items-center justify-center p-5 gap-3 relative overflow-hidden">
-                  <div className="absolute inset-0 opacity-40" style={{backgroundImage: 'radial-gradient(circle at 50% 40%, rgba(4,136,162,0.12) 0%, transparent 70%)'}} />
-                  <div className="relative z-10 flex flex-col items-center gap-3 w-full">
-                    <div className="h-14 w-14 rounded-2xl bg-brand-teal/10 border border-brand-teal/25 flex items-center justify-center">
-                      <Bot className="h-7 w-7 text-brand-teal" />
+              {/* ── DIGITAL TWIN: dark left panel + white right panel ── */}
+              <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm group">
+                <div className="flex flex-col sm:flex-row h-full">
+                  {/* Left light accent strip */}
+                  <div className="sm:w-40 lg:w-44 shrink-0 bg-gradient-to-b from-teal-50 via-white to-blue-50 border-r border-slate-100 flex flex-col items-center justify-center p-5 gap-3 relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'radial-gradient(circle at 50% 40%, rgba(4,136,162,0.12) 0%, transparent 70%)' }} />
+                    <div className="relative z-10 flex flex-col items-center gap-3 w-full">
+                      <div className="h-14 w-14 rounded-2xl bg-brand-teal/10 border border-brand-teal/25 flex items-center justify-center">
+                        <Bot className="h-7 w-7 text-brand-teal" />
+                      </div>
+                      <div className="text-center">
+                        <div className="text-[9px] text-brand-teal font-extrabold uppercase tracking-widest">AI Insight</div>
+                        <div className="text-slate-700 text-xs font-bold mt-0.5 leading-tight">Digital<br />Learning Twin</div>
+                      </div>
+                      {/* Avatar */}
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-white border-2 border-brand-teal/40 shadow-md">
+                        <img src="/assets/images/digital-twin.jpg" alt="Digital Learning Twin" className="w-full h-full object-cover" loading="lazy" />
+                      </div>
+                      <div className="text-center">
+                        <div className="text-[8px] text-slate-400 font-medium leading-tight">Personalised<br />just for you</div>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <div className="text-[9px] text-brand-teal font-extrabold uppercase tracking-widest">AI Insight</div>
-                      <div className="text-slate-700 text-xs font-bold mt-0.5 leading-tight">Digital<br/>Learning Twin</div>
+                  </div>
+                  {/* Right white content */}
+                  <div className="flex-1 bg-white p-5 sm:p-6 flex flex-col">
+                    <h3 className="text-lg font-bold text-slate-800 leading-tight">Meet Your Digital Learning Twin</h3>
+                    <p className="mt-1.5 text-sm text-slate-500 leading-relaxed">
+                      Our AI Discovery Engine™ maps cognitive abilities, motivation types, and learning styles to track your growth continuously.
+                    </p>
+                    <div className="mt-4 space-y-2 flex-1">
+                      {twinFeatures.map((f) => (
+                        <div key={f} className="flex items-center gap-2.5">
+                          <div className="h-5 w-5 rounded-full bg-brand-teal/10 border border-brand-teal/20 flex items-center justify-center shrink-0">
+                            <CheckCircle2 className="h-3 w-3 text-brand-teal" />
+                          </div>
+                          <span className="text-[11px] font-semibold text-slate-600">{f}</span>
+                        </div>
+                      ))}
                     </div>
-                    {/* Avatar */}
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-white border-2 border-brand-teal/40 shadow-md">
-                      <img src="/assets/images/digital-twin.jpg" alt="Digital Learning Twin" className="w-full h-full object-cover" loading="lazy" />
-                    </div>
-                    <div className="text-center">
-                      <div className="text-[8px] text-slate-400 font-medium leading-tight">Personalised<br/>just for you</div>
-                    </div>
+                    <Link to="/register" className="mt-4 self-start inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-teal hover:bg-teal-600 px-4 py-2.5 rounded-xl transition-all shadow-sm">
+                      Try It Free <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
                   </div>
                 </div>
-                {/* Right white content */}
-                <div className="flex-1 bg-white p-5 sm:p-6 flex flex-col">
-                  <h3 className="text-lg font-bold text-slate-800 leading-tight">Meet Your Digital Learning Twin</h3>
-                  <p className="mt-1.5 text-sm text-slate-500 leading-relaxed">
-                    Our AI Discovery Engine™ maps cognitive abilities, motivation types, and learning styles to track your growth continuously.
-                  </p>
-                  <div className="mt-4 space-y-2 flex-1">
-                    {twinFeatures.map((f) => (
-                      <div key={f} className="flex items-center gap-2.5">
-                        <div className="h-5 w-5 rounded-full bg-brand-teal/10 border border-brand-teal/20 flex items-center justify-center shrink-0">
-                          <CheckCircle2 className="h-3 w-3 text-brand-teal" />
-                        </div>
-                        <span className="text-[11px] font-semibold text-slate-600">{f}</span>
-                      </div>
-                    ))}
+              </div>
+
+              {/* ── RADAR: clean light card, radar top on mobile, side-by-side on desktop ── */}
+              <div className="rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-sm relative">
+                <div className="absolute -top-16 -right-16 w-48 h-48 bg-brand-teal/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-brand-blue/10 rounded-full blur-3xl pointer-events-none" />
+                <svg className="hidden">
+                  <defs>
+                    <linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#0488A2" stopOpacity="0.6" />
+                      <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.4" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div className="p-5 sm:p-6 relative z-10 flex flex-col">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="h-8 w-8 rounded-xl bg-brand-teal/20 border border-brand-teal/30 flex items-center justify-center">
+                      <BarChart3 className="h-4 w-4 text-brand-teal" />
+                    </div>
+                    <div>
+                      <div className="text-[9px] font-extrabold text-brand-teal uppercase tracking-widest">Cognitive Radar</div>
+                      <div className="text-slate-800 font-bold text-sm leading-tight">Your Growth Snapshot</div>
+                    </div>
                   </div>
-                  <Link to="/register" className="mt-4 self-start inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-teal hover:bg-teal-600 px-4 py-2.5 rounded-xl transition-all shadow-sm">
-                    Try It Free <ArrowRight className="h-3.5 w-3.5" />
+
+                  {/* Radar + metrics: stacked on mobile, side-by-side on sm+ */}
+                  <div className="flex flex-col sm:flex-row gap-4 items-center">
+                    {/* Radar SVG */}
+                    <div className="relative w-40 h-40 sm:w-44 sm:h-44 shrink-0 mx-auto sm:mx-0">
+                      <svg viewBox="0 0 200 200" className="w-full h-full">
+                        <polygon points="100,20 175,70 150,160 50,160 25,70" fill="none" stroke="rgba(15,23,42,0.12)" strokeWidth="1" />
+                        <polygon points="100,50 150,85 133,140 67,140 50,85" fill="none" stroke="rgba(15,23,42,0.08)" strokeWidth="1" />
+                        <motion.polygon
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.3, duration: 0.9, ease: "easeOut" }}
+                          points="100,55 155,85 140,150 65,145 45,85"
+                          fill="url(#radarGrad)"
+                          stroke="#0488A2"
+                          strokeWidth="2"
+                        />
+                        <circle cx="100" cy="55" r="3.5" fill="#60a5fa" />
+                        <circle cx="155" cy="85" r="3.5" fill="#c084fc" />
+                        <circle cx="140" cy="150" r="3.5" fill="#fb923c" />
+                        <circle cx="65" cy="145" r="3.5" fill="#2dd4bf" />
+                        <circle cx="45" cy="85" r="3.5" fill="#fbbf24" />
+                        <text x="100" y="13" fontSize="7.5" fill="#2563eb" fontWeight="700" textAnchor="middle">Academic 82</text>
+                        <text x="186" y="68" fontSize="7.5" fill="#9333ea" fontWeight="700" textAnchor="middle">Comm 71</text>
+                        <text x="160" y="174" fontSize="7.5" fill="#ea580c" fontWeight="700" textAnchor="middle">Leadership 64</text>
+                        <text x="40" y="174" fontSize="7.5" fill="#0d9488" fontWeight="700" textAnchor="middle">Innovation 76</text>
+                        <text x="14" y="68" fontSize="7.5" fill="#d97706" fontWeight="700" textAnchor="middle">Consistency 69</text>
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <span className="text-2xl font-black text-slate-800 leading-none">82</span>
+                        <span className="text-[8px] text-slate-400 font-semibold uppercase tracking-wider">Index™</span>
+                      </div>
+                    </div>
+                    {/* Metrics: 2-col grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-1 gap-1.5 w-full sm:flex-1">
+                      {snapshot.map((s) => (
+                        <div key={s.label} className={`flex items-center gap-2 rounded-xl px-3 py-2 border ${s.bgColor} ${s.borderColor}`}>
+                          <s.icon className={`h-3.5 w-3.5 ${s.textColor} shrink-0`} />
+                          <div className="min-w-0">
+                            <div className="text-[8px] text-slate-400 font-medium leading-none">{s.label}</div>
+                            <div className="text-[11px] font-bold text-slate-700 mt-0.5 leading-tight truncate">{s.value}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* CTA */}
+                  <Link to="/register" className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-teal hover:bg-teal-600 px-4 py-2.5 rounded-xl transition-all shadow-sm hover:-translate-y-0.5 active:scale-95 w-fit">
+                    Take Free Assessment <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               </div>
             </div>
-
-            {/* ── RADAR: clean light card, radar top on mobile, side-by-side on desktop ── */}
-            <div className="rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-sm relative">
-              <div className="absolute -top-16 -right-16 w-48 h-48 bg-brand-teal/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-brand-blue/10 rounded-full blur-3xl pointer-events-none" />
-              <svg className="hidden">
-                <defs>
-                  <linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#0488A2" stopOpacity="0.6" />
-                    <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.4" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div className="p-5 sm:p-6 relative z-10 flex flex-col">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="h-8 w-8 rounded-xl bg-brand-teal/20 border border-brand-teal/30 flex items-center justify-center">
-                    <BarChart3 className="h-4 w-4 text-brand-teal" />
-                  </div>
-                  <div>
-                    <div className="text-[9px] font-extrabold text-brand-teal uppercase tracking-widest">Cognitive Radar</div>
-                    <div className="text-slate-800 font-bold text-sm leading-tight">Your Growth Snapshot</div>
-                  </div>
-                </div>
-
-                {/* Radar + metrics: stacked on mobile, side-by-side on sm+ */}
-                <div className="flex flex-col sm:flex-row gap-4 items-center">
-                  {/* Radar SVG */}
-                  <div className="relative w-40 h-40 sm:w-44 sm:h-44 shrink-0 mx-auto sm:mx-0">
-                    <svg viewBox="0 0 200 200" className="w-full h-full">
-                      <polygon points="100,20 175,70 150,160 50,160 25,70" fill="none" stroke="rgba(15,23,42,0.12)" strokeWidth="1" />
-                      <polygon points="100,50 150,85 133,140 67,140 50,85" fill="none" stroke="rgba(15,23,42,0.08)" strokeWidth="1" />
-                      <motion.polygon
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.3, duration: 0.9, ease: "easeOut" }}
-                        points="100,55 155,85 140,150 65,145 45,85"
-                        fill="url(#radarGrad)"
-                        stroke="#0488A2"
-                        strokeWidth="2"
-                      />
-                      <circle cx="100" cy="55" r="3.5" fill="#60a5fa" />
-                      <circle cx="155" cy="85" r="3.5" fill="#c084fc" />
-                      <circle cx="140" cy="150" r="3.5" fill="#fb923c" />
-                      <circle cx="65" cy="145" r="3.5" fill="#2dd4bf" />
-                      <circle cx="45" cy="85" r="3.5" fill="#fbbf24" />
-                      <text x="100" y="13" fontSize="7.5" fill="#2563eb" fontWeight="700" textAnchor="middle">Academic 82</text>
-                      <text x="186" y="68" fontSize="7.5" fill="#9333ea" fontWeight="700" textAnchor="middle">Comm 71</text>
-                      <text x="160" y="174" fontSize="7.5" fill="#ea580c" fontWeight="700" textAnchor="middle">Leadership 64</text>
-                      <text x="40" y="174" fontSize="7.5" fill="#0d9488" fontWeight="700" textAnchor="middle">Innovation 76</text>
-                      <text x="14" y="68" fontSize="7.5" fill="#d97706" fontWeight="700" textAnchor="middle">Consistency 69</text>
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                      <span className="text-2xl font-black text-slate-800 leading-none">82</span>
-                      <span className="text-[8px] text-slate-400 font-semibold uppercase tracking-wider">Index™</span>
-                    </div>
-                  </div>
-                  {/* Metrics: 2-col grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-1 gap-1.5 w-full sm:flex-1">
-                    {snapshot.map((s) => (
-                      <div key={s.label} className={`flex items-center gap-2 rounded-xl px-3 py-2 border ${s.bgColor} ${s.borderColor}`}>
-                        <s.icon className={`h-3.5 w-3.5 ${s.textColor} shrink-0`} />
-                        <div className="min-w-0">
-                          <div className="text-[8px] text-slate-400 font-medium leading-none">{s.label}</div>
-                          <div className="text-[11px] font-bold text-slate-700 mt-0.5 leading-tight truncate">{s.value}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                {/* CTA */}
-                <Link to="/register" className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-teal hover:bg-teal-600 px-4 py-2.5 rounded-xl transition-all shadow-sm hover:-translate-y-0.5 active:scale-95 w-fit">
-                  Take Free Assessment <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+          </section>
         </FadeIn>
 
         {/* 5. STUDENT LEARNING EXPERIENCE CENTRE (SLEC) */}
         <FadeIn>
-        <section className="relative py-10 border-b border-border-default/50 z-10">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="rounded-xl bg-bg-secondary/40 border border-border-default/50 p-5 md:p-6 text-left">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border-default/40 pb-4 mb-6">
-                <div className="max-w-2xl">
-                  <span className="text-[9px] font-bold text-brand-blue bg-brand-blue/5 border border-brand-blue/20 px-2.5 py-0.5 rounded uppercase tracking-wider">
-                    Physical Centers / Studio
-                  </span>
-                  <h3 className="text-lg sm:text-xl font-bold text-text-heading mt-2">Student Learning Experience Centre (SLEC)</h3>
-                  <p className="mt-1 text-xs text-text-muted leading-relaxed">
-                    Our state-of-the-art interactive hubs build creativity, digital skills, logical thinking, and peer collaboration.
-                  </p>
-                </div>
-                <Link
-                  to="/framework"
-                  className="shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-brand-blue text-white hover:bg-brand-navy transition shadow-sm"
-                >
-                  Explore SLEC Labs <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                {slecCards.map((c) => (
-                  <div
-                    key={c.title}
-                    className="rounded-lg bg-card-default overflow-hidden shadow-sm border border-border-default/60 group cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
-                  >
-                    <div className="aspect-square overflow-hidden bg-bg-secondary">
-                      <img
-                        src={c.img}
-                        alt={c.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="p-2 text-center text-[10px] font-bold text-text-heading leading-tight group-hover:text-brand-blue transition-colors">
-                      {c.title}
-                    </div>
+          <section className="relative py-10 border-b border-border-default/50 z-10">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="rounded-xl bg-bg-secondary/40 border border-border-default/50 p-5 md:p-6 text-left">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border-default/40 pb-4 mb-6">
+                  <div className="max-w-2xl">
+                    <span className="text-[9px] font-bold text-brand-blue bg-brand-blue/5 border border-brand-blue/20 px-2.5 py-0.5 rounded uppercase tracking-wider">
+                      Physical Centers / Studio
+                    </span>
+                    <h3 className="text-lg sm:text-xl font-bold text-text-heading mt-2">Student Learning Experience Centre (SLEC)</h3>
+                    <p className="mt-1 text-xs text-text-muted leading-relaxed">
+                      Our state-of-the-art interactive hubs build creativity, digital skills, logical thinking, and peer collaboration.
+                    </p>
                   </div>
-                ))}
+                  <Link
+                    to="/framework"
+                    className="shrink-0 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold bg-brand-blue text-white hover:bg-brand-navy transition shadow-sm"
+                  >
+                    Explore SLEC Labs <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                  {slecCards.map((c) => (
+                    <div
+                      key={c.title}
+                      className="rounded-lg bg-card-default overflow-hidden shadow-sm border border-border-default/60 group cursor-pointer hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+                    >
+                      <div className="aspect-square overflow-hidden bg-bg-secondary">
+                        <img
+                          src={c.img}
+                          alt={c.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="p-2 text-center text-[10px] font-bold text-text-heading leading-tight group-hover:text-brand-blue transition-colors">
+                        {c.title}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
         </FadeIn>
 
         {/* 6. FUTURE IDENTITY */}
         <FadeIn>
-        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 z-10 relative">
-          <div className="rounded-2xl bg-gradient-to-br from-[#031530] via-[#051c42] to-[#04122d] border border-white/10 p-7 text-white shadow-xl relative overflow-hidden">
-            <div className="absolute -top-32 -left-32 w-72 h-72 bg-brand-teal/10 rounded-full blur-[80px] pointer-events-none" />
-            <div className="absolute -bottom-24 -right-24 w-60 h-60 bg-brand-blue/15 rounded-full blur-[80px] pointer-events-none" />
-            <div className="relative z-10">
-              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-7">
-                <div>
-                  <span className="inline-flex items-center gap-1.5 text-[10px] text-brand-teal font-extrabold tracking-widest uppercase bg-brand-teal/10 border border-brand-teal/20 px-3 py-1 rounded-full">
-                    <span className="h-1 w-3 rounded-full bg-brand-teal animate-pulse" /> Explore. Experience. Evolve.
-                  </span>
-                  <h3 className="mt-2 text-xl sm:text-2xl font-bold text-white leading-tight">Your Future Identity Awaits</h3>
-                  <p className="mt-1 text-xs text-white/50 font-medium">Choose from 40+ dynamic future identities curated for tomorrow's leaders</p>
-                </div>
-                <Link
-                  to="/register"
-                  className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-brand-navy bg-brand-teal hover:bg-teal-400 px-5 py-2.5 rounded-xl transition-all shadow-lg hover:-translate-y-0.5 active:scale-95"
-                >
-                  Explore All Paths <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-11 gap-2">
-                {paths.map((p) => (
-                  <div
-                    key={p.label}
-                    className={`group flex flex-col items-center text-center cursor-pointer rounded-2xl border p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${p.bgColor} ${p.borderColor} ${p.hoverBorder} ${p.hoverBg}`}
-                  >
-                    <div className="w-10 h-10 flex items-center justify-center rounded-xl mb-2 bg-white/5 group-hover:bg-white/10 transition-colors">
-                      <p.icon className={`h-5 w-5 ${p.textColor} group-hover:scale-110 transition-transform duration-200`} />
-                    </div>
-                    <span className="text-[9px] font-bold text-white/80 tracking-tight leading-tight group-hover:text-white transition-colors">
-                      {p.label}
+          <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 z-10 relative">
+            <div className="rounded-2xl bg-gradient-to-br from-[#031530] via-[#051c42] to-[#04122d] border border-white/10 p-7 text-white shadow-xl relative overflow-hidden">
+              <div className="absolute -top-32 -left-32 w-72 h-72 bg-brand-teal/10 rounded-full blur-[80px] pointer-events-none" />
+              <div className="absolute -bottom-24 -right-24 w-60 h-60 bg-brand-blue/15 rounded-full blur-[80px] pointer-events-none" />
+              <div className="relative z-10">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-7">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 text-[10px] text-brand-teal font-extrabold tracking-widest uppercase bg-brand-teal/10 border border-brand-teal/20 px-3 py-1 rounded-full">
+                      <span className="h-1 w-3 rounded-full bg-brand-teal animate-pulse" /> Explore. Experience. Evolve.
                     </span>
+                    <h3 className="mt-2 text-xl sm:text-2xl font-bold text-white leading-tight">Your Future Identity Awaits</h3>
+                    <p className="mt-1 text-xs text-white/50 font-medium">Choose from 40+ dynamic future identities curated for tomorrow's leaders</p>
                   </div>
-                ))}
-                <Link
-                  to="/register"
-                  className="group flex flex-col items-center text-center cursor-pointer rounded-2xl border border-white/15 bg-white/5 hover:border-brand-teal/40 hover:bg-white/10 p-3 transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div className="w-10 h-10 flex items-center justify-center rounded-xl mb-2 bg-white/5 group-hover:bg-white/10">
-                    <span className="text-lg font-black text-brand-teal group-hover:text-brand-orange transition-colors">40+</span>
-                  </div>
-                  <span className="text-[9px] font-bold text-white/60 uppercase tracking-tighter leading-tight">More</span>
-                </Link>
+                  <Link
+                    to="/register"
+                    className="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-brand-navy bg-brand-teal hover:bg-teal-400 px-5 py-2.5 rounded-xl transition-all shadow-lg hover:-translate-y-0.5 active:scale-95"
+                  >
+                    Explore All Paths <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-11 gap-2">
+                  {paths.map((p) => (
+                    <div
+                      key={p.label}
+                      className={`group flex flex-col items-center text-center cursor-pointer rounded-2xl border p-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${p.bgColor} ${p.borderColor} ${p.hoverBorder} ${p.hoverBg}`}
+                    >
+                      <div className="w-10 h-10 flex items-center justify-center rounded-xl mb-2 bg-white/5 group-hover:bg-white/10 transition-colors">
+                        <p.icon className={`h-5 w-5 ${p.textColor} group-hover:scale-110 transition-transform duration-200`} />
+                      </div>
+                      <span className="text-[9px] font-bold text-white/80 tracking-tight leading-tight group-hover:text-white transition-colors">
+                        {p.label}
+                      </span>
+                    </div>
+                  ))}
+                  <Link
+                    to="/register"
+                    className="group flex flex-col items-center text-center cursor-pointer rounded-2xl border border-white/15 bg-white/5 hover:border-brand-teal/40 hover:bg-white/10 p-3 transition-all duration-300 hover:-translate-y-1"
+                  >
+                    <div className="w-10 h-10 flex items-center justify-center rounded-xl mb-2 bg-white/5 group-hover:bg-white/10">
+                      <span className="text-lg font-black text-brand-teal group-hover:text-brand-orange transition-colors">40+</span>
+                    </div>
+                    <span className="text-[9px] font-bold text-white/60 uppercase tracking-tighter leading-tight">More</span>
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
         </FadeIn>
 
         {/* 7. PARENTS DEDICATED SHOWCASE */}
         <FadeIn>
-        <section id="parents" className="scroll-mt-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 z-10 relative">
-          <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-            <div className="grid lg:grid-cols-12 bg-gradient-to-br from-[#031530] via-[#051c42] to-[#04122d] relative items-stretch overflow-hidden">
-              <div className="absolute -top-24 -left-24 w-64 h-64 bg-brand-teal/10 rounded-full blur-[80px] pointer-events-none" />
-              <div className="absolute -bottom-24 right-0 w-72 h-72 bg-brand-blue/10 rounded-full blur-[80px] pointer-events-none" />
+          <section id="parents" className="scroll-mt-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 z-10 relative">
+            <div className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
+              <div className="grid lg:grid-cols-12 bg-gradient-to-br from-[#031530] via-[#051c42] to-[#04122d] relative items-stretch overflow-hidden">
+                <div className="absolute -top-24 -left-24 w-64 h-64 bg-brand-teal/10 rounded-full blur-[80px] pointer-events-none" />
+                <div className="absolute -bottom-24 right-0 w-72 h-72 bg-brand-blue/10 rounded-full blur-[80px] pointer-events-none" />
 
-              {/* Col 1: Text + features */}
-              <div className="lg:col-span-5 p-7 sm:p-9 flex flex-col justify-center relative z-10">
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold text-brand-orange uppercase tracking-widest bg-brand-orange/10 border border-brand-orange/20 px-3 py-1 rounded-full mb-5 w-fit">
-                  <span className="h-1.5 w-1.5 rounded-full bg-brand-orange animate-pulse" /> For Parents
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
-                  Always Informed,<br />
-                  <span className="text-brand-teal">Always Involved.</span>
-                </h3>
-                <p className="mt-3 text-sm text-white/60 leading-relaxed">
-                  Keep updated with real-time insight into your child's capabilities. View mentor feedback and tracking summaries directly from your dashboard.
-                </p>
-                <ul className="mt-5 space-y-2.5">
-                  {parentFeatures.map((f) => (
-                    <li key={f} className="flex items-center gap-3">
-                      <span className="h-5 w-5 rounded-full bg-brand-teal/15 border border-brand-teal/30 flex items-center justify-center shrink-0">
-                        <Check className="h-3 w-3 text-brand-teal" />
-                      </span>
-                      <span className="text-sm text-white/80 font-medium">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to="/register"
-                  className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-brand-navy bg-brand-teal hover:bg-teal-400 px-6 py-3 rounded-xl transition-all shadow-lg w-fit hover:-translate-y-0.5 active:scale-95"
-                >
-                  Access Parent Dashboard <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-
-              {/* Col 2: Phone mockup */}
-              <div className="lg:col-span-3 p-5 flex justify-center items-center relative z-10 lg:border-l lg:border-white/5 bg-black/10">
-                <motion.div
-                  animate={{ y: [-8, 8, -8] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-[220px] h-[420px] rounded-[2.5rem] bg-slate-950 border-[10px] border-slate-900 shadow-2xl relative overflow-hidden shrink-0 flex flex-col"
-                >
-                  {/* Dynamic Island / Notch */}
-                  <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-24 h-4 bg-black rounded-full z-30 flex items-center justify-between px-2.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-900" />
-                    <span className="w-1 h-1 rounded-full bg-blue-900/60" />
-                  </div>
-
-                  {/* Status Bar */}
-                  <div className="absolute top-1 left-0 right-0 px-6 flex justify-between items-center text-[9px] font-bold text-slate-700 z-20">
-                    <span>9:41</span>
-                    <div className="flex items-center gap-1">
-                      {/* Signal */}
-                      <svg className="w-2.5 h-2 text-slate-700" fill="currentColor" viewBox="0 0 16 16">
-                        <rect x="1" y="8" width="1.5" height="4" rx="0.5" />
-                        <rect x="3.5" y="6" width="1.5" height="6" rx="0.5" />
-                        <rect x="6" y="4" width="1.5" height="8" rx="0.5" />
-                        <rect x="8.5" y="2" width="1.5" height="10" rx="0.5" />
-                      </svg>
-                      {/* Wifi */}
-                      <svg className="w-2.5 h-2 text-slate-700" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M15.384 6.115a.485.485 0 0 0-.047-.736A12.444 12.444 0 0 0 8 3 12.44 12.44 0 0 0 .663 5.379a.485.485 0 0 0-.048.736.518.518 0 0 0 .668.05A11.448 11.448 0 0 1 8 4c2.507 0 4.827.802 6.716 2.164.205.148.49.13.668-.049z"/>
-                      </svg>
-                      {/* Battery */}
-                      <div className="w-4 h-2.5 border border-slate-700 rounded-sm p-0.5 flex items-center">
-                        <div className="w-2.5 h-full bg-slate-700 rounded-2xs" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Device Screen */}
-                  <div className="rounded-[2.1rem] bg-slate-50 text-slate-800 p-4 h-full flex flex-col pt-8 border border-slate-200 relative overflow-hidden flex-grow select-none">
-                    
-                    {/* Welcome Row */}
-                    <div className="flex items-center justify-between mt-2 px-1">
-                      <span className="text-[10px] font-bold text-slate-400">👋 Hello Parent</span>
-                      <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center">
-                        <Users className="w-3 h-3 text-slate-600" />
-                      </div>
-                    </div>
-
-                    {/* Section Header */}
-                    <div className="text-left mt-2 px-1">
-                      <h4 className="text-sm font-black text-slate-800 leading-tight">My Child's Growth</h4>
-                      <p className="text-[8px] text-slate-400 font-medium">Real-time learning metrics</p>
-                    </div>
-
-                    {/* VEDHKRIT INDEX Ring Card */}
-                    <div className="bg-white rounded-2xl border border-slate-100/70 p-3 shadow-xs my-3 flex flex-col items-center">
-                      <div className="relative w-20 h-20 flex items-center justify-center rounded-full bg-slate-50 border border-slate-100/50 shadow-inner">
-                        <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full rotate-[-90deg]">
-                          <circle cx="50" cy="50" r="41" fill="none" stroke="#f1f5f9" strokeWidth="8" />
-                          <circle cx="50" cy="50" r="41" fill="none" stroke="url(#phoneRadarGrad)" strokeWidth="8" strokeDasharray="257" strokeDashoffset="46" strokeLinecap="round" />
-                        </svg>
-                        <defs>
-                          <linearGradient id="phoneRadarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#0488A2" />
-                            <stop offset="100%" stopColor="#052261" />
-                          </linearGradient>
-                        </defs>
-                        <div className="flex flex-col items-center relative z-10">
-                          <div className="text-2xl font-black text-slate-800 leading-none">82</div>
-                          <div className="text-[7px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Index</div>
-                        </div>
-                      </div>
-                      <div className="text-[7.5px] text-slate-400 font-black uppercase tracking-widest mt-2 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200/50">
-                        VEDHKRIT INDEX™
-                      </div>
-                    </div>
-
-                    {/* Two-column quick stats */}
-                    <div className="grid grid-cols-2 gap-2 w-full">
-                      <div className="bg-white rounded-xl p-2 border border-slate-100 text-left shadow-xs flex flex-col justify-between h-12">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[8px] text-slate-400 font-extrabold uppercase tracking-wide">Attendance</span>
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        </div>
-                        <div className="font-extrabold text-[#052261] text-sm leading-none mt-1">95%</div>
-                      </div>
-                      <div className="bg-white rounded-xl p-2 border border-slate-100 text-left shadow-xs flex flex-col justify-between h-12">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[8px] text-slate-400 font-extrabold uppercase tracking-wide">Progress</span>
-                          <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
-                        </div>
-                        <div className="font-extrabold text-[#0488A2] text-xs leading-none mt-1">On Track</div>
-                      </div>
-                    </div>
-
-                    {/* Button */}
-                    <button className="mt-auto w-full text-[9px] py-2.5 rounded-xl bg-gradient-to-r from-brand-teal to-brand-blue hover:opacity-95 text-white font-extrabold uppercase tracking-wider shadow-sm transition-opacity">
-                      View Full Dashboard
-                    </button>
-
-                  </div>
-
-                  {/* Home Indicator Bar */}
-                  <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-20 h-1 bg-black/40 rounded-full z-30" />
-                </motion.div>
-              </div>
-
-              {/* Col 3: Testimonial with photo */}
-              <div className="lg:col-span-4 relative z-10 lg:border-l lg:border-white/5 overflow-hidden flex flex-col justify-end min-h-[260px] lg:min-h-0 group">
-                <img
-                  src="/assets/images/parents-family.jpg"
-                  alt="Parents and Family"
-                  className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent" />
-                <div className="relative z-20 p-7">
-                  <div className="flex items-center gap-1 mb-3">
-                    {[1,2,3,4,5].map(i => (
-                      <svg key={i} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                    ))}
-                  </div>
-                  <div className="text-2xl text-brand-teal font-serif leading-none select-none mb-2">"</div>
-                  <p className="text-sm font-medium leading-relaxed text-white/90">
-                    Vedhkrit has helped my daughter discover her strengths and build coding portfolios she never thought she could construct.
+                {/* Col 1: Text + features */}
+                <div className="lg:col-span-5 p-7 sm:p-9 flex flex-col justify-center relative z-10">
+                  <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold text-brand-orange uppercase tracking-widest bg-brand-orange/10 border border-brand-orange/20 px-3 py-1 rounded-full mb-5 w-fit">
+                    <span className="h-1.5 w-1.5 rounded-full bg-brand-orange animate-pulse" /> For Parents
+                  </span>
+                  <h3 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
+                    Always Informed,<br />
+                    <span className="text-brand-teal">Always Involved.</span>
+                  </h3>
+                  <p className="mt-3 text-sm text-white/60 leading-relaxed">
+                    Keep updated with real-time insight into your child's capabilities. View mentor feedback and tracking summaries directly from your dashboard.
                   </p>
-                  <div className="text-right text-2xl text-brand-teal font-serif leading-none select-none -mt-1">"</div>
-                  <div className="mt-4 flex items-center gap-3 pt-3 border-t border-white/10">
-                    <img src="/assets/images/parent-avatar.jpg" alt="Priya Sharma" className="h-9 w-9 rounded-full object-cover border-2 border-brand-teal/40" loading="lazy" />
-                    <div>
-                      <div className="text-sm font-bold text-white leading-none">Priya Sharma</div>
-                      <div className="text-[10px] text-white/50 mt-0.5">Parent of Grade 9 Learner</div>
+                  <ul className="mt-5 space-y-2.5">
+                    {parentFeatures.map((f) => (
+                      <li key={f} className="flex items-center gap-3">
+                        <span className="h-5 w-5 rounded-full bg-brand-teal/15 border border-brand-teal/30 flex items-center justify-center shrink-0">
+                          <Check className="h-3 w-3 text-brand-teal" />
+                        </span>
+                        <span className="text-sm text-white/80 font-medium">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    to="/register"
+                    className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-brand-navy bg-brand-teal hover:bg-teal-400 px-6 py-3 rounded-xl transition-all shadow-lg w-fit hover:-translate-y-0.5 active:scale-95"
+                  >
+                    Access Parent Dashboard <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+
+                {/* Col 2: Phone mockup */}
+                <div className="lg:col-span-3 p-5 flex justify-center items-center relative z-10 lg:border-l lg:border-white/5 bg-black/10">
+                  <motion.div
+                    animate={{ y: [-8, 8, -8] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-[220px] h-[420px] rounded-[2.5rem] bg-slate-950 border-[10px] border-slate-900 shadow-2xl relative overflow-hidden shrink-0 flex flex-col"
+                  >
+                    {/* Dynamic Island / Notch */}
+                    <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-24 h-4 bg-black rounded-full z-30 flex items-center justify-between px-2.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-900" />
+                      <span className="w-1 h-1 rounded-full bg-blue-900/60" />
+                    </div>
+
+                    {/* Status Bar */}
+                    <div className="absolute top-1 left-0 right-0 px-6 flex justify-between items-center text-[9px] font-bold text-slate-700 z-20">
+                      <span>9:41</span>
+                      <div className="flex items-center gap-1">
+                        {/* Signal */}
+                        <svg className="w-2.5 h-2 text-slate-700" fill="currentColor" viewBox="0 0 16 16">
+                          <rect x="1" y="8" width="1.5" height="4" rx="0.5" />
+                          <rect x="3.5" y="6" width="1.5" height="6" rx="0.5" />
+                          <rect x="6" y="4" width="1.5" height="8" rx="0.5" />
+                          <rect x="8.5" y="2" width="1.5" height="10" rx="0.5" />
+                        </svg>
+                        {/* Wifi */}
+                        <svg className="w-2.5 h-2 text-slate-700" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M15.384 6.115a.485.485 0 0 0-.047-.736A12.444 12.444 0 0 0 8 3 12.44 12.44 0 0 0 .663 5.379a.485.485 0 0 0-.048.736.518.518 0 0 0 .668.05A11.448 11.448 0 0 1 8 4c2.507 0 4.827.802 6.716 2.164.205.148.49.13.668-.049z" />
+                        </svg>
+                        {/* Battery */}
+                        <div className="w-4 h-2.5 border border-slate-700 rounded-sm p-0.5 flex items-center">
+                          <div className="w-2.5 h-full bg-slate-700 rounded-2xs" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Device Screen */}
+                    <div className="rounded-[2.1rem] bg-slate-50 text-slate-800 p-4 h-full flex flex-col pt-8 border border-slate-200 relative overflow-hidden flex-grow select-none">
+
+                      {/* Welcome Row */}
+                      <div className="flex items-center justify-between mt-2 px-1">
+                        <span className="text-[10px] font-bold text-slate-400">👋 Hello Parent</span>
+                        <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center">
+                          <Users className="w-3 h-3 text-slate-600" />
+                        </div>
+                      </div>
+
+                      {/* Section Header */}
+                      <div className="text-left mt-2 px-1">
+                        <h4 className="text-sm font-black text-slate-800 leading-tight">My Child's Growth</h4>
+                        <p className="text-[8px] text-slate-400 font-medium">Real-time learning metrics</p>
+                      </div>
+
+                      {/* VEDHKRIT INDEX Ring Card */}
+                      <div className="bg-white rounded-2xl border border-slate-100/70 p-3 shadow-xs my-3 flex flex-col items-center">
+                        <div className="relative w-20 h-20 flex items-center justify-center rounded-full bg-slate-50 border border-slate-100/50 shadow-inner">
+                          <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full rotate-[-90deg]">
+                            <circle cx="50" cy="50" r="41" fill="none" stroke="#f1f5f9" strokeWidth="8" />
+                            <circle cx="50" cy="50" r="41" fill="none" stroke="url(#phoneRadarGrad)" strokeWidth="8" strokeDasharray="257" strokeDashoffset="46" strokeLinecap="round" />
+                          </svg>
+                          <defs>
+                            <linearGradient id="phoneRadarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#0488A2" />
+                              <stop offset="100%" stopColor="#052261" />
+                            </linearGradient>
+                          </defs>
+                          <div className="flex flex-col items-center relative z-10">
+                            <div className="text-2xl font-black text-slate-800 leading-none">82</div>
+                            <div className="text-[7px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Index</div>
+                          </div>
+                        </div>
+                        <div className="text-[7.5px] text-slate-400 font-black uppercase tracking-widest mt-2 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200/50">
+                          VEDHKRIT INDEX™
+                        </div>
+                      </div>
+
+                      {/* Two-column quick stats */}
+                      <div className="grid grid-cols-2 gap-2 w-full">
+                        <div className="bg-white rounded-xl p-2 border border-slate-100 text-left shadow-xs flex flex-col justify-between h-12">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[8px] text-slate-400 font-extrabold uppercase tracking-wide">Attendance</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          </div>
+                          <div className="font-extrabold text-[#052261] text-sm leading-none mt-1">95%</div>
+                        </div>
+                        <div className="bg-white rounded-xl p-2 border border-slate-100 text-left shadow-xs flex flex-col justify-between h-12">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[8px] text-slate-400 font-extrabold uppercase tracking-wide">Progress</span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+                          </div>
+                          <div className="font-extrabold text-[#0488A2] text-xs leading-none mt-1">On Track</div>
+                        </div>
+                      </div>
+
+                      {/* Button */}
+                      <button className="mt-auto w-full text-[9px] py-2.5 rounded-xl bg-gradient-to-r from-brand-teal to-brand-blue hover:opacity-95 text-white font-extrabold uppercase tracking-wider shadow-sm transition-opacity">
+                        View Full Dashboard
+                      </button>
+
+                    </div>
+
+                    {/* Home Indicator Bar */}
+                    <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-20 h-1 bg-black/40 rounded-full z-30" />
+                  </motion.div>
+                </div>
+
+                {/* Col 3: Testimonial with photo */}
+                <div className="lg:col-span-4 relative z-10 lg:border-l lg:border-white/5 overflow-hidden flex flex-col justify-end min-h-[260px] lg:min-h-0 group">
+                  <img
+                    src="/assets/images/parents-family.jpg"
+                    alt="Parents and Family"
+                    className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent" />
+                  <div className="relative z-20 p-7">
+                    <div className="flex items-center gap-1 mb-3">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <svg key={i} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                      ))}
+                    </div>
+                    <div className="text-2xl text-brand-teal font-serif leading-none select-none mb-2">"</div>
+                    <p className="text-sm font-medium leading-relaxed text-white/90">
+                      Vedhkrit has helped my daughter discover her strengths and build coding portfolios she never thought she could construct.
+                    </p>
+                    <div className="text-right text-2xl text-brand-teal font-serif leading-none select-none -mt-1">"</div>
+                    <div className="mt-4 flex items-center gap-3 pt-3 border-t border-white/10">
+                      <img src="/assets/images/parent-avatar.jpg" alt="Priya Sharma" className="h-9 w-9 rounded-full object-cover border-2 border-brand-teal/40" loading="lazy" />
+                      <div>
+                        <div className="text-sm font-bold text-white leading-none">Priya Sharma</div>
+                        <div className="text-[10px] text-white/50 mt-0.5">Parent of Grade 9 Learner</div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </FadeIn>
+
+        {/* 8. READY TO DESIGN YOUR FUTURE (App-Ready Final CTA) */}
+        <FadeIn>
+          <section className="py-12 bg-gradient-to-br from-[#031530] via-[#052261] to-[#04122d] text-white relative overflow-hidden z-10 border-t border-white/10">
+
+            {/* Background image covering full screen on mobile, right 2/3rds on desktop */}
+            <div className="absolute inset-0 z-0">
+              <img
+                src="/assets/images/final-cta-v2.png"
+                alt="Student Success CTA Backdrop"
+                className="absolute inset-y-0 right-0 w-full lg:w-2/3 h-full object-cover object-right lg:object-top opacity-90 lg:opacity-100"
+                loading="eager"
+              />
+            </div>
+
+            {/* Custom continuous premium gradient overlay mask (seamless desktop transition) */}
+            <div
+              className="absolute inset-0 z-10 hidden lg:block"
+              style={{
+                background: 'linear-gradient(to right, #031530 0%, #031530 30%, rgba(3, 21, 48, 0.95) 45%, rgba(3, 21, 48, 0.7) 65%, rgba(3, 21, 48, 0.2) 85%, transparent 100%)'
+              }}
+            />
+            {/* Mobile vertical gradient overlay mask */}
+            <div
+              className="absolute inset-0 z-10 lg:hidden"
+              style={{
+                background: 'linear-gradient(to bottom, rgba(3, 21, 48, 0.95) 0%, rgba(3, 21, 48, 0.8) 50%, rgba(3, 21, 48, 0.98) 100%)'
+              }}
+            />
+
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-20">
+              <div className="max-w-2xl text-left space-y-4">
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight">
+                  Ready to Design <span className="text-brand-teal">Your Future?</span>
+                </h2>
+                <p className="text-xs sm:text-sm leading-relaxed text-slate-300 max-w-md font-medium">
+                  Join thousands of students and parents unlocking true cognitive potential, matching with mentors, and creating future-ready skillsets.
+                </p>
+                <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <Link
+                    to="/register"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-btn-accent hover:bg-orange-600 px-5 py-2.5 text-xs sm:text-sm font-bold text-text-inverse transition-colors shadow-lg animate-pulse"
+                  >
+                    Start Journey Free <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link
+                    to="/contact"
+                    className="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/10 hover:bg-white/20 px-5 py-2.5 text-xs sm:text-sm font-bold text-white transition-colors"
+                  >
+                    Contact Sales
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
         </FadeIn>
       </div>
     </div>
