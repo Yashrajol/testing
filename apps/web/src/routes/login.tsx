@@ -29,6 +29,59 @@ function LoginPage() {
       return;
     }
 
+    // Demo bypass for seeded accounts
+    const isSeededAccount = [
+      "student@vedhkrit.com",
+      "parent@vedhkrit.com",
+      "mentor@vedhkrit.com",
+      "admin@vedhkrit.com",
+      "superadmin@vedhkrit.com"
+    ].includes(email.toLowerCase()) && password === "password123";
+
+    if (isSeededAccount) {
+      const roleMap: Record<string, string> = {
+        "student@vedhkrit.com": "STUDENT",
+        "parent@vedhkrit.com": "PARENT",
+        "mentor@vedhkrit.com": "MENTOR",
+        "admin@vedhkrit.com": "ADMIN",
+        "superadmin@vedhkrit.com": "SUPERADMIN"
+      };
+      const nameMap: Record<string, string> = {
+        "student@vedhkrit.com": "Yash Rajole",
+        "parent@vedhkrit.com": "Priya Sharma",
+        "mentor@vedhkrit.com": "Neha Mehta",
+        "admin@vedhkrit.com": "Admin User",
+        "superadmin@vedhkrit.com": "Super Admin"
+      };
+      
+      const role = roleMap[email.toLowerCase()];
+      const mockUser = {
+        id: `${role.toLowerCase()}-123`,
+        email: email.toLowerCase(),
+        name: nameMap[email.toLowerCase()],
+        role: role,
+        status: "ACTIVE",
+      };
+
+      login("mock-jwt-token-for-yash", mockUser);
+      toast.success("Successfully logged in!");
+
+      if (role === "STUDENT") {
+        navigate({ to: "/dashboard/student" });
+      } else if (role === "PARENT") {
+        navigate({ to: "/dashboard/parent" });
+      } else if (role === "MENTOR") {
+        navigate({ to: "/dashboard/mentor" });
+      } else if (role === "ADMIN") {
+        navigate({ to: "/dashboard/admin" });
+      } else if (role === "SUPERADMIN") {
+        navigate({ to: "/dashboard/super" });
+      } else {
+        navigate({ to: "/dashboard" });
+      }
+      return;
+    }
+
     loginMutation.mutate(
       { email, password },
       {
