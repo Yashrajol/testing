@@ -1,6 +1,23 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { DashboardShell } from "@/components/dashboard-shell";
-import { LayoutDashboard, BookOpen, Compass, Sparkles, Calendar, Award, FileText, Bot, Target, TrendingUp } from "lucide-react";
+import { 
+  LayoutDashboard, 
+  BookOpen, 
+  Video, 
+  CheckSquare, 
+  FileText, 
+  Book, 
+  Sparkles, 
+  Target, 
+  Users, 
+  Award, 
+  Calendar, 
+  MessageSquare, 
+  User, 
+  Settings,
+  CalendarDays,
+  Compass
+} from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/student")({
   component: StudentDashboardLayout,
@@ -8,16 +25,19 @@ export const Route = createFileRoute("/dashboard/student")({
 });
 
 const items = [
-  { to: "/dashboard/student", label: "Overview", icon: LayoutDashboard },
-  { to: "/dashboard/student/academics", label: "Academics", icon: BookOpen },
-  { to: "/dashboard/student/skills", label: "Skills", icon: Sparkles },
-  { to: "/dashboard/student/career", label: "Career", icon: Compass },
-  { to: "/dashboard/student/goals", label: "Goals", icon: Target },
-  { to: "/dashboard/student/sessions", label: "Mentor Sessions", icon: Calendar },
-  { to: "/dashboard/student/portfolio", label: "Portfolio", icon: Award },
+  { to: "/dashboard/student", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dashboard/student/academics", label: "My Subjects", icon: BookOpen },
+  { to: "/dashboard/student/sessions", label: "Live Classes", icon: Video },
+  { to: "/dashboard/student/goals", label: "Homework", icon: CheckSquare },
   { to: "/dashboard/student/assessments", label: "Assessments", icon: FileText },
-  { to: "/dashboard/student/ai", label: "AI Assistant", icon: Bot },
-  { to: "/dashboard/student/reports", label: "Reports", icon: TrendingUp },
+  { to: "/dashboard/student/portfolio", label: "Study Material", icon: Book },
+  { to: "/dashboard/student/planner", label: "Daily Planner", icon: CalendarDays },
+  { to: "/dashboard/student/ai", label: "VedhAI", icon: Sparkles },
+  { to: "/dashboard/student/skills", label: "My Growth", icon: Target },
+  { to: "/dashboard/student/mentor", label: "Mentor", icon: Users },
+  { to: "/dashboard/student/career", label: "Career Explorer", icon: Compass },
+  { to: "/dashboard/student/reports", label: "Achievements", icon: Award },
+  { to: "/dashboard/student/profile", label: "Profile", icon: User },
 ];
 
 function StudentDashboardLayout() {

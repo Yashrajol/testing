@@ -23,8 +23,8 @@ Before initiating a live presentation or recording a platform walkthrough, compl
    npm run dev
    ```
 2. **Access Links:**
-   * **Public Website / Portals (TanStack Router):** `http://localhost:3000` (or active Vite server port).
-   * **Back-office Cohort/Admin Server (NestJS):** `http://localhost:4000` (or NestJS environment port).
+   * **Public Website / Portals (TanStack Router):** `http://localhost:8080` (or active Vite server port).
+   * **Back-office Cohort/Admin Server (NestJS):** `http://localhost:5000` (or NestJS environment port).
 3. **Reset State:** Clear browser cookies or open an Incognito tab to experience the **Branded Preloader** and clean onboarding routing correctly.
 4. **Resolution Testing:** 
    * Pre-load on both standard desktop viewports (e.g. `1920x1080`) and toggle mobile inspection viewports (e.g. `375x812` - iPhone X/12) to showcase responsive fluid scaling.
