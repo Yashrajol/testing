@@ -52,10 +52,10 @@ import { Route as DashboardStudentAssessmentsRouteImport } from './routes/dashbo
 import { Route as DashboardStudentAiRouteImport } from './routes/dashboard.student.ai'
 import { Route as DashboardStudentAcademicsRouteImport } from './routes/dashboard.student.academics'
 import { Route as DashboardParentReportsRouteImport } from './routes/dashboard.parent.reports'
-import { Route as DashboardParentRecommendationsRouteImport } from './routes/dashboard.parent.recommendations'
-import { Route as DashboardParentMentorNotesRouteImport } from './routes/dashboard.parent.mentor-notes'
-import { Route as DashboardParentGrowthRouteImport } from './routes/dashboard.parent.growth'
-import { Route as DashboardParentCommunicationRouteImport } from './routes/dashboard.parent.communication'
+import { Route as DashboardParentProgressRouteImport } from './routes/dashboard.parent.progress'
+import { Route as DashboardParentProfileRouteImport } from './routes/dashboard.parent.profile'
+import { Route as DashboardParentMessagesRouteImport } from './routes/dashboard.parent.messages'
+import { Route as DashboardParentMentorRouteImport } from './routes/dashboard.parent.mentor'
 import { Route as DashboardParentAttendanceRouteImport } from './routes/dashboard.parent.attendance'
 import { Route as DashboardMentorStudentsRouteImport } from './routes/dashboard.mentor.students'
 import { Route as DashboardMentorSessionsRouteImport } from './routes/dashboard.mentor.sessions'
@@ -290,29 +290,26 @@ const DashboardParentReportsRoute = DashboardParentReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => DashboardParentRoute,
 } as any)
-const DashboardParentRecommendationsRoute =
-  DashboardParentRecommendationsRouteImport.update({
-    id: '/recommendations',
-    path: '/recommendations',
-    getParentRoute: () => DashboardParentRoute,
-  } as any)
-const DashboardParentMentorNotesRoute =
-  DashboardParentMentorNotesRouteImport.update({
-    id: '/mentor-notes',
-    path: '/mentor-notes',
-    getParentRoute: () => DashboardParentRoute,
-  } as any)
-const DashboardParentGrowthRoute = DashboardParentGrowthRouteImport.update({
-  id: '/growth',
-  path: '/growth',
+const DashboardParentProgressRoute = DashboardParentProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
   getParentRoute: () => DashboardParentRoute,
 } as any)
-const DashboardParentCommunicationRoute =
-  DashboardParentCommunicationRouteImport.update({
-    id: '/communication',
-    path: '/communication',
-    getParentRoute: () => DashboardParentRoute,
-  } as any)
+const DashboardParentProfileRoute = DashboardParentProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => DashboardParentRoute,
+} as any)
+const DashboardParentMessagesRoute = DashboardParentMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => DashboardParentRoute,
+} as any)
+const DashboardParentMentorRoute = DashboardParentMentorRouteImport.update({
+  id: '/mentor',
+  path: '/mentor',
+  getParentRoute: () => DashboardParentRoute,
+} as any)
 const DashboardParentAttendanceRoute =
   DashboardParentAttendanceRouteImport.update({
     id: '/attendance',
@@ -423,10 +420,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/mentor/sessions': typeof DashboardMentorSessionsRoute
   '/dashboard/mentor/students': typeof DashboardMentorStudentsRoute
   '/dashboard/parent/attendance': typeof DashboardParentAttendanceRoute
-  '/dashboard/parent/communication': typeof DashboardParentCommunicationRoute
-  '/dashboard/parent/growth': typeof DashboardParentGrowthRoute
-  '/dashboard/parent/mentor-notes': typeof DashboardParentMentorNotesRoute
-  '/dashboard/parent/recommendations': typeof DashboardParentRecommendationsRoute
+  '/dashboard/parent/mentor': typeof DashboardParentMentorRoute
+  '/dashboard/parent/messages': typeof DashboardParentMessagesRoute
+  '/dashboard/parent/profile': typeof DashboardParentProfileRoute
+  '/dashboard/parent/progress': typeof DashboardParentProgressRoute
   '/dashboard/parent/reports': typeof DashboardParentReportsRoute
   '/dashboard/student/academics': typeof DashboardStudentAcademicsRoute
   '/dashboard/student/ai': typeof DashboardStudentAiRoute
@@ -480,10 +477,10 @@ export interface FileRoutesByTo {
   '/dashboard/mentor/sessions': typeof DashboardMentorSessionsRoute
   '/dashboard/mentor/students': typeof DashboardMentorStudentsRoute
   '/dashboard/parent/attendance': typeof DashboardParentAttendanceRoute
-  '/dashboard/parent/communication': typeof DashboardParentCommunicationRoute
-  '/dashboard/parent/growth': typeof DashboardParentGrowthRoute
-  '/dashboard/parent/mentor-notes': typeof DashboardParentMentorNotesRoute
-  '/dashboard/parent/recommendations': typeof DashboardParentRecommendationsRoute
+  '/dashboard/parent/mentor': typeof DashboardParentMentorRoute
+  '/dashboard/parent/messages': typeof DashboardParentMessagesRoute
+  '/dashboard/parent/profile': typeof DashboardParentProfileRoute
+  '/dashboard/parent/progress': typeof DashboardParentProgressRoute
   '/dashboard/parent/reports': typeof DashboardParentReportsRoute
   '/dashboard/student/academics': typeof DashboardStudentAcademicsRoute
   '/dashboard/student/ai': typeof DashboardStudentAiRoute
@@ -544,10 +541,10 @@ export interface FileRoutesById {
   '/dashboard/mentor/sessions': typeof DashboardMentorSessionsRoute
   '/dashboard/mentor/students': typeof DashboardMentorStudentsRoute
   '/dashboard/parent/attendance': typeof DashboardParentAttendanceRoute
-  '/dashboard/parent/communication': typeof DashboardParentCommunicationRoute
-  '/dashboard/parent/growth': typeof DashboardParentGrowthRoute
-  '/dashboard/parent/mentor-notes': typeof DashboardParentMentorNotesRoute
-  '/dashboard/parent/recommendations': typeof DashboardParentRecommendationsRoute
+  '/dashboard/parent/mentor': typeof DashboardParentMentorRoute
+  '/dashboard/parent/messages': typeof DashboardParentMessagesRoute
+  '/dashboard/parent/profile': typeof DashboardParentProfileRoute
+  '/dashboard/parent/progress': typeof DashboardParentProgressRoute
   '/dashboard/parent/reports': typeof DashboardParentReportsRoute
   '/dashboard/student/academics': typeof DashboardStudentAcademicsRoute
   '/dashboard/student/ai': typeof DashboardStudentAiRoute
@@ -608,10 +605,10 @@ export interface FileRouteTypes {
     | '/dashboard/mentor/sessions'
     | '/dashboard/mentor/students'
     | '/dashboard/parent/attendance'
-    | '/dashboard/parent/communication'
-    | '/dashboard/parent/growth'
-    | '/dashboard/parent/mentor-notes'
-    | '/dashboard/parent/recommendations'
+    | '/dashboard/parent/mentor'
+    | '/dashboard/parent/messages'
+    | '/dashboard/parent/profile'
+    | '/dashboard/parent/progress'
     | '/dashboard/parent/reports'
     | '/dashboard/student/academics'
     | '/dashboard/student/ai'
@@ -665,10 +662,10 @@ export interface FileRouteTypes {
     | '/dashboard/mentor/sessions'
     | '/dashboard/mentor/students'
     | '/dashboard/parent/attendance'
-    | '/dashboard/parent/communication'
-    | '/dashboard/parent/growth'
-    | '/dashboard/parent/mentor-notes'
-    | '/dashboard/parent/recommendations'
+    | '/dashboard/parent/mentor'
+    | '/dashboard/parent/messages'
+    | '/dashboard/parent/profile'
+    | '/dashboard/parent/progress'
     | '/dashboard/parent/reports'
     | '/dashboard/student/academics'
     | '/dashboard/student/ai'
@@ -728,10 +725,10 @@ export interface FileRouteTypes {
     | '/dashboard/mentor/sessions'
     | '/dashboard/mentor/students'
     | '/dashboard/parent/attendance'
-    | '/dashboard/parent/communication'
-    | '/dashboard/parent/growth'
-    | '/dashboard/parent/mentor-notes'
-    | '/dashboard/parent/recommendations'
+    | '/dashboard/parent/mentor'
+    | '/dashboard/parent/messages'
+    | '/dashboard/parent/profile'
+    | '/dashboard/parent/progress'
     | '/dashboard/parent/reports'
     | '/dashboard/student/academics'
     | '/dashboard/student/ai'
@@ -1073,32 +1070,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardParentReportsRouteImport
       parentRoute: typeof DashboardParentRoute
     }
-    '/dashboard/parent/recommendations': {
-      id: '/dashboard/parent/recommendations'
-      path: '/recommendations'
-      fullPath: '/dashboard/parent/recommendations'
-      preLoaderRoute: typeof DashboardParentRecommendationsRouteImport
+    '/dashboard/parent/progress': {
+      id: '/dashboard/parent/progress'
+      path: '/progress'
+      fullPath: '/dashboard/parent/progress'
+      preLoaderRoute: typeof DashboardParentProgressRouteImport
       parentRoute: typeof DashboardParentRoute
     }
-    '/dashboard/parent/mentor-notes': {
-      id: '/dashboard/parent/mentor-notes'
-      path: '/mentor-notes'
-      fullPath: '/dashboard/parent/mentor-notes'
-      preLoaderRoute: typeof DashboardParentMentorNotesRouteImport
+    '/dashboard/parent/profile': {
+      id: '/dashboard/parent/profile'
+      path: '/profile'
+      fullPath: '/dashboard/parent/profile'
+      preLoaderRoute: typeof DashboardParentProfileRouteImport
       parentRoute: typeof DashboardParentRoute
     }
-    '/dashboard/parent/growth': {
-      id: '/dashboard/parent/growth'
-      path: '/growth'
-      fullPath: '/dashboard/parent/growth'
-      preLoaderRoute: typeof DashboardParentGrowthRouteImport
+    '/dashboard/parent/messages': {
+      id: '/dashboard/parent/messages'
+      path: '/messages'
+      fullPath: '/dashboard/parent/messages'
+      preLoaderRoute: typeof DashboardParentMessagesRouteImport
       parentRoute: typeof DashboardParentRoute
     }
-    '/dashboard/parent/communication': {
-      id: '/dashboard/parent/communication'
-      path: '/communication'
-      fullPath: '/dashboard/parent/communication'
-      preLoaderRoute: typeof DashboardParentCommunicationRouteImport
+    '/dashboard/parent/mentor': {
+      id: '/dashboard/parent/mentor'
+      path: '/mentor'
+      fullPath: '/dashboard/parent/mentor'
+      preLoaderRoute: typeof DashboardParentMentorRouteImport
       parentRoute: typeof DashboardParentRoute
     }
     '/dashboard/parent/attendance': {
@@ -1284,20 +1281,20 @@ const DashboardMentorRouteWithChildren = DashboardMentorRoute._addFileChildren(
 
 interface DashboardParentRouteChildren {
   DashboardParentAttendanceRoute: typeof DashboardParentAttendanceRoute
-  DashboardParentCommunicationRoute: typeof DashboardParentCommunicationRoute
-  DashboardParentGrowthRoute: typeof DashboardParentGrowthRoute
-  DashboardParentMentorNotesRoute: typeof DashboardParentMentorNotesRoute
-  DashboardParentRecommendationsRoute: typeof DashboardParentRecommendationsRoute
+  DashboardParentMentorRoute: typeof DashboardParentMentorRoute
+  DashboardParentMessagesRoute: typeof DashboardParentMessagesRoute
+  DashboardParentProfileRoute: typeof DashboardParentProfileRoute
+  DashboardParentProgressRoute: typeof DashboardParentProgressRoute
   DashboardParentReportsRoute: typeof DashboardParentReportsRoute
   DashboardParentIndexRoute: typeof DashboardParentIndexRoute
 }
 
 const DashboardParentRouteChildren: DashboardParentRouteChildren = {
   DashboardParentAttendanceRoute: DashboardParentAttendanceRoute,
-  DashboardParentCommunicationRoute: DashboardParentCommunicationRoute,
-  DashboardParentGrowthRoute: DashboardParentGrowthRoute,
-  DashboardParentMentorNotesRoute: DashboardParentMentorNotesRoute,
-  DashboardParentRecommendationsRoute: DashboardParentRecommendationsRoute,
+  DashboardParentMentorRoute: DashboardParentMentorRoute,
+  DashboardParentMessagesRoute: DashboardParentMessagesRoute,
+  DashboardParentProfileRoute: DashboardParentProfileRoute,
+  DashboardParentProgressRoute: DashboardParentProgressRoute,
   DashboardParentReportsRoute: DashboardParentReportsRoute,
   DashboardParentIndexRoute: DashboardParentIndexRoute,
 }

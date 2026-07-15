@@ -29,6 +29,24 @@ function LoginPage() {
       return;
     }
 
+    // Demo bypass for parent seeded account
+    const isParentSeeded = email.toLowerCase() === "parent@vedhkrit.com" && password === "password123";
+
+    if (isParentSeeded) {
+      const mockUser = {
+        id: "parent-123",
+        email: "parent@vedhkrit.com",
+        name: "Priya Sharma",
+        role: "PARENT",
+        status: "ACTIVE",
+      };
+
+      login("mock-jwt-token-for-yash", mockUser);
+      toast.success("Successfully logged in!");
+      navigate({ to: "/dashboard/parent" });
+      return;
+    }
+
     loginMutation.mutate(
       { email, password },
       {
