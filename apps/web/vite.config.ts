@@ -12,6 +12,16 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  vite: {
+    server: {
+      host: "0.0.0.0",
+      port: 8080,
+      watch: {
+        usePolling: true,
+        interval: 1000,
+      },
+    },
+  },
   // Deployed to Vercel; without this the config defaults to a Cloudflare Workers build.
   nitro: { preset: "vercel" },
 });

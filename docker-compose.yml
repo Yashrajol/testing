@@ -63,9 +63,6 @@ services:
     image: vedhkrit-app:dev
     container_name: vedhkrit-web
     command: npm run dev --workspace=@vedhkrit/web
-    environment:
-      VITE_API_URL: http://localhost:5000
-      CHOKIDAR_USEPOLLING: "true"
     ports:
       - "8080:8080"
     volumes: *app-volumes
