@@ -193,12 +193,8 @@
 
 @layer base {
   * { border-color: var(--color-border); }
-  html {
-    font-family: var(--font-sans);
-    overflow-x: hidden;
-  }
+  html, body { font-family: var(--font-sans); }
   body {
-    font-family: var(--font-sans);
     margin: 0;
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -209,28 +205,6 @@
     background-attachment: fixed;
   }
   h1,h2,h3,h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
-}
-
-/* Lenis Smooth Scroll Recommended CSS */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-
-.lenis.lenis-scrolling iframe {
-  pointer-events: none;
 }
 
 @utility glass {
@@ -293,9 +267,4 @@ html.lenis body {
   }
 }
 
-/* Scale down homepage sections below hero by 5% on desktop viewports */
-@media (min-width: 1024px) {
-  .home-sections-scaled {
-    zoom: 0.95;
-  }
-}
+

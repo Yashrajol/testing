@@ -539,7 +539,7 @@ function HomePage() {
       </section>
 
       {/* Vector Illustrations background applied below Hero Section */}
-      <div className="relative overflow-x-clip home-sections-scaled">
+      <div className="relative">
         <TechBackgroundDecorator />
 
         {/* 2. THE VEDHKRIT JOURNEY */}
