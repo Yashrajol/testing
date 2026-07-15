@@ -158,16 +158,17 @@ function Assessment() {
 
           {/* Engine Architecture Callout */}
           <motion.div variants={itemVariants} className="w-full">
-            <GlassCard className="bg-gradient-to-br from-brand-navy to-indigo-950 p-8 sm:p-12 text-center text-white border-0">
-              <Shield className="h-12 w-12 text-brand-teal mx-auto mb-6 opacity-80" />
-              <h2 className="text-3xl font-black mb-4">Enterprise-Grade Architecture</h2>
-              <p className="text-white/70 max-w-2xl mx-auto text-sm leading-relaxed mb-8">
+            <div className="rounded-3xl bg-gradient-to-br from-brand-navy to-indigo-950 p-8 sm:p-12 text-center text-white border-0 shadow-xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
+              <Shield className="h-12 w-12 text-brand-teal mx-auto mb-6 opacity-80 relative z-10" />
+              <h2 className="text-3xl font-black mb-4 relative z-10">Enterprise-Grade Architecture</h2>
+              <p className="text-white/70 max-w-2xl mx-auto text-sm leading-relaxed mb-8 relative z-10">
                 Our diagnostic engine uses Item Response Theory (IRT) and Machine Learning to dynamically adjust question difficulty based on student responses, reducing test fatigue while increasing measurement accuracy.
               </p>
-              <Link to="/register" className="inline-flex items-center gap-2 rounded-xl bg-white text-brand-navy px-6 py-3 text-sm font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
+              <Link to="/register" className="inline-flex items-center gap-2 rounded-xl bg-white text-brand-navy px-6 py-3 text-sm font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all relative z-10">
                 Request School Demo <ArrowRight className="h-4 w-4" />
               </Link>
-            </GlassCard>
+            </div>
           </motion.div>
 
         </motion.div>
