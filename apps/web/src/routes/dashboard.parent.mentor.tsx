@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageHeader } from "@/components/dashboard-shell";
 import { GlassCard } from "@/components/glass-card";
-import { 
-  User, Calendar, CheckSquare, MessageSquare, 
+import {
+  User, Calendar, CheckSquare, MessageSquare,
   Sparkles, BookOpen, Heart, Award, Clock, Download, Video, Phone
 } from "lucide-react";
 import { motion } from "motion/react";
+import { mentorAvatar } from "@/lib/avatars";
 
 export const Route = createFileRoute("/dashboard/parent/mentor")({
   component: ParentMentorPage,
@@ -200,7 +201,7 @@ function ParentMentorPage() {
             <div className="relative pb-5 border-b border-slate-100">
               <div className="mx-auto h-20 w-20 rounded-full bg-slate-50 p-0.5 border border-slate-200 overflow-hidden shadow-inner">
                 <img 
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=120&auto=format&fit=crop" 
+                  src={mentorAvatar(2, 120)}
                   alt="Priya Iyer" 
                   className="h-full w-full object-cover" 
                 />

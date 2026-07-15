@@ -179,7 +179,7 @@ function AssessmentsPage() {
       animate="show"
       className="space-y-6 text-left"
     >
-      <PageHeader title="Assessments" subtitle="Attempt scheduled tests, view diagnostic charts, and review weak topics." />
+      <PageHeader title="Assessments" subtitle="Take your tests, check your results, and see which topics to work on." />
 
       {/* Top Highlights Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -331,7 +331,7 @@ function AssessmentsPage() {
                     </div>
 
                     <button 
-                      onClick={() => toast.info(`Accessing exam diagnostics analysis for: ${test.chapter}`)}
+                      onClick={() => toast.info(`Opening your test review for: ${test.chapter}`)}
                       className="w-full py-2 bg-slate-50 border border-slate-150 text-text-heading rounded-xl text-xs font-bold hover:bg-slate-100 transition-colors flex items-center justify-center gap-1.5"
                     >
                       <BarChart3 className="h-4 w-4" /> View Detailed Analysis

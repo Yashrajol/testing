@@ -34,10 +34,10 @@ const twinFeatures = [
 ];
 
 const snapshot = [
-  { icon: Brain, label: "Learning Style", value: "Visual Learner", textColor: "text-purple-400", bgColor: "bg-purple-950/30", borderColor: "border-purple-500/20", hoverBg: "hover:bg-purple-500/10" },
-  { icon: Sparkles, label: "Top Strength", value: "Logical Thinking", textColor: "text-teal-400", bgColor: "bg-teal-950/30", borderColor: "border-teal-500/20", hoverBg: "hover:bg-teal-500/10" },
-  { icon: TargetIcon, label: "Growth Area", value: "Public Speaking", textColor: "text-orange-400", bgColor: "bg-orange-950/30", borderColor: "border-orange-500/20", hoverBg: "hover:bg-orange-500/10" },
-  { icon: Cpu, label: "Career Interest", value: "AI & Technology", textColor: "text-blue-400", bgColor: "bg-blue-950/30", borderColor: "border-blue-500/20", hoverBg: "hover:bg-blue-500/10" },
+  { icon: Brain, label: "Learning Style", value: "Visual Learner", textColor: "text-purple-500", bgColor: "bg-purple-50", borderColor: "border-purple-200", hoverBg: "hover:bg-purple-100" },
+  { icon: Sparkles, label: "Top Strength", value: "Logical Thinking", textColor: "text-teal-500", bgColor: "bg-teal-50", borderColor: "border-teal-200", hoverBg: "hover:bg-teal-100" },
+  { icon: TargetIcon, label: "Growth Area", value: "Public Speaking", textColor: "text-orange-500", bgColor: "bg-orange-50", borderColor: "border-orange-200", hoverBg: "hover:bg-orange-100" },
+  { icon: Cpu, label: "Career Interest", value: "AI & Technology", textColor: "text-blue-500", bgColor: "bg-blue-50", borderColor: "border-blue-200", hoverBg: "hover:bg-blue-100" },
 ];
 
 const slecCards = [
@@ -649,14 +649,15 @@ function HomePage() {
               <FadeIn delay={0.1} x={-20} y={0}>
                 <div className="group rounded-2xl overflow-hidden border border-brand-blue/20 bg-white hover:shadow-xl hover:shadow-brand-blue/10 transition-all duration-500 h-full flex flex-col">
                   <div className="flex flex-col sm:flex-row flex-1">
-                    {/* Left visual panel — tablet/desktop only */}
-                    <div className="hidden sm:flex sm:w-40 lg:w-48 shrink-0 bg-gradient-to-br from-brand-blue via-[#1d4ed8] to-brand-navy flex-col items-center justify-center p-5 gap-3 relative overflow-hidden">
-                      <div className="absolute inset-0 opacity-20" style={{backgroundImage: 'radial-gradient(circle at 30% 30%, #60a5fa 0%, transparent 60%), radial-gradient(circle at 70% 70%, #0488A2 0%, transparent 60%)'}} />
+                    {/* Left visual panel — real student photo, tablet/desktop only */}
+                    <div className="hidden sm:flex sm:w-40 lg:w-48 shrink-0 flex-col items-center justify-end p-5 gap-3 relative overflow-hidden">
+                      <img src="/assets/images/student-verve.png" alt="Student" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-brand-blue/85 via-brand-blue/25 to-transparent" />
                       <div className="relative z-10 text-center">
-                        <div className="h-12 w-12 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center mx-auto mb-2">
-                          <GraduationCap className="h-6 w-6 text-white" />
+                        <div className="h-11 w-11 rounded-2xl bg-white/25 backdrop-blur-sm border border-white/40 flex items-center justify-center mx-auto mb-2">
+                          <GraduationCap className="h-5.5 w-5.5 text-white" />
                         </div>
-                        <div className="text-white/80 text-[9px] font-bold uppercase tracking-widest">For Students</div>
+                        <div className="text-white text-[9px] font-bold uppercase tracking-widest drop-shadow">For Students</div>
                       </div>
                     </div>
 
@@ -700,42 +701,57 @@ function HomePage() {
 
               {/* ── PARENT CARD ── */}
               <FadeIn delay={0.2} x={20} y={0}>
-                <div className="group rounded-2xl overflow-hidden border border-white/10 bg-gradient-to-br from-[#1a0a00] via-[#2d1200] to-[#1a0800] hover:shadow-xl hover:shadow-brand-orange/10 transition-all duration-500 h-full flex flex-col">
-                  <div className="p-4 sm:p-5 flex-1 flex flex-col">
-                    <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
-                      <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-brand-orange/20 border border-brand-orange/30 flex items-center justify-center shrink-0">
-                        <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-brand-orange" />
-                      </div>
-                      <span className="text-[9px] sm:text-[10px] font-extrabold text-brand-orange uppercase tracking-widest bg-brand-orange/15 px-2 py-0.5 rounded-full border border-brand-orange/25">For Parents</span>
-                    </div>
-                    <h3 className="text-base sm:text-lg font-bold text-white leading-tight">Always Informed. Always Involved.</h3>
-                    <p className="mt-1.5 text-xs sm:text-sm text-white/60 leading-relaxed flex-1">
-                      Stay updated with deep insights into your child's growth. Track progress, receive recommendations, and review mentor feedback in real time.
-                    </p>
-                    <div className="mt-2 sm:mt-3 grid grid-cols-2 gap-1.5">
-                      {["Live Reports", "Mentor Feedback", "Growth Alerts", "Safe Space"].map(f => (
-                        <div key={f} className="flex items-center gap-1.5">
-                          <span className="h-3.5 w-3.5 rounded-full bg-brand-orange/20 border border-brand-orange/30 flex items-center justify-center shrink-0">
-                            <Check className="h-2 w-2 text-brand-orange" />
-                          </span>
-                          <span className="text-[9px] sm:text-[10px] font-semibold text-white/80">{f}</span>
+                <div className="group rounded-2xl overflow-hidden border border-brand-orange/20 bg-white hover:shadow-xl hover:shadow-brand-orange/10 transition-all duration-500 h-full flex flex-col">
+                  <div className="flex flex-col sm:flex-row flex-1">
+                    {/* Left visual panel — real family photo, tablet/desktop only */}
+                    <div className="hidden sm:flex sm:w-40 lg:w-48 shrink-0 flex-col items-center justify-end p-5 gap-3 relative overflow-hidden">
+                      <img src="/assets/images/parents-family.jpg" alt="Parents" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-brand-orange/85 via-brand-orange/25 to-transparent" />
+                      <div className="relative z-10 text-center">
+                        <div className="h-11 w-11 rounded-2xl bg-white/25 backdrop-blur-sm border border-white/40 flex items-center justify-center mx-auto mb-2">
+                          <Users className="h-5.5 w-5.5 text-white" />
                         </div>
-                      ))}
+                        <div className="text-white text-[9px] font-bold uppercase tracking-widest drop-shadow">For Parents</div>
+                      </div>
                     </div>
-                    <Link to="/register" className="mt-3 self-start inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-orange hover:bg-orange-500 px-4 py-2 rounded-xl transition-all shadow-md shadow-brand-orange/30 hover:-translate-y-0.5 active:scale-95">
-                      Access Parent Dashboard <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
+
+                    {/* Content */}
+                    <div className="flex-1 p-4 sm:p-5 flex flex-col">
+                      <div className="flex sm:hidden items-center gap-2 mb-2.5">
+                        <div className="h-7 w-7 rounded-lg bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center shrink-0">
+                          <Users className="h-3.5 w-3.5 text-brand-orange" />
+                        </div>
+                        <span className="text-[9px] font-extrabold text-brand-orange uppercase tracking-widest bg-brand-orange/8 px-2 py-0.5 rounded-full border border-brand-orange/15">For Parents</span>
+                      </div>
+                      <h3 className="text-base sm:text-lg font-bold text-slate-800 leading-tight">Always Informed. Always Involved.</h3>
+                      <p className="mt-1.5 text-xs sm:text-sm text-slate-500 leading-relaxed flex-1">
+                        Stay updated with deep insights into your child's growth. Track progress, receive recommendations, and review mentor feedback in real time.
+                      </p>
+                      <div className="mt-2 sm:mt-3 grid grid-cols-2 gap-1.5">
+                        {["Live Reports", "Mentor Feedback", "Growth Alerts", "Safe Space"].map(f => (
+                          <div key={f} className="flex items-center gap-1.5">
+                            <span className="h-3.5 w-3.5 rounded-full bg-brand-orange/15 border border-brand-orange/25 flex items-center justify-center shrink-0">
+                              <Check className="h-2 w-2 text-brand-orange" />
+                            </span>
+                            <span className="text-[9px] sm:text-[10px] font-semibold text-slate-600">{f}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <Link to="/register" className="mt-3 self-start inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-orange hover:bg-orange-500 px-4 py-2 rounded-xl transition-all shadow-md shadow-brand-orange/20 hover:-translate-y-0.5 active:scale-95">
+                        Access Parent Dashboard <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
                   </div>
-                  {/* Bottom stats bar */}
-                  <div className="grid grid-cols-3 divide-x divide-white/10 border-t border-white/10">
+                  {/* Bottom stats bar — matches student card */}
+                  <div className="grid grid-cols-3 divide-x divide-brand-orange/10 border-t border-brand-orange/10 bg-slate-50/80">
                     {[
                       { v: "97%", l: "Satisfaction", c: "text-brand-orange" },
-                      { v: "Live", l: "Daily Reports", c: "text-orange-300" },
-                      { v: "10K+", l: "Families", c: "text-yellow-400" },
+                      { v: "Live", l: "Daily Reports", c: "text-orange-500" },
+                      { v: "10K+", l: "Families", c: "text-amber-500" },
                     ].map(s => (
                       <div key={s.l} className="py-2.5 sm:py-3 px-1 text-center">
                         <div className={`text-base sm:text-lg font-black ${s.c} leading-none`}>{s.v}</div>
-                        <div className="text-[8px] sm:text-[9px] text-white/40 font-semibold mt-0.5 uppercase tracking-wide leading-tight">{s.l}</div>
+                        <div className="text-[8px] sm:text-[9px] text-slate-400 font-semibold mt-0.5 uppercase tracking-wide leading-tight">{s.l}</div>
                       </div>
                     ))}
                   </div>
@@ -753,23 +769,23 @@ function HomePage() {
             {/* ── DIGITAL TWIN: dark left panel + white right panel ── */}
             <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm group">
               <div className="flex flex-col sm:flex-row h-full">
-                {/* Left dark accent strip */}
-                <div className="sm:w-40 lg:w-44 shrink-0 bg-gradient-to-b from-[#031530] to-[#051c42] flex flex-col items-center justify-center p-5 gap-3 relative overflow-hidden">
-                  <div className="absolute inset-0 opacity-30" style={{backgroundImage: 'radial-gradient(circle at 50% 40%, #0488A2 0%, transparent 70%)'}} />
+                {/* Left light accent strip */}
+                <div className="sm:w-40 lg:w-44 shrink-0 bg-gradient-to-b from-teal-50 via-white to-blue-50 border-r border-slate-100 flex flex-col items-center justify-center p-5 gap-3 relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-40" style={{backgroundImage: 'radial-gradient(circle at 50% 40%, rgba(4,136,162,0.12) 0%, transparent 70%)'}} />
                   <div className="relative z-10 flex flex-col items-center gap-3 w-full">
-                    <div className="h-14 w-14 rounded-2xl bg-brand-teal/20 border border-brand-teal/30 flex items-center justify-center">
+                    <div className="h-14 w-14 rounded-2xl bg-brand-teal/10 border border-brand-teal/25 flex items-center justify-center">
                       <Bot className="h-7 w-7 text-brand-teal" />
                     </div>
                     <div className="text-center">
                       <div className="text-[9px] text-brand-teal font-extrabold uppercase tracking-widest">AI Insight</div>
-                      <div className="text-white text-xs font-bold mt-0.5 leading-tight">Digital<br/>Learning Twin</div>
+                      <div className="text-slate-700 text-xs font-bold mt-0.5 leading-tight">Digital<br/>Learning Twin</div>
                     </div>
                     {/* Avatar */}
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-brand-navy border-2 border-brand-teal/40 shadow-lg">
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-white border-2 border-brand-teal/40 shadow-md">
                       <img src="/assets/images/digital-twin.jpg" alt="Digital Learning Twin" className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div className="text-center">
-                      <div className="text-[8px] text-white/50 font-medium leading-tight">Personalised<br/>just for you</div>
+                      <div className="text-[8px] text-slate-400 font-medium leading-tight">Personalised<br/>just for you</div>
                     </div>
                   </div>
                 </div>
@@ -796,10 +812,10 @@ function HomePage() {
               </div>
             </div>
 
-            {/* ── RADAR: dark card, radar top on mobile, side-by-side on desktop ── */}
-            <div className="rounded-2xl bg-gradient-to-br from-[#031530] via-[#051c42] to-[#04122d] border border-white/10 overflow-hidden shadow-lg relative">
-              <div className="absolute -top-16 -right-16 w-48 h-48 bg-brand-teal/20 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-brand-blue/20 rounded-full blur-3xl pointer-events-none" />
+            {/* ── RADAR: clean light card, radar top on mobile, side-by-side on desktop ── */}
+            <div className="rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-sm relative">
+              <div className="absolute -top-16 -right-16 w-48 h-48 bg-brand-teal/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-brand-blue/10 rounded-full blur-3xl pointer-events-none" />
               <svg className="hidden">
                 <defs>
                   <linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -815,7 +831,7 @@ function HomePage() {
                   </div>
                   <div>
                     <div className="text-[9px] font-extrabold text-brand-teal uppercase tracking-widest">Cognitive Radar</div>
-                    <div className="text-white font-bold text-sm leading-tight">Your Growth Snapshot</div>
+                    <div className="text-slate-800 font-bold text-sm leading-tight">Your Growth Snapshot</div>
                   </div>
                 </div>
 
@@ -824,8 +840,8 @@ function HomePage() {
                   {/* Radar SVG */}
                   <div className="relative w-40 h-40 sm:w-44 sm:h-44 shrink-0 mx-auto sm:mx-0">
                     <svg viewBox="0 0 200 200" className="w-full h-full">
-                      <polygon points="100,20 175,70 150,160 50,160 25,70" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
-                      <polygon points="100,50 150,85 133,140 67,140 50,85" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+                      <polygon points="100,20 175,70 150,160 50,160 25,70" fill="none" stroke="rgba(15,23,42,0.12)" strokeWidth="1" />
+                      <polygon points="100,50 150,85 133,140 67,140 50,85" fill="none" stroke="rgba(15,23,42,0.08)" strokeWidth="1" />
                       <motion.polygon
                         initial={{ opacity: 0, scale: 0.5 }}
                         whileInView={{ opacity: 1, scale: 1 }}
@@ -841,15 +857,15 @@ function HomePage() {
                       <circle cx="140" cy="150" r="3.5" fill="#fb923c" />
                       <circle cx="65" cy="145" r="3.5" fill="#2dd4bf" />
                       <circle cx="45" cy="85" r="3.5" fill="#fbbf24" />
-                      <text x="100" y="13" fontSize="7.5" fill="#60a5fa" fontWeight="700" textAnchor="middle">Academic 82</text>
-                      <text x="186" y="68" fontSize="7.5" fill="#c084fc" fontWeight="700" textAnchor="middle">Comm 71</text>
-                      <text x="160" y="174" fontSize="7.5" fill="#fb923c" fontWeight="700" textAnchor="middle">Leadership 64</text>
-                      <text x="40" y="174" fontSize="7.5" fill="#2dd4bf" fontWeight="700" textAnchor="middle">Innovation 76</text>
-                      <text x="14" y="68" fontSize="7.5" fill="#fbbf24" fontWeight="700" textAnchor="middle">Consistency 69</text>
+                      <text x="100" y="13" fontSize="7.5" fill="#2563eb" fontWeight="700" textAnchor="middle">Academic 82</text>
+                      <text x="186" y="68" fontSize="7.5" fill="#9333ea" fontWeight="700" textAnchor="middle">Comm 71</text>
+                      <text x="160" y="174" fontSize="7.5" fill="#ea580c" fontWeight="700" textAnchor="middle">Leadership 64</text>
+                      <text x="40" y="174" fontSize="7.5" fill="#0d9488" fontWeight="700" textAnchor="middle">Innovation 76</text>
+                      <text x="14" y="68" fontSize="7.5" fill="#d97706" fontWeight="700" textAnchor="middle">Consistency 69</text>
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                      <span className="text-2xl font-black text-white leading-none">82</span>
-                      <span className="text-[8px] text-white/40 font-semibold uppercase tracking-wider">Index™</span>
+                      <span className="text-2xl font-black text-slate-800 leading-none">82</span>
+                      <span className="text-[8px] text-slate-400 font-semibold uppercase tracking-wider">Index™</span>
                     </div>
                   </div>
                   {/* Metrics: 2-col grid */}
@@ -858,8 +874,8 @@ function HomePage() {
                       <div key={s.label} className={`flex items-center gap-2 rounded-xl px-3 py-2 border ${s.bgColor} ${s.borderColor}`}>
                         <s.icon className={`h-3.5 w-3.5 ${s.textColor} shrink-0`} />
                         <div className="min-w-0">
-                          <div className="text-[8px] text-white/40 font-medium leading-none">{s.label}</div>
-                          <div className="text-[11px] font-bold text-white mt-0.5 leading-tight truncate">{s.value}</div>
+                          <div className="text-[8px] text-slate-400 font-medium leading-none">{s.label}</div>
+                          <div className="text-[11px] font-bold text-slate-700 mt-0.5 leading-tight truncate">{s.value}</div>
                         </div>
                       </div>
                     ))}

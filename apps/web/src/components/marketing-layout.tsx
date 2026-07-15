@@ -6,6 +6,81 @@ import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLenis } from "@/hooks/use-lenis";
 
+// Each top-level nav button links to its page and reveals a hover dropdown of the
+// key sections on that page (deep-linked via hash).
+const NAV_GROUPS: {
+  label: string;
+  to: string;
+  sections: { label: string; desc: string; hash: string }[];
+}[] = [
+  {
+    label: "AI Discovery",
+    to: "/assessment",
+    sections: [
+      { label: "How It Works", desc: "The 3-step discovery flow", hash: "how-it-works" },
+      { label: "Aptitude & Interest Test", desc: "AI-powered assessment", hash: "test" },
+      { label: "Your Discovery Report", desc: "Personalised insights", hash: "report" },
+      { label: "Discovery Engine™", desc: "The AI behind it", hash: "engine" },
+    ],
+  },
+  {
+    label: "Mentoring",
+    to: "/mentoring",
+    sections: [
+      { label: "1:1 Mentor Sessions", desc: "Personal guidance", hash: "sessions" },
+      { label: "Mentor Network", desc: "Verified expert mentors", hash: "network" },
+      { label: "Growth Plans", desc: "Actionable milestones", hash: "plans" },
+      { label: "Book a Mentor", desc: "Start today", hash: "book" },
+    ],
+  },
+  {
+    label: "Growth Studio",
+    to: "/slec",
+    sections: [
+      { label: "SLEC Labs", desc: "Hands-on learning hubs", hash: "labs" },
+      { label: "Skill Programs", desc: "21st-century skills", hash: "programs" },
+      { label: "Innovation & Maker Lab", desc: "Build & create", hash: "maker" },
+      { label: "Studio Experience", desc: "What to expect", hash: "experience" },
+    ],
+  },
+  {
+    label: "Career Blueprint",
+    to: "/career",
+    sections: [
+      { label: "Career Pathways", desc: "50+ future careers", hash: "pathways" },
+      { label: "Personalised Roadmaps", desc: "Step-by-step plans", hash: "roadmaps" },
+      { label: "Industry Insights", desc: "Real-world guidance", hash: "insights" },
+      { label: "Future Identities", desc: "Who you'll become", hash: "identities" },
+    ],
+  },
+  {
+    label: "For Parents",
+    to: "/parents",
+    sections: [
+      { label: "Parent Dashboard", desc: "Everything in one place", hash: "dashboard" },
+      { label: "Live Reports", desc: "Real-time progress", hash: "reports" },
+      { label: "Mentor Feedback", desc: "Notes & recommendations", hash: "feedback" },
+      { label: "Safe & Private", desc: "Your child's data, protected", hash: "safe" },
+    ],
+  },
+  {
+    label: "Resources",
+    to: "/stories",
+    sections: [
+      { label: "Success Stories", desc: "Real student journeys", hash: "stories" },
+      { label: "Guides & Articles", desc: "Tips for students & parents", hash: "guides" },
+      { label: "Webinars", desc: "Learn from experts", hash: "webinars" },
+      { label: "FAQs", desc: "Common questions", hash: "faqs" },
+    ],
+  },
+];
+
+const MORE_LINKS = [
+  { to: "/framework", label: "ILDF Framework" },
+  { to: "/about", label: "About Us" },
+  { to: "/contact", label: "Contact Us" },
+];
+
 export function MarketingLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
@@ -94,27 +169,51 @@ export function MarketingLayout() {
           </div>
 
           <nav className="hidden items-center gap-0.5 xl:flex">
-            <Link to="/assessment" className={navLinkClass("/assessment")}>
-              AI Discovery
-            </Link>
-            <Link to="/mentoring" className={navLinkClass("/mentoring")}>
-              Mentoring
-            </Link>
-            <Link to="/slec" className={navLinkClass("/slec")}>
-              Growth Studio
-            </Link>
-            <Link to="/framework" className={navLinkClass("/framework")}>
-              ILDF Framework
-            </Link>
-            <Link to="/career" className={navLinkClass("/career")}>
-              Career Blueprint
-            </Link>
-            <Link to="/" hash="parents" className={navLinkClass("/#parents")}>
-              For Parents
-            </Link>
-            <Link to="/stories" className={navLinkClass("/stories")}>
-              Resources
-            </Link>
+            {/* Each button links to its page + reveals a hover dropdown of that page's sections */}
+            {NAV_GROUPS.map((group) => (
+              <div key={group.label} className="relative group">
+                <Link to={group.to} className={navLinkClass(group.to)}>
+                  {group.label}
+                </Link>
+                <div className="absolute left-0 top-full pt-2 hidden group-hover:block z-50">
+                  <div className="w-60 rounded-xl border border-slate-100 bg-white p-1.5 shadow-lg">
+                    <div className="px-3 pt-1 pb-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">On this page</div>
+                    {group.sections.map((s) => (
+                      <Link
+                        key={s.label}
+                        to={group.to}
+                        hash={s.hash}
+                        className="block rounded-lg px-3 py-2 text-left hover:bg-bg-secondary transition-colors"
+                      >
+                        <span className="block text-xs font-bold text-text-heading">{s.label}</span>
+                        <span className="block text-[10px] text-text-muted">{s.desc}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* More hover dropdown (ILDF Framework moved here) */}
+            <div className="relative group">
+              <button className={getDropdownBtnClass()}>
+                More
+                <ChevronDown className="h-3 w-3 transition-transform duration-200 group-hover:rotate-180" />
+              </button>
+              <div className="absolute right-0 top-full pt-2 hidden group-hover:block z-50">
+                <div className="w-52 rounded-xl border border-slate-100 bg-white p-1.5 shadow-lg">
+                  {MORE_LINKS.map((item) => (
+                    <Link
+                      key={item.label}
+                      to={item.to}
+                      className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-text-body hover:bg-bg-secondary hover:text-brand-blue transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
           </nav>
 
           {/* Desktop Right Actions (10% brand accents) */}
@@ -161,19 +260,31 @@ export function MarketingLayout() {
             <Link to="/slec" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
               Growth Studio
             </Link>
-            <Link to="/framework" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
-              ILDF Framework
-            </Link>
             <Link to="/career" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
               Career Blueprint
             </Link>
-            <Link to="/" hash="parents" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
+            <Link to="/parents" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
               For Parents
             </Link>
             <Link to="/stories" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
               Resources
             </Link>
-            
+
+            {/* More group */}
+            <div className="pt-2 mt-1 border-t border-border-default">
+              <div className="px-2.5 pb-1 pt-1 text-[9px] font-bold uppercase tracking-wider text-slate-400">More</div>
+              {MORE_LINKS.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
             <div className="flex gap-2 pt-3 border-t border-border-default mt-2">
               <Link to="/login" onClick={() => setOpen(false)} className="flex-1 rounded-md border border-brand-blue bg-btn-secondary py-2 text-center text-xs font-bold text-brand-navy">
                 Login
@@ -201,7 +312,7 @@ export function MarketingLayout() {
           {/* Main Links Row */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-12 pb-4 border-b border-slate-200">
             {/* Branding Column */}
-            <div className="lg:col-span-4 space-y-3">
+            <div className="lg:col-span-3 space-y-3">
               <Logo variant="light" size="lg" />
               <p className="text-[11px] leading-relaxed text-slate-500 pr-4 mt-2">
                 An integrated learner development platform helping students discover potential, identify skills, and design their future.
@@ -221,7 +332,7 @@ export function MarketingLayout() {
               </div>
             </div>
 
-            {/* Links Columns */}
+            {/* Explore Column */}
             <div className="lg:col-span-2 text-left">
               <h5 className="font-bold text-slate-800 mb-2.5">Explore</h5>
               <ul className="space-y-1.5 text-slate-500">
@@ -229,44 +340,55 @@ export function MarketingLayout() {
                 <li><Link to="/framework" className="hover:text-brand-blue transition-colors">Solutions</Link></li>
                 <li><Link to="/assessment" className="hover:text-brand-blue transition-colors">Assessment</Link></li>
                 <li><Link to="/career" className="hover:text-brand-blue transition-colors">Career Pathways</Link></li>
+                <li><Link to="/framework" className="hover:text-brand-blue transition-colors">ILDF Framework</Link></li>
+                <li><Link to="/about" className="hover:text-brand-blue transition-colors">About Us</Link></li>
+                <li><Link to="/contact" className="hover:text-brand-blue transition-colors">Contact Us</Link></li>
               </ul>
             </div>
 
+            {/* Programs Column */}
+            <div className="lg:col-span-2 text-left">
+              <h5 className="font-bold text-slate-800 mb-2.5">Programs</h5>
+              <ul className="space-y-1.5 text-slate-500">
+                <li><Link to="/assessment" className="hover:text-brand-blue transition-colors">AI Aptitude Test</Link></li>
+                <li><Link to="/career" className="hover:text-brand-blue transition-colors">Career Roadmap</Link></li>
+                <li><Link to="/slec" className="hover:text-brand-blue transition-colors">Skill Portfolio</Link></li>
+                <li><Link to="/mentoring" className="hover:text-brand-blue transition-colors">1:1 Mentoring</Link></li>
+              </ul>
+            </div>
+
+            {/* Ecosystem Column */}
             <div className="lg:col-span-2 text-left">
               <h5 className="font-bold text-slate-800 mb-2.5">Ecosystem Portals</h5>
               <ul className="space-y-1.5 text-slate-500">
                 <li><Link to="/dashboard/student" className="hover:text-brand-blue transition-colors">Student Portal</Link></li>
                 <li><Link to="/dashboard/parent" className="hover:text-brand-blue transition-colors">Parent Portal</Link></li>
                 <li><Link to="/dashboard/mentor" className="hover:text-brand-blue transition-colors">Mentor Lounge</Link></li>
-                <li><Link to="/dashboard/admin" className="hover:text-brand-blue transition-colors">School Portal</Link></li>
-                <li><Link to="/dashboard/super" className="hover:text-brand-blue transition-colors">Platform Admin</Link></li>
+                <li><Link to="/dashboard/admin" className="hover:text-brand-blue transition-colors">Institute Admin</Link></li>
               </ul>
             </div>
 
-            <div className="lg:col-span-2 text-left">
-              <h5 className="font-bold text-slate-800 mb-2.5">Support</h5>
-              <ul className="space-y-1.5 text-slate-500">
-                <li><Link to="/contact" className="hover:text-brand-blue transition-colors">Help Center</Link></li>
-                <li><Link to="/contact" className="hover:text-brand-blue transition-colors">FAQs</Link></li>
+            {/* Support + Contact Column */}
+            <div className="lg:col-span-3 text-left space-y-2.5 text-slate-500">
+              <h5 className="font-bold text-slate-800 mb-1">Help & Contact</h5>
+              <ul className="space-y-1.5">
+                <li><Link to="/contact" className="hover:text-brand-blue transition-colors">Help Center & FAQs</Link></li>
                 <li><Link to="/contact" className="hover:text-brand-blue transition-colors">Privacy Policy</Link></li>
                 <li><Link to="/contact" className="hover:text-brand-blue transition-colors">Terms of Service</Link></li>
               </ul>
-            </div>
-
-            {/* Contacts Column */}
-            <div className="lg:col-span-2 text-left space-y-2 text-slate-500">
-              <h5 className="font-bold text-slate-800 mb-2.5">Contact Us</h5>
-              <div className="flex items-center gap-2">
-                <Phone className="h-3.5 w-3.5 text-brand-teal shrink-0" />
-                <span>+91 98765 43210</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail className="h-3.5 w-3.5 text-brand-teal shrink-0" />
-                <span>vedhkrit@gmail.com</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="h-3.5 w-3.5 text-brand-teal shrink-0" />
-                <span>Mumbai, India</span>
+              <div className="pt-1.5 space-y-1.5 border-t border-slate-100">
+                <div className="flex items-center gap-2">
+                  <Phone className="h-3.5 w-3.5 text-brand-teal shrink-0" />
+                  <span>+91 98765 43210</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5 text-brand-teal shrink-0" />
+                  <span>vedhkrit@gmail.com</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-3.5 w-3.5 text-brand-teal shrink-0" />
+                  <span>Mumbai, India</span>
+                </div>
               </div>
             </div>
           </div>

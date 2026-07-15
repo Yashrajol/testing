@@ -1,4 +1,6 @@
 // Realistic mock data for VEDHKRIT demo
+import { studentAvatar, mentorAvatar } from "./avatars";
+
 const firstNames = ["Aarav", "Vivaan", "Aditya", "Vihaan", "Arjun", "Sai", "Reyansh", "Ayaan", "Krishna", "Ishaan", "Aanya", "Diya", "Saanvi", "Aadhya", "Pari", "Anika", "Navya", "Riya", "Myra", "Sara", "Kabir", "Dhruv", "Ansh", "Veer", "Ira", "Kiara", "Nisha", "Tara", "Arnav", "Rohan", "Meera", "Zoya", "Advait", "Kiaan", "Aaradhya", "Anaya", "Mira", "Tanvi", "Shaurya", "Yuvraj"];
 const lastNames = ["Sharma", "Verma", "Patel", "Reddy", "Iyer", "Nair", "Kapoor", "Mehta", "Joshi", "Gupta", "Singh", "Kumar", "Khan", "Bose", "Das", "Rao", "Pillai", "Banerjee", "Chopra", "Malhotra"];
 const schools = ["Delhi Public School", "DAV Public School", "Kendriya Vidyalaya", "Ryan International", "Modern School", "Bal Bharati", "Springdales", "Sanskriti School", "Vasant Valley", "Step by Step", "The Heritage School", "Pathways World", "Shiv Nadar School", "Lotus Valley", "Amity International", "Mayo College", "Doon School", "Welham", "Genesis Global", "Inventure Academy"];
@@ -18,7 +20,8 @@ export const students = Array.from({ length: 500 }, (_, i) => {
     grade,
     section: ["A", "B", "C", "D"][Math.floor(seed(i + 3) * 4)],
     school: pick(schools, i + 5),
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`,
+    avatar: studentAvatar(i),
+    assessmentDone: seed(i + 71) > 0.35,
     growthScore: Math.round(60 + seed(i + 11) * 38),
     academic: Math.round(55 + seed(i + 13) * 42),
     skills: Math.round(50 + seed(i + 17) * 45),
@@ -40,7 +43,7 @@ export const mentors = Array.from({ length: 50 }, (_, i) => ({
   rating: Math.round((4 + seed(i + 51) * 1) * 10) / 10,
   students: 8 + Math.floor(seed(i + 53) * 15),
   sessions: 50 + Math.floor(seed(i + 57) * 200),
-  avatar: `https://api.dicebear.com/7.x/personas/svg?seed=${i + 200}`,
+  avatar: mentorAvatar(i),
 }));
 
 export const schoolList = Array.from({ length: 20 }, (_, i) => ({

@@ -104,7 +104,7 @@ export function FloatingWidgets() {
                       alt="Veda"
                       className="h-6 w-6 object-contain rounded-full bg-slate-100 p-0.5 animate-pulse"
                     />
-                    <span className="font-extrabold text-xs uppercase tracking-wider text-slate-700 font-mono">Veda Study Buddy</span>
+                    <span className="font-extrabold text-xs uppercase tracking-wider text-slate-700 font-mono">Veda AI Mentor</span>
                   </div>
                   <button onClick={() => setChatOpen(false)} className="hover:bg-slate-100 p-1.5 rounded-md transition-colors text-slate-500">
                     <X className="h-4.5 w-4.5" />
@@ -112,7 +112,7 @@ export function FloatingWidgets() {
                 </div>
                 <div className="flex-1 p-4 bg-[#fffdfb] overflow-y-auto text-sm space-y-3">
                   <div className="bg-[#fffef0] p-3 rounded-lg rounded-tl-none border border-amber-200/30 text-slate-700 font-mono text-xs shadow-xs leading-relaxed">
-                    Hi! I'm Veda, your study buddy. How can I help you today?
+                    Hi! I'm Veda, your AI mentor. How can I help you today?
                   </div>
                 </div>
                 <div className="p-3 border-t border-slate-100 bg-[#fffef0] shrink-0">
@@ -146,7 +146,7 @@ export function FloatingWidgets() {
                     alt="Veda"
                     className="h-6 w-6 object-contain rounded-full bg-white/20 p-0.5"
                   />
-                  <span className="font-bold text-sm">Veda your study buddy</span>
+                  <span className="font-bold text-sm">Veda · AI Mentor</span>
                 </div>
                 <button onClick={() => setChatOpen(false)} className="hover:bg-white/20 p-1 rounded-md transition-colors">
                   <X className="h-4 w-4" />
@@ -154,7 +154,7 @@ export function FloatingWidgets() {
               </div>
               <div className="flex-1 p-4 bg-slate-50 overflow-y-auto text-sm space-y-3">
                 <div className="bg-brand-teal/10 p-3 rounded-lg rounded-tl-none border border-brand-teal/20 text-slate-700">
-                  Hi! I'm Veda, your study buddy. How can I help you today?
+                  Hi! I'm Veda, your AI mentor. How can I help you today?
                 </div>
               </div>
               <div className="p-3 border-t border-slate-200 bg-white">

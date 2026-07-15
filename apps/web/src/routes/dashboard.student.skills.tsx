@@ -32,12 +32,12 @@ export const Route = createFileRoute("/dashboard/student/skills")({
 });
 
 const timelineSteps = [
-  { id: "step-1", title: "Discover", desc: "Discover primary learning styles and key aptitudes.", status: "completed" },
-  { id: "step-2", title: "Understand", desc: "Understand core subject strengths and conceptual gaps.", status: "completed" },
-  { id: "step-3", title: "Plan", desc: "Plan personal academic schedules & soft skill milestones.", status: "completed" },
-  { id: "step-4", title: "Explore", desc: "Explore recommended career blueprints and study roadmaps.", status: "active" },
-  { id: "step-5", title: "Develop", desc: "Develop advanced problem solving and verbal communications.", status: "locked" },
-  { id: "step-6", title: "Achieve", desc: "Achieve top ranks in Olympiads and board examinations.", status: "locked" }
+  { id: "step-1", title: "Discover", desc: "Find out how you learn best and what you're good at.", status: "completed" },
+  { id: "step-2", title: "Understand", desc: "See which subjects you're strong in and which need more work.", status: "completed" },
+  { id: "step-3", title: "Plan", desc: "Make a study plan and set goals for your skills.", status: "completed" },
+  { id: "step-4", title: "Explore", desc: "Look at career ideas and study paths made just for you.", status: "active" },
+  { id: "step-5", title: "Develop", desc: "Get better at solving problems and speaking clearly.", status: "locked" },
+  { id: "step-6", title: "Achieve", desc: "Aim for top marks in Olympiads and board exams.", status: "locked" }
 ];
 
 const certificatesData = [
@@ -60,9 +60,9 @@ const careerPathways: CareerPathway[] = [
   {
     id: "engineer",
     name: "Engineer",
-    subjects: "Mathematics, Physics, Chemistry, Computer CS",
-    skills: ["Problem Solving (90%)", "Coding Logic (85%)", "Spatial Reasoning (80%)"],
-    activities: ["Participate in School Robotics Exhibition", "Solve monthly coding puzzles", "Attend JEE prep workshops"],
+    subjects: "Mathematics, Physics, Chemistry, Computer Science",
+    skills: ["Problem Solving (90%)", "Coding Logic (85%)", "Thinking in 3D shapes (80%)"],
+    activities: ["Join the School Robotics Show", "Solve a coding puzzle every month", "Attend JEE prep classes"],
     videos: [
       { title: "Software Engineering Career Guide", speaker: "Mr. Satya Murthy, Tech Principal", length: "12 mins" },
       { title: "Building Hardware & Robots", speaker: "Dr. Alok Sen, Robotics Researcher", length: "15 mins" }
@@ -73,8 +73,8 @@ const careerPathways: CareerPathway[] = [
     id: "doctor",
     name: "Doctor",
     subjects: "Biology, Chemistry, Physics, English",
-    skills: ["Anatomical recall (80%)", "Active empathy (95%)", "Diagnostic analysis (85%)"],
-    activities: ["Complete basic First Aid Certification", "Score 95% in biology cellular lab projects", "Volunteer at local health booths"],
+    skills: ["Body & organs knowledge (80%)", "Caring for others (95%)", "Finding what's wrong (85%)"],
+    activities: ["Finish a basic First Aid course", "Score 95% in your Biology lab projects", "Help out at local health camps"],
     videos: [
       { title: "Pathway to NEET Exam Success", speaker: "Dr. Sneha Paul, Surgeon", length: "18 mins" },
       { title: "Daily Life in a Pediatric Ward", speaker: "Dr. Kabir Roy, Pediatrician", length: "14 mins" }
@@ -84,9 +84,9 @@ const careerPathways: CareerPathway[] = [
   {
     id: "ias",
     name: "IAS Officer",
-    subjects: "History, Political Civics, Economics, Geography, English",
-    skills: ["Public speech (90%)", "Policy analysis (80%)", "Global current affairs (95%)"],
-    activities: ["Read newspaper headlines daily", "Join school debating and public policy groups", "Participate in Mock UN (MUN) events"],
+    subjects: "History, Civics, Economics, Geography, English",
+    skills: ["Public speaking (90%)", "Understanding rules & laws (80%)", "World news (95%)"],
+    activities: ["Read the newspaper headlines every day", "Join the school debate and discussion club", "Take part in Model UN (MUN) events"],
     videos: [
       { title: "UPSC Syllabus Decoded", speaker: "Mr. Vijay Kumar, Retd. IAS Officer", length: "20 mins" },
       { title: "Administrative Policies & Reforms", speaker: "Ms. Rashmi Patel, Deputy Commissioner", length: "16 mins" }
@@ -97,8 +97,8 @@ const careerPathways: CareerPathway[] = [
     id: "pilot",
     name: "Commercial Pilot",
     subjects: "Physics, Mathematics, English",
-    skills: ["Spatial awareness (95%)", "Hand-eye coordination (90%)", "Weather chart analysis (85%)"],
-    activities: ["Complete basic flight simulator trials", "Attend aeronautics science model clubs", "Study air navigation maps"],
+    skills: ["Sense of direction (95%)", "Hand-eye coordination (90%)", "Reading weather charts (85%)"],
+    activities: ["Try a basic flight simulator", "Join an aeroplane model-making club", "Learn to read air navigation maps"],
     videos: [
       { title: "From Cadet to Captain's Seat", speaker: "Capt. Vivek Varma, A320 Commander", length: "15 mins" },
       { title: "Basics of Flight Mechanics & Physics", speaker: "Capt. Shreya Sen, Chief Instructor", length: "12 mins" }
@@ -145,15 +145,15 @@ function UnifiedGrowthPage() {
       animate="show"
       className="space-y-6 text-left"
     >
-      <PageHeader title="My Growth" subtitle="Vedhkrit signature development index, Learning DNA profiler, and soft skills roadmap." />
+      <PageHeader title="My Growth" subtitle="Your growth score, how you learn best, and your plan to build new skills." />
 
       {/* Top Cards Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Vedhkrit Index", val: "780 / 1000", desc: "Top 8% percentile nationwide", color: "border-brand-blue text-brand-blue bg-blue-50/50" },
-          { label: "Learning DNA Profile", val: "Practical & Visual", desc: "Learns through diagram systems", color: "border-brand-teal text-brand-teal bg-teal-50/50" },
-          { label: "Confidence Metric", val: "86%", desc: "+4% from last evaluation", color: "border-brand-orange text-brand-orange bg-orange-50/50" },
-          { label: "Academic Growth", val: "+14%", desc: "Consistency level outstanding", color: "border-purple-500 text-purple-600 bg-purple-50/50" }
+          { label: "Vedhkrit Index", val: "780 / 1000", desc: "In the top 8% across India", color: "border-brand-blue text-brand-blue bg-blue-50/50" },
+          { label: "How You Learn Best", val: "Hands-on & Visual", desc: "You learn well with pictures", color: "border-brand-teal text-brand-teal bg-teal-50/50" },
+          { label: "Confidence", val: "86%", desc: "+4% since last check", color: "border-brand-orange text-brand-orange bg-orange-50/50" },
+          { label: "Study Growth", val: "+14%", desc: "You study regularly — great job!", color: "border-purple-500 text-purple-600 bg-purple-50/50" }
         ].map((stat, i) => (
           <GlassCard key={i} className={cn("p-5 border-l-4 bg-white flex flex-col justify-between h-24 shadow-xs", stat.color)}>
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{stat.label}</span>
@@ -172,9 +172,9 @@ function UnifiedGrowthPage() {
           <GlassCard className="p-6 border border-slate-100 bg-white flex-grow flex flex-col justify-between min-h-[380px]">
             <div>
               <h3 className="text-base font-bold text-text-heading flex items-center gap-2">
-                <Brain className="h-5 w-5 text-brand-blue" /> Cognitive & Skill DNA
+                <Brain className="h-5 w-5 text-brand-blue" /> Your Skills & Thinking
               </h3>
-              <p className="text-[10px] text-text-muted mt-0.5">Development levels across core student indicators</p>
+              <p className="text-[10px] text-text-muted mt-0.5">How you're growing in the key areas</p>
             </div>
 
             {/* Premium Custom SVG Radar Chart */}
@@ -217,7 +217,7 @@ function UnifiedGrowthPage() {
             </div>
             
             <div className="text-[10px] text-text-muted font-bold text-center border-t border-slate-50 pt-3">
-              Overall DNA Skill Quotient: <span className="text-brand-blue font-extrabold">85/100</span>
+              Overall Skill Score: <span className="text-brand-blue font-extrabold">85/100</span>
             </div>
           </GlassCard>
         </div>
@@ -230,7 +230,7 @@ function UnifiedGrowthPage() {
                 <Compass className="h-5 w-5 text-brand-teal" />
                 Vedhkrit Journey Timeline
               </h3>
-              <p className="text-[10px] text-text-muted mt-0.5">Track developmental phases through Class 8th to 10th</p>
+              <p className="text-[10px] text-text-muted mt-0.5">Your learning journey from Class 8 to Class 10</p>
             </div>
 
             {/* Timeline sequence tree */}
@@ -285,9 +285,9 @@ function UnifiedGrowthPage() {
               <div className="p-4 bg-emerald-50/50 border border-emerald-100 rounded-2xl space-y-2">
                 <span className="text-emerald-700 uppercase tracking-wider text-[9px] font-bold block">Key Strengths</span>
                 <ul className="space-y-1 text-[11px] text-emerald-900 font-semibold list-disc list-inside">
-                  <li>Logical Reasoning</li>
-                  <li>Syllabus Consistency</li>
-                  <li>Visual-Spatial Memory</li>
+                  <li>Logical thinking</li>
+                  <li>Studying regularly</li>
+                  <li>Remembering with pictures</li>
                 </ul>
               </div>
 
@@ -295,9 +295,9 @@ function UnifiedGrowthPage() {
               <div className="p-4 bg-orange-50/50 border border-brand-orange/15 rounded-2xl space-y-2">
                 <span className="text-brand-orange uppercase tracking-wider text-[9px] font-bold block">Needs Attention</span>
                 <ul className="space-y-1 text-[11px] text-orange-950 font-semibold list-disc list-inside">
-                  <li>Speech pacing in presentations</li>
-                  <li>Time management during exam prep</li>
-                  <li>Biology anatomical labeling</li>
+                  <li>Speaking at a steady pace</li>
+                  <li>Managing time before exams</li>
+                  <li>Labeling diagrams in Biology</li>
                 </ul>
               </div>
             </div>
@@ -309,7 +309,7 @@ function UnifiedGrowthPage() {
                 <span className="text-[10px] uppercase tracking-wider text-slate-450 font-bold block">Mentor Recommendations</span>
               </div>
               <p className="text-xs text-text-body font-medium leading-relaxed italic">
-                "Aarav has shown remarkable aptitude in analytical math worksheets. To improve verbal delivery, I suggest taking part in the weekly school debate preparation program."
+                "Aarav is really good at solving maths problems. To speak more confidently, he should join the weekly school debate practice."
               </p>
               <span className="text-[8.5px] font-bold text-slate-400 block uppercase tracking-wider">— Neha Mahta, Growth Advisor</span>
             </div>
@@ -353,7 +353,7 @@ function UnifiedGrowthPage() {
                 <Compass className="h-5 w-5 text-brand-blue" />
                 Career Explorer
               </h3>
-              <p className="text-[10px] text-text-muted mt-0.5">Explore required pathways, develop core competencies, and track progress</p>
+              <p className="text-[10px] text-text-muted mt-0.5">See what you need, build key skills, and track how far you've come</p>
             </div>
 
             {/* Dropdown / Tile selector */}
@@ -380,16 +380,16 @@ function UnifiedGrowthPage() {
               <div className="grid gap-4 sm:grid-cols-2 text-xs font-bold text-text-muted">
                 {/* Subjects */}
                 <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-2">
-                  <span className="text-slate-400 uppercase tracking-wider text-[8.5px] font-bold block">Required Stream & Subjects</span>
+                  <span className="text-slate-400 uppercase tracking-wider text-[8.5px] font-bold block">Subjects You'll Need</span>
                   <p className="text-text-heading font-extrabold leading-relaxed">{selectedPathway.subjects}</p>
                 </div>
 
                 {/* Progress bar */}
                 <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex flex-col justify-between">
-                  <span className="text-slate-400 uppercase tracking-wider text-[8.5px] font-bold block">Milestone Progress Rate</span>
+                  <span className="text-slate-400 uppercase tracking-wider text-[8.5px] font-bold block">Your Progress</span>
                   <div>
                     <div className="flex justify-between font-bold text-text-heading mb-1.5">
-                      <span>Pathway Completion</span>
+                      <span>How far you've come</span>
                       <span>{selectedPathway.progress}%</span>
                     </div>
                     <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
@@ -403,7 +403,7 @@ function UnifiedGrowthPage() {
               <div className="grid gap-4 sm:grid-cols-2 text-xs font-semibold text-text-body">
                 {/* Skills */}
                 <div className="space-y-3">
-                  <h4 className="font-display text-xs font-bold text-slate-400 uppercase tracking-wider">Skills to Develop</h4>
+                  <h4 className="font-display text-xs font-bold text-slate-400 uppercase tracking-wider">Skills to Build</h4>
                   <div className="space-y-2">
                     {selectedPathway.skills.map((skill, i) => (
                       <div key={i} className="p-2.5 bg-white border border-slate-100 rounded-xl flex items-center justify-between shadow-2xs">
@@ -416,7 +416,7 @@ function UnifiedGrowthPage() {
 
                 {/* Activities */}
                 <div className="space-y-3 text-left">
-                  <h4 className="font-display text-xs font-bold text-slate-400 uppercase tracking-wider">Recommended Activities</h4>
+                  <h4 className="font-display text-xs font-bold text-slate-400 uppercase tracking-wider">Things to Try</h4>
                   <ul className="space-y-2 text-[11px] text-text-muted font-medium">
                     {selectedPathway.activities.map((act, i) => (
                       <li key={i} className="flex items-start gap-2">

@@ -1,9 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/dashboard-shell";
 import { GlassCard } from "@/components/glass-card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { students } from "@/lib/mock-data";
-import { UserCheck, Star, Calendar, MessageCircle, AlertCircle } from "lucide-react";
+import { UserCheck, Star, Calendar, MessageCircle, AlertCircle, FileClock, BookOpen, ClipboardCheck, CheckCircle2 } from "lucide-react";
 import { motion } from "motion/react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/dashboard/mentor/students")({
   component: MentorStudentsPage,
@@ -12,7 +21,19 @@ export const Route = createFileRoute("/dashboard/mentor/students")({
 
 const myStudents = students.slice(0, 12); // Mentor Priya Iyer has 12 assigned mentees
 
+function activityLogFor(student: (typeof myStudents)[number]) {
+  return [
+    { icon: Calendar, label: "Attendance", detail: `${student.attendance}% present this term`, color: "text-emerald-600 bg-emerald-50" },
+    { icon: BookOpen, label: "Homework", detail: `${Math.round(student.academic * 0.9)}% submissions on time`, color: "text-brand-blue bg-blue-50" },
+    { icon: ClipboardCheck, label: "Self-Assessment", detail: student.assessmentDone ? "Completed — reviewed by mentor" : "Not yet completed", color: student.assessmentDone ? "text-emerald-600 bg-emerald-50" : "text-brand-orange bg-orange-50" },
+    { icon: Star, label: "Sessions Attended", detail: `${3 + (student.grade % 4)} mentoring sessions this term`, color: "text-purple-600 bg-purple-50" },
+    { icon: FileClock, label: "Recent Note", detail: "Consistent effort in class; encourage more peer collaboration.", color: "text-brand-teal bg-teal-50" },
+  ];
+}
+
 function MentorStudentsPage() {
+  const [activeStudent, setActiveStudent] = useState<(typeof myStudents)[number] | null>(null);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -80,8 +101,11 @@ function MentorStudentsPage() {
               </div>
 
               <div className="mt-5 pt-3.5 border-t border-border-default/30 flex gap-2">
-                <button className="flex-1 text-center rounded-xl border border-border-default bg-white/70 py-2 text-[10px] font-bold text-text-heading hover:bg-bg-secondary hover:text-brand-blue transition-all cursor-pointer">
-                  Notes
+                <button
+                  onClick={() => setActiveStudent(student)}
+                  className="flex-1 text-center rounded-xl border border-border-default bg-white/70 py-2 text-[10px] font-bold text-text-heading hover:bg-bg-secondary hover:text-brand-blue transition-all cursor-pointer"
+                >
+                  Full Report
                 </button>
                 <button className="flex-1 text-center rounded-xl gradient-brand py-2 text-[10px] font-bold text-white shadow-sm hover:opacity-95 transition-all cursor-pointer">
                   Manage Plan
@@ -91,6 +115,39 @@ function MentorStudentsPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* Detailed activity report — for counseling and consultation */}
+      <Dialog open={!!activeStudent} onOpenChange={(open) => !open && setActiveStudent(null)}>
+        <DialogContent className="max-w-lg text-left">
+          {activeStudent && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3">
+                  <img src={activeStudent.avatar} alt="" className="h-11 w-11 rounded-full object-cover bg-slate-100" />
+                  <div>
+                    <DialogTitle>{activeStudent.name} — Full Activity Report</DialogTitle>
+                    <DialogDescription>Consolidated activity log for counseling and consultation.</DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-2.5">
+                {activityLogFor(activeStudent).map((entry) => (
+                  <div key={entry.label} className="flex items-start gap-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50">
+                    <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center shrink-0", entry.color)}>
+                      <entry.icon className="h-4 w-4" />
+                    </div>
+                    <div className="text-xs">
+                      <span className="font-bold text-text-heading block">{entry.label}</span>
+                      <span className="text-text-muted">{entry.detail}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

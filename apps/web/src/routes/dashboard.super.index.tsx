@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageHeader } from "@/components/dashboard-shell";
 import { GlassCard } from "@/components/glass-card";
 import { StatCard } from "@/components/stat-card";
-import { Building2, DollarSign, Users, Activity } from "lucide-react";
-import { schoolList, platformRevenue } from "@/lib/mock-data";
+import { Building2, DollarSign, Users, Activity, ClipboardCheck } from "lucide-react";
+import { schoolList, platformRevenue, students } from "@/lib/mock-data";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { motion } from "motion/react";
 
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/dashboard/super/")({
 function SuperOverview() {
   const totalStudents = schoolList.reduce((a, s) => a + s.students, 0);
   const mrr = platformRevenue[platformRevenue.length - 1].mrr;
+  const assessmentCompletionRate = Math.round((students.filter((s) => s.assessmentDone).length / students.length) * 100);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -43,6 +44,7 @@ function SuperOverview() {
         <StatCard icon={Building2} label="Schools Onboarded" value={schoolList.length} trend="▲ 3 this month" accent="primary" />
         <StatCard icon={Users} label="Total Students" value={totalStudents.toLocaleString()} trend="▲ 8.2% YoY" accent="primary" />
         <StatCard icon={Activity} label="Active Sessions/day" value="2,486" trend="▲ 12%" accent="warning" />
+        <StatCard icon={ClipboardCheck} label="Platform Self-Assessment Completion" value={`${assessmentCompletionRate}%`} trend="▲ 6.1%" accent="accent" />
       </motion.div>
 
       <div className="grid gap-6 lg:grid-cols-3">

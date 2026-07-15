@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GlassCard } from "@/components/glass-card";
-import { Users, Calendar, AlertTriangle, Star, CheckSquare, Sparkles, MessageSquare, ArrowRight, User, GraduationCap, Video, Plus, FileText, Send, BookOpen } from "lucide-react";
+import { Users, Calendar, AlertTriangle, Star, CheckSquare, Sparkles, MessageSquare, ArrowRight, User, GraduationCap, Video, Plus, FileText, Send, BookOpen, ClipboardCheck } from "lucide-react";
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 import { students } from "@/lib/mock-data";
 import { useMentorOverview } from "@/lib/api";
+import { BANNER_PHOTOS } from "@/lib/avatars";
 
 export const Route = createFileRoute("/dashboard/mentor/")({
   component: MentorDashboardOverview,
@@ -59,10 +60,10 @@ function MentorDashboardOverview() {
           
           {/* Vector Character Banner illustration */}
           <div className="absolute right-0 bottom-0 top-0 w-1/2 md:w-1/3 bg-gradient-to-l from-blue-50/70 to-transparent flex items-end justify-end">
-            <img 
-              src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=220&auto=format&fit=crop" 
-              className="h-[120%] w-full object-cover object-top opacity-85 mix-blend-multiply select-none pointer-events-none" 
-              alt="" 
+            <img
+              src={BANNER_PHOTOS.mentor}
+              className="h-[120%] w-full object-cover object-top opacity-85 mix-blend-multiply select-none pointer-events-none"
+              alt=""
             />
           </div>
         </div>
@@ -229,6 +230,29 @@ function MentorDashboardOverview() {
             </GlassCard>
 
           </div>
+
+          {/* Assessment Monitoring */}
+          <GlassCard className="p-5 border border-slate-100 bg-white">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-display text-sm font-bold text-text-heading flex items-center gap-2">
+                <ClipboardCheck className="h-4.5 w-4.5 text-brand-orange" />
+                Self-Assessment Monitoring
+              </h3>
+              <Link to="/dashboard/mentor/assessments" className="text-[10px] text-brand-blue font-bold hover:underline">Review All Reports</Link>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {myStudents.filter((s: any) => s.assessmentDone === false).slice(0, 5).map((s: any, idx: number) => (
+                <div key={idx} className="flex items-center gap-2 pr-3 pl-1.5 py-1.5 rounded-full border border-brand-orange/20 bg-orange-50/50">
+                  <img src={s.avatar} alt="" className="h-6 w-6 rounded-full object-cover bg-slate-100" />
+                  <span className="text-[10px] font-bold text-text-heading">{s.name}</span>
+                  <span className="text-[8.5px] font-bold text-brand-orange uppercase">Pending</span>
+                </div>
+              ))}
+              {myStudents.filter((s: any) => s.assessmentDone === false).length === 0 && (
+                <p className="text-xs text-emerald-600 font-semibold">All assigned mentees have completed their self-assessment.</p>
+              )}
+            </div>
+          </GlassCard>
 
         </div>
 
