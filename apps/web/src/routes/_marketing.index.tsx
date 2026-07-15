@@ -341,7 +341,7 @@ function HomePage() {
   }
 
   return (
-    <div className="relative bg-bg-primary text-text-body font-sans antialiased overflow-x-hidden">
+    <div className="relative bg-bg-primary text-text-body font-sans antialiased overflow-x-clip">
       {/* 1. DESKTOP HERO SECTION (Light-themed matching reference image with bottom-left quadrant alignment) */}
       <section className="hidden lg:flex relative border-b border-slate-100 h-dvh items-center overflow-hidden bg-white z-10">
 

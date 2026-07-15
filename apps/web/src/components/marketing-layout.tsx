@@ -1,7 +1,7 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { Logo } from "./logo";
 import { FloatingWidgets } from "./floating-widgets";
-import { Menu, X, Facebook, Instagram, Linkedin, Youtube, Phone, Mail, MapPin, ChevronDown, Home } from "lucide-react";
+import { Menu, X, Facebook, Instagram, Linkedin, Youtube, Phone, Mail, MapPin, Home } from "lucide-react";
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLenis } from "@/hooks/use-lenis";
@@ -13,67 +13,67 @@ const NAV_GROUPS: {
   to: string;
   sections: { label: string; desc: string; hash: string }[];
 }[] = [
-  {
-    label: "AI Discovery",
-    to: "/assessment",
-    sections: [
-      { label: "How It Works", desc: "The 3-step discovery flow", hash: "how-it-works" },
-      { label: "Aptitude & Interest Test", desc: "AI-powered assessment", hash: "test" },
-      { label: "Your Discovery Report", desc: "Personalised insights", hash: "report" },
-      { label: "Discovery Engine™", desc: "The AI behind it", hash: "engine" },
-    ],
-  },
-  {
-    label: "Mentoring",
-    to: "/mentoring",
-    sections: [
-      { label: "1:1 Mentor Sessions", desc: "Personal guidance", hash: "sessions" },
-      { label: "Mentor Network", desc: "Verified expert mentors", hash: "network" },
-      { label: "Growth Plans", desc: "Actionable milestones", hash: "plans" },
-      { label: "Book a Mentor", desc: "Start today", hash: "book" },
-    ],
-  },
-  {
-    label: "Growth Studio",
-    to: "/slec",
-    sections: [
-      { label: "SLEC Labs", desc: "Hands-on learning hubs", hash: "labs" },
-      { label: "Skill Programs", desc: "21st-century skills", hash: "programs" },
-      { label: "Innovation & Maker Lab", desc: "Build & create", hash: "maker" },
-      { label: "Studio Experience", desc: "What to expect", hash: "experience" },
-    ],
-  },
-  {
-    label: "Career Blueprint",
-    to: "/career",
-    sections: [
-      { label: "Career Pathways", desc: "50+ future careers", hash: "pathways" },
-      { label: "Personalised Roadmaps", desc: "Step-by-step plans", hash: "roadmaps" },
-      { label: "Industry Insights", desc: "Real-world guidance", hash: "insights" },
-      { label: "Future Identities", desc: "Who you'll become", hash: "identities" },
-    ],
-  },
-  {
-    label: "For Parents",
-    to: "/parents",
-    sections: [
-      { label: "Parent Dashboard", desc: "Everything in one place", hash: "dashboard" },
-      { label: "Live Reports", desc: "Real-time progress", hash: "reports" },
-      { label: "Mentor Feedback", desc: "Notes & recommendations", hash: "feedback" },
-      { label: "Safe & Private", desc: "Your child's data, protected", hash: "safe" },
-    ],
-  },
-  {
-    label: "Resources",
-    to: "/stories",
-    sections: [
-      { label: "Success Stories", desc: "Real student journeys", hash: "stories" },
-      { label: "Guides & Articles", desc: "Tips for students & parents", hash: "guides" },
-      { label: "Webinars", desc: "Learn from experts", hash: "webinars" },
-      { label: "FAQs", desc: "Common questions", hash: "faqs" },
-    ],
-  },
-];
+    {
+      label: "AI Discovery",
+      to: "/assessment",
+      sections: [
+        { label: "How It Works", desc: "The 3-step discovery flow", hash: "how-it-works" },
+        { label: "Aptitude & Interest Test", desc: "AI-powered assessment", hash: "test" },
+        { label: "Your Discovery Report", desc: "Personalised insights", hash: "report" },
+        { label: "Discovery Engine™", desc: "The AI behind it", hash: "engine" },
+      ],
+    },
+    {
+      label: "Mentoring",
+      to: "/mentoring",
+      sections: [
+        { label: "1:1 Mentor Sessions", desc: "Personal guidance", hash: "sessions" },
+        { label: "Mentor Network", desc: "Verified expert mentors", hash: "network" },
+        { label: "Growth Plans", desc: "Actionable milestones", hash: "plans" },
+        { label: "Book a Mentor", desc: "Start today", hash: "book" },
+      ],
+    },
+    {
+      label: "Growth Studio",
+      to: "/slec",
+      sections: [
+        { label: "SLEC Labs", desc: "Hands-on learning hubs", hash: "labs" },
+        { label: "Skill Programs", desc: "21st-century skills", hash: "programs" },
+        { label: "Innovation & Maker Lab", desc: "Build & create", hash: "maker" },
+        { label: "Studio Experience", desc: "What to expect", hash: "experience" },
+      ],
+    },
+    {
+      label: "Career Blueprint",
+      to: "/career",
+      sections: [
+        { label: "Career Pathways", desc: "50+ future careers", hash: "pathways" },
+        { label: "Personalised Roadmaps", desc: "Step-by-step plans", hash: "roadmaps" },
+        { label: "Industry Insights", desc: "Real-world guidance", hash: "insights" },
+        { label: "Future Identities", desc: "Who you'll become", hash: "identities" },
+      ],
+    },
+    {
+      label: "For Parents",
+      to: "/parents",
+      sections: [
+        { label: "Parent Dashboard", desc: "Everything in one place", hash: "dashboard" },
+        { label: "Live Reports", desc: "Real-time progress", hash: "reports" },
+        { label: "Mentor Feedback", desc: "Notes & recommendations", hash: "feedback" },
+        { label: "Safe & Private", desc: "Your child's data, protected", hash: "safe" },
+      ],
+    },
+    {
+      label: "Resources",
+      to: "/stories",
+      sections: [
+        { label: "Success Stories", desc: "Real student journeys", hash: "stories" },
+        { label: "Guides & Articles", desc: "Tips for students & parents", hash: "guides" },
+        { label: "Webinars", desc: "Learn from experts", hash: "webinars" },
+        { label: "FAQs", desc: "Common questions", hash: "faqs" },
+      ],
+    },
+  ];
 
 const MORE_LINKS = [
   { to: "/framework", label: "ILDF Framework" },
@@ -112,25 +112,25 @@ export function MarketingLayout() {
   };
 
   const navLinkClass = (toPath: string) => cn(
-    "rounded px-2 py-1.5 text-[11px] font-bold transition-all duration-200 whitespace-nowrap",
+    "inline-flex items-center rounded px-2 py-1.5 text-[11px] font-bold transition-all duration-200 whitespace-nowrap",
     isTransparentHeader
       ? (pathname === toPath
-          ? "text-brand-navy bg-slate-200/50"
-          : "text-slate-800 hover:text-brand-blue hover:bg-slate-100/50")
+        ? "text-brand-navy bg-slate-200/50"
+        : "text-slate-800 hover:text-brand-blue hover:bg-slate-100/50")
       : (pathname === toPath
-          ? "text-brand-navy bg-bg-secondary"
-          : "text-text-body hover:text-brand-blue hover:bg-bg-secondary")
+        ? "text-brand-navy bg-bg-secondary"
+        : "text-text-body hover:text-brand-blue hover:bg-bg-secondary")
   );
 
   const getDropdownBtnClass = () => cn(
-    "flex items-center gap-1 rounded px-2 py-1.5 text-[11px] font-bold transition-all duration-200 whitespace-nowrap",
+    "inline-flex items-center gap-1 rounded px-2 py-1.5 text-[11px] font-bold transition-all duration-200 whitespace-nowrap",
     isTransparentHeader
       ? "text-slate-800 hover:text-brand-blue hover:bg-slate-100/50"
       : "text-text-body hover:text-brand-blue hover:bg-bg-secondary"
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg-primary text-text-body font-sans overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-bg-primary text-text-body font-sans overflow-x-clip">
       {/* 1. HEADER (Frosted Liquid Glassmorphism) */}
       <header className={cn(
         "fixed top-0 left-0 right-0 z-40 transition-all duration-300",
@@ -145,8 +145,8 @@ export function MarketingLayout() {
             <button
               className={cn(
                 "xl:hidden p-2 rounded-full transition-all duration-200 flex items-center justify-center border",
-                isTransparentHeader 
-                  ? "bg-white border-slate-100 shadow-sm text-brand-navy hover:bg-slate-50" 
+                isTransparentHeader
+                  ? "bg-white border-slate-100 shadow-sm text-brand-navy hover:bg-slate-50"
                   : "bg-white border-slate-100 shadow-xs text-text-body hover:text-brand-blue"
               )}
               onClick={() => setOpen(!open)}
@@ -198,7 +198,6 @@ export function MarketingLayout() {
             <div className="relative group">
               <button className={getDropdownBtnClass()}>
                 More
-                <ChevronDown className="h-3 w-3 transition-transform duration-200 group-hover:rotate-180" />
               </button>
               <div className="absolute right-0 top-full pt-2 hidden group-hover:block z-50">
                 <div className="w-52 rounded-xl border border-slate-100 bg-white p-1.5 shadow-lg">
