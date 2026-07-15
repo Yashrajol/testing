@@ -2,10 +2,16 @@ import { Link, useRouter } from "@tanstack/react-router";
 import { Logo } from "./logo";
 import { FloatingWidgets } from "./floating-widgets";
 import { cn } from "@/lib/utils";
-import { Bell, Search, Menu, X } from "lucide-react";
+import { Bell, Search, Menu, X, Lock } from "lucide-react";
 import { useState, useEffect, type ReactNode } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "@/contexts/auth-context";
+import { getRoleAvatar as getCuratedRoleAvatar } from "@/lib/avatars";
+import { useAssessmentStatus } from "@/lib/assessment-status";
+import { toast } from "sonner";
+
+// Sidebar sections a new student can still reach before finishing the self-assessment.
+const STUDENT_UNLOCKED_LABELS = ["Dashboard", "Assessments", "Mentor", "Profile"];
 
 export interface NavItem {
   to: string;
@@ -22,7 +28,7 @@ interface DashboardShellProps {
 }
 
 import { useTheme } from "./theme-provider";
-import { Paintbrush, Sparkles, MessageSquare, LogOut, ArrowRight } from "lucide-react";
+import { Paintbrush, MessageSquare, LogOut, ArrowRight } from "lucide-react";
 
 export function DashboardShell({ role, roleLabel, userName, items, children }: DashboardShellProps) {
   const [open, setOpen] = useState(false);
@@ -45,6 +51,8 @@ export function DashboardShell({ role, roleLabel, userName, items, children }: D
     return items[0]?.label;
   });
   const { theme, setTheme } = useTheme();
+  const { done: assessmentDone } = useAssessmentStatus();
+  const gateNav = role === "student" && !assessmentDone;
 
   const getBgImage = () => {
     switch (theme) {
@@ -55,15 +63,17 @@ export function DashboardShell({ role, roleLabel, userName, items, children }: D
     }
   };
 
-  const getRoleAvatar = () => {
-    if (role === "student") return "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=120&auto=format&fit=crop";
-    if (role === "parent") return "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=120&auto=format&fit=crop";
-    if (role === "mentor") return "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=120&auto=format&fit=crop";
-    return "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=120&auto=format&fit=crop";
+  const getRoleAvatar = () => getCuratedRoleAvatar(role);
+
+  const handleLockedClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast.info("Complete your self-assessment first", {
+      description: "Finish the Vedhkrit self-assessment to unlock this section.",
+    });
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-slate-50/40 text-left">
+    <div className="dashboard-root min-h-screen relative overflow-hidden bg-slate-50/40 text-left">
       {/* Dynamic Background Theme */}
       {theme !== 'default' && (
         <div 
@@ -83,22 +93,27 @@ export function DashboardShell({ role, roleLabel, userName, items, children }: D
           <nav className="flex-1 mt-6 space-y-1 overflow-y-auto">
             {items.map((item) => {
               const active = activeLabel === item.label;
+              const locked = gateNav && !STUDENT_UNLOCKED_LABELS.includes(item.label);
               return (
                 <Link
                   key={item.label}
                   to={item.to}
-                  onClick={() => setActiveLabel(item.label)}
+                  onClick={(e) => (locked ? handleLockedClick(e) : setActiveLabel(item.label))}
+                  aria-disabled={locked}
                   className={cn(
                     "group flex w-full items-center gap-3.5 rounded-xl px-3.5 py-2.5 text-left text-xs font-semibold transition-all cursor-pointer",
-                    active
-                      ? role === "student"
-                        ? "bg-brand-orange text-white shadow-md shadow-brand-orange/20"
-                        : "bg-brand-blue text-white shadow-md shadow-brand-blue/20"
-                      : "text-slate-500 hover:bg-slate-50 hover:text-text-heading",
+                    locked
+                      ? "text-slate-350 hover:bg-slate-50"
+                      : active
+                        ? role === "student"
+                          ? "bg-brand-orange text-white shadow-md shadow-brand-orange/20"
+                          : "bg-brand-blue text-white shadow-md shadow-brand-blue/20"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-text-heading",
                   )}
                 >
                   <item.icon className="h-4.5 w-4.5 shrink-0" />
-                  <span className="truncate">{item.label}</span>
+                  <span className="truncate flex-1">{item.label}</span>
+                  {locked && <Lock className="h-3 w-3 shrink-0 text-slate-300" />}
                 </Link>
               );
             })}
@@ -156,22 +171,30 @@ export function DashboardShell({ role, roleLabel, userName, items, children }: D
                   <nav className="space-y-1">
                     {items.map((item) => {
                       const active = activeLabel === item.label;
+                      const locked = gateNav && !STUDENT_UNLOCKED_LABELS.includes(item.label);
                       return (
                         <Link
                           key={item.label}
                           to={item.to}
-                          onClick={() => { setActiveLabel(item.label); setOpen(false); }}
+                          onClick={(e) => {
+                            if (locked) return handleLockedClick(e);
+                            setActiveLabel(item.label);
+                            setOpen(false);
+                          }}
                           className={cn(
                             "flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-left text-xs font-semibold cursor-pointer",
-                            active
-                              ? role === "student"
-                                ? "bg-brand-orange text-white"
-                                : "bg-brand-blue text-white"
-                              : "text-slate-600 hover:bg-slate-50",
+                            locked
+                              ? "text-slate-350"
+                              : active
+                                ? role === "student"
+                                  ? "bg-brand-orange text-white"
+                                  : "bg-brand-blue text-white"
+                                : "text-slate-600 hover:bg-slate-50",
                           )}
                         >
                           <item.icon className="h-4.5 w-4.5" />
-                          {item.label}
+                          <span className="flex-1">{item.label}</span>
+                          {locked && <Lock className="h-3 w-3 shrink-0 text-slate-300" />}
                         </Link>
                       );
                     })}
@@ -209,11 +232,21 @@ export function DashboardShell({ role, roleLabel, userName, items, children }: D
               </div>
               
               <div className="flex items-center gap-2 sm:gap-3">
-                {/* VedhAI Action Button */}
-                <button className="rounded-xl border border-purple-200 bg-purple-50/40 px-3.5 py-1.5 text-[10.5px] font-bold text-purple-700 flex items-center gap-1.5 hover:bg-purple-50 hover:shadow-xs transition-all cursor-pointer">
-                  <Sparkles className="h-3.5 w-3.5 animate-pulse" />
-                  <span>VedhAI</span>
-                </button>
+                {/* Veda AI Mentor Button */}
+                {role === "student" || role === "parent" ? (
+                  <Link
+                    to={role === "student" ? "/dashboard/student/ai" : "/dashboard/parent/ai"}
+                    className="rounded-xl border border-brand-teal/25 bg-teal-50/40 px-3 py-1.5 text-[10.5px] font-bold text-brand-teal flex items-center gap-1.5 hover:bg-teal-50 hover:shadow-xs transition-all cursor-pointer"
+                  >
+                    <img src="/assets/brand/veda-logo.png" alt="Veda" className="h-4 w-4 object-contain rounded-full" />
+                    <span>Ask Veda</span>
+                  </Link>
+                ) : (
+                  <button className="rounded-xl border border-brand-teal/25 bg-teal-50/40 px-3 py-1.5 text-[10.5px] font-bold text-brand-teal flex items-center gap-1.5 hover:bg-teal-50 hover:shadow-xs transition-all cursor-pointer">
+                    <img src="/assets/brand/veda-logo.png" alt="Veda" className="h-4 w-4 object-contain rounded-full" />
+                    <span>Ask Veda</span>
+                  </button>
+                )}
 
                 {/* Theme Switcher */}
                 <div className="relative group">
@@ -252,6 +285,9 @@ export function DashboardShell({ role, roleLabel, userName, items, children }: D
           <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 relative z-10">{children}</main>
         </div>
       </div>
+
+      {/* Floating Veda AI mentor — available across student & parent dashboards */}
+      {(role === "student" || role === "parent") && <FloatingWidgets />}
     </div>
   );
 }

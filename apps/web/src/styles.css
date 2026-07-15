@@ -240,3 +240,10 @@
     radial-gradient(at 0% 100%, oklch(0.7 0.16 200 / 0.15) 0px, transparent 50%),
     radial-gradient(at 100% 100%, oklch(0.7 0.16 280 / 0.12) 0px, transparent 50%);
 }
+
+/* Compact dashboard layouts on desktop at 100% zoom */
+@media (min-width: 1024px) {
+  html:has(.dashboard-root) {
+    font-size: 14.5px;
+  }
+}
