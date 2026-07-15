@@ -1166,62 +1166,6 @@ function HomePage() {
           </div>
         </section>
         </FadeIn>
-
-        {/* 8. READY TO DESIGN YOUR FUTURE (App-Ready Final CTA) */}
-        <FadeIn>
-        <section className="py-12 bg-gradient-to-br from-[#031530] via-[#052261] to-[#04122d] text-white relative overflow-hidden z-10 border-t border-white/10">
-          
-          {/* Background image covering full screen on mobile, right 2/3rds on desktop */}
-          <div className="absolute inset-0 z-0">
-            <img
-              src="/assets/images/final-cta-v2.png"
-              alt="Student Success CTA Backdrop"
-              className="absolute inset-y-0 right-0 w-full lg:w-2/3 h-full object-cover object-right lg:object-top opacity-90 lg:opacity-100"
-              loading="eager"
-            />
-          </div>
-          
-          {/* Custom continuous premium gradient overlay mask (seamless desktop transition) */}
-          <div 
-            className="absolute inset-0 z-10 hidden lg:block" 
-            style={{ 
-              background: 'linear-gradient(to right, #031530 0%, #031530 30%, rgba(3, 21, 48, 0.95) 45%, rgba(3, 21, 48, 0.7) 65%, rgba(3, 21, 48, 0.2) 85%, transparent 100%)' 
-            }} 
-          />
-          {/* Mobile vertical gradient overlay mask */}
-          <div 
-            className="absolute inset-0 z-10 lg:hidden" 
-            style={{ 
-              background: 'linear-gradient(to bottom, rgba(3, 21, 48, 0.95) 0%, rgba(3, 21, 48, 0.8) 50%, rgba(3, 21, 48, 0.98) 100%)' 
-            }} 
-          />
-          
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-20">
-            <div className="max-w-2xl text-left space-y-4">
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight">
-                Ready to Design <span className="text-brand-teal">Your Future?</span>
-              </h2>
-              <p className="text-xs sm:text-sm leading-relaxed text-slate-300 max-w-md font-medium">
-                Join thousands of students and parents unlocking true cognitive potential, matching with mentors, and creating future-ready skillsets.
-              </p>
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Link
-                  to="/register"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-btn-accent hover:bg-orange-600 px-5 py-2.5 text-xs sm:text-sm font-bold text-text-inverse transition-colors shadow-lg animate-pulse"
-                >
-                  Start Journey Free <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  to="/contact"
-                  className="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/10 hover:bg-white/20 px-5 py-2.5 text-xs sm:text-sm font-bold text-white transition-colors"
-                >
-                  Contact Sales
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-        </FadeIn>
       </div>
     </div>
   );
