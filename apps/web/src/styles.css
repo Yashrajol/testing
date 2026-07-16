@@ -1,7 +1,6 @@
 @import "tailwindcss" source(none);
-@source "../src";
 @import "tw-animate-css";
-
+@source "../src";
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -196,6 +195,7 @@
   * { border-color: var(--color-border); }
   html, body { font-family: var(--font-sans); }
   body {
+    margin: 0;
     background-color: var(--color-background);
     color: var(--color-foreground);
     background-image:
@@ -266,3 +266,26 @@
     --spacing-16: 2.8rem;
   }
 }
+
+/* Lenis smooth scrolling integration classes */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+
