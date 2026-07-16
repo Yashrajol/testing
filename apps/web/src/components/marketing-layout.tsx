@@ -64,19 +64,20 @@ const NAV_GROUPS: {
       ],
     },
     {
-      label: "Resources",
-      to: "/stories",
+      label: "ILDF Framework",
+      to: "/framework",
       sections: [
-        { label: "Success Stories", desc: "Real student journeys", hash: "stories" },
-        { label: "Guides & Articles", desc: "Tips for students & parents", hash: "guides" },
-        { label: "Webinars", desc: "Learn from experts", hash: "webinars" },
-        { label: "FAQs", desc: "Common questions", hash: "faqs" },
+        { label: "Discover Phase", desc: "Grades 8-9 strengths mapping", hash: "phase-1" },
+        { label: "Explore Phase", desc: "Grades 9-10 career interest", hash: "phase-2" },
+        { label: "Align Phase", desc: "Grades 10-11 stream selection", hash: "phase-3" },
+        { label: "Prepare Phase", desc: "Grades 11-12 profile building", hash: "phase-4" },
+        { label: "Launch Phase", desc: "Grade 12 college readiness", hash: "phase-5" },
       ],
     },
   ];
 
 const MORE_LINKS = [
-  { to: "/framework", label: "ILDF Framework" },
+  { to: "/stories", label: "Resources" },
   { to: "/about", label: "About Us" },
   { to: "/contact", label: "Contact Us" },
 ];
@@ -265,8 +266,8 @@ export function MarketingLayout() {
             <Link to="/parents" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
               For Parents
             </Link>
-            <Link to="/stories" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
-              Resources
+            <Link to="/framework" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
+              ILDF Framework
             </Link>
 
             {/* More group */}

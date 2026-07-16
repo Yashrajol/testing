@@ -21,23 +21,23 @@ const sampleChartData = [
 const blueprintPaths = [
   {
     role: "AI & Machine Learning Engineer",
-    traits: "Logic, Abstract Reasoning, Clerical Speed",
-    subjectPath: "Maths, Computer Science, Statistics",
-    colleges: "IITs, IIITs, BITS, IISc Bangalore",
+    traits: "Logic, Abstract Reasoning, Problem Solving",
+    subjectPath: "PCM + Computer Science",
+    colleges: "IITs, IIITs, BITS Pilani, IISc",
     outcome: "94% High Demand"
   },
   {
-    role: "UX Researcher & Product Architect",
-    traits: "Spatial, Verbal Ability, Empathy Index",
-    subjectPath: "Design, Psychology, Media Studies",
-    colleges: "NID, IIT Design Docks, Srishti Institute",
+    role: "UX Designer & Product Architect",
+    traits: "Creativity, Spatial Design, Empathy",
+    subjectPath: "Humanities / Science / Commerce + Design elective",
+    colleges: "NIDs, IIT Design Departments, Srishti",
     outcome: "86% High Growth"
   },
   {
     role: "Climate Tech & Green Innovator",
-    traits: "Critical Thinking, Systems Analysis, SEL",
-    subjectPath: "Chemistry, Environmental Science, Economics",
-    colleges: "IISER, Ashoka University, TISS",
+    traits: "Critical Thinking, Analysis, Social Awareness",
+    subjectPath: "PCB/PCM + Environmental Sciences",
+    colleges: "IISERs, Ashoka University, TISS",
     outcome: "91% Emerging Sector"
   }
 ];
@@ -85,11 +85,11 @@ function Career() {
               <Compass className="h-4 w-4" /> Career Architecture & Strategy
             </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-text-heading leading-tight tracking-tight">
-              From Aptitude Match to <br className="hidden sm:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-brand-blue">College Admissions.</span>
+              From Stream Selection to <br className="hidden sm:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-brand-blue">Your Dream Career.</span>
             </h1>
             <p className="mt-6 text-sm sm:text-base leading-relaxed text-text-muted max-w-2xl mx-auto">
-              Our career mapping does not stop at generic suggestions. We synthesize data to architect a multi-year blueprint connecting subjects, university paths, and ultimate real-world roles.
+              End stream-selection confusion in Class 10. Our career mapping connects your natural aptitudes to the right subjects, board combinations, and college goals.
             </p>
           </motion.div>
 
@@ -132,9 +132,9 @@ function Career() {
 
             {/* Explanation text */}
             <motion.div variants={itemVariants} className="space-y-6">
-              <h2 className="text-2xl sm:text-3xl font-black text-text-heading leading-tight">Eliminate Guesswork in Stream Selection</h2>
+              <h2 className="text-2xl sm:text-3xl font-black text-text-heading leading-tight">Choose Streams with Absolute Confidence</h2>
               <p className="text-sm text-text-muted leading-relaxed">
-                Our dynamic projection model runs thousands of permutations matching a student's cognitive and behavioral baseline against 400+ modern career paths.
+                We map your logic, interests, and study styles to match you with 400+ modern careers, showing you exactly how to get there starting from Class 9 or 10.
               </p>
               
               <div className="space-y-4 pt-4">
@@ -143,8 +143,8 @@ function Career() {
                     <CheckCircle2 className="h-4 w-4" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-text-heading">Precision Subject Alignment</h4>
-                    <p className="text-xs text-text-muted mt-1 leading-relaxed">Map exact combinations (e.g. PCM vs Humanities) critical for targeted university admissions.</p>
+                    <h4 className="text-sm font-bold text-text-heading">Stream & Board Alignment</h4>
+                    <p className="text-xs text-text-muted mt-1 leading-relaxed">Map the exact combination (e.g., PCM, PCB, Commerce, or Humanities) suited to your learning profile.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -152,8 +152,8 @@ function Career() {
                     <CheckCircle2 className="h-4 w-4" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-text-heading">Macro-trend Indexing</h4>
-                    <p className="text-xs text-text-muted mt-1 leading-relaxed">Roles are weighted against 10-year market growth forecasts, preventing focus on obsolete sectors.</p>
+                    <h4 className="text-sm font-bold text-text-heading">Future-Proof Careers</h4>
+                    <p className="text-xs text-text-muted mt-1 leading-relaxed">We focus on high-growth, modern opportunities so you spend time building relevant skills.</p>
                   </div>
                 </div>
               </div>
