@@ -378,7 +378,7 @@ export function MarketingLayout() {
               <div className="pt-1.5 space-y-1.5 border-t border-slate-100">
                 <div className="flex items-center gap-2">
                   <Phone className="h-3.5 w-3.5 text-brand-teal shrink-0" />
-                  <span>+91 98765 43210</span>
+                  <span>+91 9326461381</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-3.5 w-3.5 text-brand-teal shrink-0" />
@@ -386,7 +386,7 @@ export function MarketingLayout() {
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-3.5 w-3.5 text-brand-teal shrink-0" />
-                  <span>Mumbai, India</span>
+                  <span>Mumbai, Maharashtra </span>
                 </div>
               </div>
             </div>

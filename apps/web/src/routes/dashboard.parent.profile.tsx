@@ -17,7 +17,7 @@ export const Route = createFileRoute("/dashboard/parent/profile")({
 function ParentProfilePage() {
   const [parentName, setParentName] = useState("Rohan Sharma");
   const [parentEmail, setParentEmail] = useState("rohan.sharma@example.com");
-  const [parentPhone, setParentPhone] = useState("+91 98765 43210");
+  const [parentPhone, setParentPhone] = useState("+91 9326461381");
   const [parentAddress, setParentAddress] = useState("Flat 402, Green Glen Layout, Bellandur, Bangalore - 560103");
   
   const [emergencyContactName, setEmergencyContactName] = useState("Sunita Sharma");

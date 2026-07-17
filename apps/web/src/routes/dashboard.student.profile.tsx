@@ -45,7 +45,7 @@ function ProfileManagementPage() {
     return saved ? JSON.parse(saved) : {
       name: "Yash Rajole",
       email: "yash.rajole@example.com",
-      phone: "+91 98765 43210",
+      phone: "+91 9326461381",
       avatar: studentAvatar(0, 220),
       fatherName: "Rajesh Rajole",
       motherName: "Suneeta Rajole",
