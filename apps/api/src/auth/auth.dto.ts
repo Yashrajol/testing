@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsOptional, IsString, Length, MinLength } from 'class-validator';
-import { RoleName as Role } from '@prisma/client';
+import { RoleName as Role } from '@vedhkrit/database';
 
 // Messages are written for the person filling in the form: class-validator's
 // defaults ("password must be longer than or equal to 8 characters") get shown

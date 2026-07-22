@@ -3,7 +3,7 @@ import { CmsService } from './cms.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { RoleName as Role } from '@prisma/client';
+import { RoleName as Role } from '@vedhkrit/database';
 
 @Controller('cms')
 export class CmsController {
