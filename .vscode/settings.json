@@ -1,5 +1,8 @@
 {
   "css.validate": false,
   "css.lint.unknownAtRules": "ignore",
-  "codeQL.createQuery.qlPackLocation": "c:\\Users\\yashr\\OneDrive\\Desktop\\VEDHKRIT"
+  "codeQL.createQuery.qlPackLocation": "c:\\Users\\yashr\\OneDrive\\Desktop\\VEDHKRIT",
+  "codeQL.githubDatabase.download": "never",
+  "snyk.advanced.organization": "fa5a0cb2-d16e-4b0e-a47c-d763b577c1a9",
+  "snyk.advanced.autoSelectOrganization": true
 }
