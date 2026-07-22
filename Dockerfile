@@ -1,41 +1,45 @@
-# Stage 1: Build stage
+# Production image for the NestJS API (apps/api).
+# Built from the monorepo root: docker build -f Dockerfile .
+
 FROM node:20-alpine AS builder
 
-WORKDIR /usr/src/app
+RUN apk add --no-cache openssl python3 make g++
 
-# Install build dependencies
-RUN apk add --no-cache python3 make g++
+WORKDIR /usr/src/app
 
 COPY package*.json ./
 COPY turbo.json ./
 COPY packages/ ./packages/
-COPY apps/web/package*.json ./apps/web/
-COPY apps/web/ ./apps/web/
+COPY apps/api/package*.json ./apps/api/
+COPY apps/api/ ./apps/api/
+COPY .npmrc ./
 
 # Install packages
 RUN npm ci
 
-# Build web frontend
-RUN npx turbo run build --filter=@vedhkrit/web...
+# Run prisma generate and build the API and its dependencies
+RUN npm run db:generate --workspace=@vedhkrit/database
+RUN npx turbo run build --filter=@vedhkrit/api...
 
-# Stage 2: Production Nginx runtime stage
-FROM nginx:1.25-alpine AS runner
+# Drop dev dependencies, keeping the generated Prisma client.
+RUN npm prune --omit=dev
 
-# Non-root user permissions
-RUN chown -R nginx:nginx /var/cache/nginx /var/log/nginx /etc/nginx/conf.d
 
-# Copy custom Nginx configuration
-COPY infra/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY infra/nginx/default.conf /etc/nginx/conf.d/default.conf
+FROM node:20-alpine AS runner
 
-# Copy built frontend static assets
-COPY --from=builder /usr/src/app/apps/web/dist /usr/share/nginx/html
+RUN apk add --no-cache openssl
 
-EXPOSE 80
+ENV NODE_ENV=production
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost/healthz || exit 1
+WORKDIR /app
 
-USER nginx
+COPY --from=builder /usr/src/app/node_modules node_modules/
+COPY --from=builder /usr/src/app/package.json package.json
+COPY --from=builder /usr/src/app/packages packages/
+COPY --from=builder /usr/src/app/apps/api/dist apps/api/dist/
+COPY --from=builder /usr/src/app/apps/api/package.json apps/api/package.json
 
-CMD ["nginx", "-g", "daemon off;"]
+# Render injects PORT; main.ts falls back to 5000 locally.
+EXPOSE 5000
+
+CMD ["node", "apps/api/dist/main.js"]
