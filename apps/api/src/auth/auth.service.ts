@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException, ConflictException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { RoleName as Role, AccountStatus } from '@prisma/client';
+import { RoleName as Role, AccountStatus } from '@vedhkrit/database';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
 

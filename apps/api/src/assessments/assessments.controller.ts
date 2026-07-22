@@ -4,7 +4,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { AuthService } from '../auth/auth.service';
-import { RoleName as Role } from '@prisma/client';
+import { RoleName as Role } from '@vedhkrit/database';
 import { Request } from 'express';
 
 @Controller('assessments')

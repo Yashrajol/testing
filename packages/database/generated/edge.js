@@ -2036,7 +2036,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\yashr\\OneDrive\\Desktop\\VEDHKRIT\\packages\\database\\generated",
+      "value": "E:\\Startup Building\\WORKSPACE\\VEDHKRIT\\packages\\database\\generated",
       "fromEnvVar": null
     },
     "config": {
@@ -2052,7 +2052,7 @@ const config = {
     "previewFeatures": [
       "prismaSchemaFolder"
     ],
-    "sourceFilePath": "C:\\Users\\yashr\\OneDrive\\Desktop\\VEDHKRIT\\prisma\\schema\\schema.prisma",
+    "sourceFilePath": "E:\\Startup Building\\WORKSPACE\\VEDHKRIT\\prisma\\schema\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
