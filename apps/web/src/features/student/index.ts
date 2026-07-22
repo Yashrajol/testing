@@ -1,6 +1,6 @@
-export * as StudentDashboard from '../dashboard';
-export * as StudentAcademics from '../academics';
-export * as StudentPlanner from '../planner';
-export * as StudentPortfolio from '../portfolio';
-export * as StudentGrowth from '../growth';
-export * as StudentLearningDNA from '../learning-dna';
+export * as StudentDashboard from '@/features/dashboard';
+export * as StudentAcademics from '@/features/academics';
+export * as StudentPlanner from '@/features/planner';
+export * as StudentPortfolio from '@/features/portfolio';
+export * as StudentGrowth from '@/features/growth';
+export * as StudentLearningDNA from '@/features/learning-dna';
