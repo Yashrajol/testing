@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Brain, Cpu, Sparkles, Target, Award, LineChart, Shield, ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion } from "motion/react";
-import { GlassCard } from "@/components/glass-card";
+import { GlassCard } from "@/shared/ui/glass-card";
 
 export const Route = createFileRoute("/_marketing/assessment")({
   component: Assessment,
@@ -11,51 +11,51 @@ export const Route = createFileRoute("/_marketing/assessment")({
 const assessmentPillars = [
   {
     icon: Brain,
-    type: "Cognitive",
-    name: "DBDA Aptitude Profile",
-    duration: "45 Mins",
-    format: "Adaptive MCQ",
+    type: "Aptitude & Logic",
+    name: "Strengths Profile",
+    duration: "30 Mins",
+    format: "Aptitude Games",
     gradient: "from-brand-blue to-indigo-500",
     textCol: "text-brand-blue",
     features: [
-      "Verbal & Numerical Reasoning",
-      "Spatial & Abstract Aptitude",
-      "Clerical & Spatial Ability",
-      "Real-time difficulty scaling"
+      "Logical & Verbal Reasoning",
+      "Numerical & Coding Aptitude",
+      "Spatial & Abstract Thinking",
+      "Fun, game-like puzzles"
     ],
-    outcome: "Detailed Cognitive Talent Map"
+    outcome: "Detailed Cognitive Map"
   },
   {
     icon: Sparkles,
-    type: "Behavioral",
-    name: "SEL & Emotional Intelligence",
-    duration: "25 Mins",
-    format: "Scenario Response",
+    type: "Study Habits & EQ",
+    name: "Focus & Resilience Profile",
+    duration: "20 Mins",
+    format: "Situational Choice",
     gradient: "from-brand-teal to-emerald-500",
     textCol: "text-brand-teal",
     features: [
-      "Social-Emotional Learning (SEL)",
-      "Locus of Control & Resilience",
-      "Collaboration & Empathy Indices",
-      "Self-Management capabilities"
+      "Social-Emotional skills (SEL)",
+      "Exam stress resilience",
+      "Collaboration & team habits",
+      "Goal setting & self-study style"
     ],
-    outcome: "Interpersonal & EQ Summary"
+    outcome: "Confidence & EQ Summary"
   },
   {
     icon: Target,
-    type: "Learning Style",
-    name: "Cognitive Twin Detector",
-    duration: "20 Mins",
-    format: "Interactive VAK Profile",
+    type: "Learning Styles",
+    name: "Study Hacks Detector",
+    duration: "15 Mins",
+    format: "Interactive VAK Map",
     gradient: "from-brand-orange to-amber-500",
     textCol: "text-brand-orange",
     features: [
-      "Visual, Auditory & Kinesthetic (VAK)",
-      "Information processing speed",
-      "Optimal environment analysis",
-      "Retention trigger mapping"
+      "Visual vs Auditory learning",
+      "Hands-on memory triggers",
+      "Perfect study environment setup",
+      "Actionable study hacks"
     ],
-    outcome: "Personalized Learning Protocols"
+    outcome: "Custom Study Guide"
   }
 ];
 
@@ -106,7 +106,7 @@ function Assessment() {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange to-brand-blue">Actionable Data.</span>
             </h1>
             <p className="mt-6 text-sm sm:text-base leading-relaxed text-text-muted max-w-2xl mx-auto">
-              Move beyond generic career tests. Our tripartite assessment engine captures deep cognitive, behavioral, and learning-style metrics to build a complete student profile.
+              Move beyond stressful, boring career tests. Discover your natural talents, focus style, and study strengths with our engaging, bite-sized assessments designed for Grades 8–12.
             </p>
           </motion.div>
 
@@ -161,9 +161,9 @@ function Assessment() {
             <div className="rounded-3xl bg-gradient-to-br from-brand-navy to-indigo-950 p-8 sm:p-12 text-center text-white border-0 shadow-xl relative overflow-hidden">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent pointer-events-none" />
               <Shield className="h-12 w-12 text-brand-teal mx-auto mb-6 opacity-80 relative z-10" />
-              <h2 className="text-3xl font-black mb-4 relative z-10">Enterprise-Grade Architecture</h2>
+              <h2 className="text-3xl font-black mb-4 relative z-10">Adaptive & Stress-Free</h2>
               <p className="text-white/70 max-w-2xl mx-auto text-sm leading-relaxed mb-8 relative z-10">
-                Our diagnostic engine uses Item Response Theory (IRT) and Machine Learning to dynamically adjust question difficulty based on student responses, reducing test fatigue while increasing measurement accuracy.
+                Our smart diagnostic engine dynamically adjusts difficulty to match your pace. No timers, no exam-hall stress—just clear insights to help you learn better and build your profile.
               </p>
               <Link to="/register" className="inline-flex items-center gap-2 rounded-xl bg-white text-brand-navy px-6 py-3 text-sm font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all relative z-10">
                 Request School Demo <ArrowRight className="h-4 w-4" />

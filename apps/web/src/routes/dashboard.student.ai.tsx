@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { VedaAssistant } from "@/components/veda-assistant";
+import { VedaAssistant } from "@/features/ai/components/veda-assistant";
 
 export const Route = createFileRoute("/dashboard/student/ai")({
   component: () => <VedaAssistant role="student" />,

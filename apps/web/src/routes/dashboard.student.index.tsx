@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GlassCard } from "@/components/glass-card";
+import { GlassCard } from "@/shared/ui/glass-card";
 import {
   Check,
   Lock,
@@ -26,23 +26,26 @@ import {
   Activity,
   UserCheck,
   ChevronRight,
-  ClipboardCheck
+  ClipboardCheck,
+  Bell
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
-import { useStudentOverview } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { useAuth } from "@/app/providers/auth-context";
+import { useStudentDashboard } from "@/features/dashboard/queries/use-student-dashboard";
+import { useNotifications } from "@/features/notifications/queries/useNotifications";
+import { cn } from "@/shared/utils/utils";
 import { toast } from "sonner";
-import { useAssessmentStatus } from "@/lib/assessment-status";
-import { studentAvatar } from "@/lib/avatars";
-import { SelfAssessmentModal } from "@/components/self-assessment";
+import { useAssessmentStatus } from "@/shared/constants/assessment-status";
+import { studentAvatar } from "@/shared/utils/avatars";
+import { SelfAssessmentModal } from "@/features/assessments/components/self-assessment";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
+} from "@/shared/ui/dialog";
 
 export const Route = createFileRoute("/dashboard/student/")({
   component: StudentDashboardOverview,
@@ -50,16 +53,25 @@ export const Route = createFileRoute("/dashboard/student/")({
 });
 
 function StudentDashboardOverview() {
-  const { data: apiData, isLoading } = useStudentOverview();
-  const [homeworkCheck, setHomeworkCheck] = useState([
-    { id: 1, text: "Mathematics worksheet - 12 (Linear Equations)", done: false },
-    { id: 2, text: "Science balanced equations booklet", done: true },
-    { id: 3, text: "English voice exercises conversion", done: false }
-  ]);
-  const [revisionGoals, setRevisionGoals] = useState([
-    { id: 1, text: "Physics laws of motion formulas sheets", done: false },
-    { id: 2, text: "Geography climate map coordinates", done: true }
-  ]);
+  const { user } = useAuth();
+  const studentId = user?.id || 'student-123';
+  const { data: dashboardData, isLoading, isError, refetch } = useStudentDashboard(studentId);
+  const { data: notificationsData } = useNotifications(studentId);
+
+  const [homeworkCheck, setHomeworkCheck] = useState<Array<{ id: string | number; text: string; done: boolean }>>([]);
+  const [revisionGoals, setRevisionGoals] = useState<Array<{ id: string | number; text: string; done: boolean }>>([]);
+
+  useEffect(() => {
+    if (dashboardData?.assignmentStatus) {
+      if (dashboardData.assignmentStatus.checklist) {
+        setHomeworkCheck(dashboardData.assignmentStatus.checklist);
+      }
+      if (dashboardData.assignmentStatus.revisionGoals) {
+        setRevisionGoals(dashboardData.assignmentStatus.revisionGoals);
+      }
+    }
+  }, [dashboardData]);
+
   const [pomoTime, setPomoTime] = useState(1500); // 25 mins
   const [pomoRunning, setPomoRunning] = useState(false);
   const { done: assessmentDone, markDone } = useAssessmentStatus();
@@ -90,12 +102,30 @@ function StudentDashboardOverview() {
     return () => clearInterval(interval);
   }, [pomoRunning]);
 
-  const userName = apiData?.student?.user?.name || "Yash Rajole";
+  const userName = dashboardData?.studentName || user?.name || "Student";
 
   if (isLoading) {
     return (
       <div className="flex h-[60dvh] items-center justify-center">
         <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex h-[60dvh] flex-col items-center justify-center space-y-4 text-center">
+        <AlertCircle className="h-12 w-12 text-brand-orange animate-bounce" />
+        <h3 className="font-display text-lg font-bold text-text-heading">Failed to load dashboard data</h3>
+        <p className="text-xs text-text-muted max-w-sm">
+          Something went wrong while connecting to the server. Please check your connection and try again.
+        </p>
+        <button
+          onClick={() => refetch()}
+          className="px-4 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold hover:bg-brand-navy transition-all cursor-pointer shadow-sm"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -172,23 +202,23 @@ function StudentDashboardOverview() {
             <div className="z-10 grid grid-cols-2 gap-y-3 gap-x-4 pt-6 border-t border-slate-100/60 mt-4 text-[11px] font-medium text-text-muted max-w-[62%]">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-blue-50 text-brand-blue"><BookOpen className="h-3.5 w-3.5" /></div>
-                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">School</span>Delhi Public School</div>
+                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">School</span>{dashboardData?.profile?.schoolName || "Delhi Public School"}</div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-purple-50 text-purple-600"><GraduationCap className="h-3.5 w-3.5" /></div>
-                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Class & Section</span>Class IX - A</div>
+                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Class & Section</span>{dashboardData?.profile?.className ? `${dashboardData.profile.className} - ${dashboardData.profile.sectionName || ''}` : "Class IX - A"}</div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-teal-50 text-brand-teal"><Activity className="h-3.5 w-3.5" /></div>
-                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Batch</span>Foundation A1</div>
+                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Batch</span>{dashboardData?.profile?.batchName || "Foundation A1"}</div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-orange-50 text-brand-orange"><Award className="h-3.5 w-3.5" /></div>
-                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Roll Number</span>23</div>
+                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Roll Number</span>{dashboardData?.profile?.rollNumber || "23"}</div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-slate-50 text-slate-600"><Calendar className="h-3.5 w-3.5" /></div>
-                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Academic Year</span>2026 - 27</div>
+                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Academic Year</span>{dashboardData?.profile?.academicYear || "2026 - 27"}</div>
               </div>
             </div>
 
@@ -211,23 +241,46 @@ function StudentDashboardOverview() {
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Vedhkrit Index™</span>
                   <h3 className="font-display text-4xl font-black text-brand-orange mt-1.5 flex items-baseline gap-1">
-                    82<span className="text-sm font-semibold text-text-muted">/100</span>
+                    {dashboardData?.vedhkritIndex?.value ?? 82}<span className="text-sm font-semibold text-text-muted">/100</span>
                   </h3>
                   <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-md mt-1 inline-block">
-                    Great Progress
+                    {dashboardData?.vedhkritIndex?.status || "Great Progress"}
                   </span>
                 </div>
                 {/* Mini Sparkline Chart */}
                 <div className="w-20 h-12 pt-2">
                   <svg className="w-full h-full" viewBox="0 0 100 40">
-                    <path
-                      d="M0,35 Q15,20 30,28 T60,12 T90,5 L100,5"
-                      fill="none"
-                      stroke="var(--brand-orange)"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
+                    {dashboardData?.vedhkritIndex?.history && dashboardData.vedhkritIndex.history.length > 1 ? (
+                      <path
+                        d={dashboardData.vedhkritIndex.history.reduce((acc, val, i, arr) => {
+                          const x = (i / (arr.length - 1)) * 90 + 5;
+                          const y = 35 - (val / 100) * 30;
+                          return acc + (i === 0 ? `M${x},${y}` : ` L${x},${y}`);
+                        }, "")}
+                        fill="none"
+                        stroke="var(--brand-orange)"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      />
+                    ) : (
+                      <path
+                        d="M0,35 Q15,20 30,28 T60,12 T90,5 L100,5"
+                        fill="none"
+                        stroke="var(--brand-orange)"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                      />
+                    )}
+                    <circle 
+                      cx={dashboardData?.vedhkritIndex?.history && dashboardData.vedhkritIndex.history.length > 0 
+                        ? (90 + 5) 
+                        : "90"} 
+                      cy={dashboardData?.vedhkritIndex?.history && dashboardData.vedhkritIndex.history.length > 0 
+                        ? (35 - (dashboardData.vedhkritIndex.history[dashboardData.vedhkritIndex.history.length - 1] / 100) * 30) 
+                        : "5"} 
+                      r="3" 
+                      fill="var(--brand-orange)" 
                     />
-                    <circle cx="90" cy="5" r="3" fill="var(--brand-orange)" />
                   </svg>
                 </div>
               </div>
@@ -280,8 +333,7 @@ function StudentDashboardOverview() {
               <ClipboardCheck className="h-6 w-6" />
             </div>
             <DialogTitle> ✨ Discover. Learn. Grow. </DialogTitle>
-            <DialogDescription>Start your Self-Assessment.
-            </DialogDescription>
+            <DialogDescription>Start your Self-Assessment.</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col sm:flex-row gap-2.5 mt-2">
             <button
@@ -325,38 +377,37 @@ function StudentDashboardOverview() {
                 <button className="text-[10px] text-brand-blue font-bold hover:underline">View Full</button>
               </div>
               <div className="space-y-4">
-                {[
-                  { time: "09:00 AM", title: "Mathematics Live Class", sub: "Algebra - Linear Equations", live: true },
-                  { time: "11:00 AM", title: "Science Class", sub: "Chemical Reactions", live: false },
-                  { time: "02:00 PM", title: "Homework Deadline", sub: "Maths Worksheet - 12", deadline: true },
-                  { time: "05:00 PM", title: "Mentor Session", sub: "Career Guidance", live: false }
-                ].map((item, idx) => (
-                  <div key={idx} className="flex gap-3 relative pb-2 group">
-                    <div className="flex flex-col items-center shrink-0">
-                      <div className={cn(
-                        "h-3 w-3 rounded-full border-2 bg-white z-10",
-                        item.live ? "border-brand-orange bg-brand-orange animate-ping" :
-                          item.deadline ? "border-red-500" : "border-brand-blue"
-                      )} />
-                      {idx < 3 && <div className="w-[1.5px] bg-slate-100 flex-grow h-14" />}
-                    </div>
-                    <div className="text-left flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[9.5px] font-bold text-slate-400">{item.time}</span>
-                        {item.live && (
-                          <span className="text-[8px] font-bold uppercase tracking-wider text-white bg-red-500 px-1 rounded animate-pulse">LIVE</span>
-                        )}
+                {!dashboardData?.todaysLessons || dashboardData.todaysLessons.length === 0 ? (
+                  <div className="text-center py-10 text-xs text-text-muted">No lessons scheduled today</div>
+                ) : (
+                  dashboardData.todaysLessons.map((item, idx) => (
+                    <div key={item.id || idx} className="flex gap-3 relative pb-2 group">
+                      <div className="flex flex-col items-center shrink-0">
+                        <div className={cn(
+                          "h-3 w-3 rounded-full border-2 bg-white z-10",
+                          item.live ? "border-brand-orange bg-brand-orange animate-ping" :
+                            item.deadline ? "border-red-500" : "border-brand-blue"
+                        )} />
+                        {idx < dashboardData.todaysLessons.length - 1 && <div className="w-[1.5px] bg-slate-100 flex-grow h-14" />}
                       </div>
-                      <h4 className="text-xs font-bold text-text-heading truncate mt-0.5">{item.title}</h4>
-                      <p className="text-[10px] text-text-muted truncate mt-0.5">{item.sub}</p>
+                      <div className="text-left flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[9.5px] font-bold text-slate-400">{item.time}</span>
+                          {item.live && (
+                            <span className="text-[8px] font-bold uppercase tracking-wider text-white bg-red-500 px-1 rounded animate-pulse">LIVE</span>
+                          )}
+                        </div>
+                        <h4 className="text-xs font-bold text-text-heading truncate mt-0.5">{item.title}</h4>
+                        <p className="text-[10px] text-text-muted truncate mt-0.5">{item.description || item.subject || ''}</p>
+                      </div>
+                      {(item.live || item.joinUrl) && (
+                        <button className="h-7 px-3 bg-brand-blue text-white rounded-lg text-[10px] font-bold self-center shrink-0 hover:bg-brand-navy transition-all">
+                          Join Now
+                        </button>
+                      )}
                     </div>
-                    {(item.live || item.title === "Science Class" || item.title === "Mentor Session") && (
-                      <button className="h-7 px-3 bg-brand-blue text-white rounded-lg text-[10px] font-bold self-center shrink-0 hover:bg-brand-navy transition-all">
-                        Join Now
-                      </button>
-                    )}
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </GlassCard>
@@ -419,12 +470,12 @@ function StudentDashboardOverview() {
             </h3>
             <div className="grid grid-cols-3 gap-x-2 gap-y-4 text-center">
               {[
-                { label: "Attendance", val: 95, color: "text-brand-teal" },
-                { label: "Overall %", val: 87.4, color: "text-brand-blue" },
-                { label: "Homework", val: 93, color: "text-brand-orange" },
-                { label: "Test Avg", val: 84, color: "text-brand-blue" },
-                { label: "Confidence", val: 71, color: "text-purple-600" },
-                { label: "Overall Index", val: 82, color: "text-brand-orange" }
+                { label: "Attendance", val: dashboardData?.attendancePercentage ?? 95, color: "text-brand-teal" },
+                { label: "Overall %", val: dashboardData?.assignmentStatus?.overallPercentage ?? 87.4, color: "text-brand-blue" },
+                { label: "Homework", val: dashboardData?.assignmentStatus?.homeworkCompletion ?? 93, color: "text-brand-orange" },
+                { label: "Test Avg", val: dashboardData?.assignmentStatus?.testAverage ?? 84, color: "text-brand-blue" },
+                { label: "Confidence", val: dashboardData?.assignmentStatus?.confidenceIndex ?? 71, color: "text-purple-600" },
+                { label: "Overall Index", val: dashboardData?.vedhkritIndex?.value ?? 82, color: "text-brand-orange" }
               ].map((g, idx) => (
                 <div key={idx} className="flex flex-col items-center">
                   <CircularProgress percent={Math.round(g.val)} colorClass={g.color} size={44} strokeWidth={4} />
@@ -490,24 +541,26 @@ function StudentDashboardOverview() {
                 <h4 className="font-display text-xs font-bold text-slate-400 uppercase tracking-wider">Today's Timetable</h4>
 
                 <div className="space-y-3">
-                  {[
-                    { time: "09:00 AM - 10:00 AM", title: "Mathematics", desc: "Linear Equations word sums", live: true },
-                    { time: "11:00 AM - 12:00 PM", title: "Science Physics", desc: "Chemical Reaction Balancing", live: false },
-                    { time: "02:00 PM - 03:00 PM", title: "English Language", desc: "Active & Passive Voice conversions", live: false }
-                  ].map((cls, i) => (
-                    <div key={i} className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl text-left flex justify-between items-center text-xs">
-                      <div>
-                        <span className="text-[8.5px] font-bold text-slate-400 block">{cls.time}</span>
-                        <h5 className="font-bold text-text-heading mt-0.5">{cls.title}</h5>
-                        <p className="text-[9.5px] text-text-muted font-semibold mt-0.5">{cls.desc}</p>
-                      </div>
-                      {cls.live && (
-                        <span className="text-[8px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded animate-pulse shrink-0">
-                          LIVE
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                  {!dashboardData?.todaysLessons || dashboardData.todaysLessons.filter(l => !l.deadline).length === 0 ? (
+                    <div className="text-center py-6 text-xs text-text-muted">No classes scheduled today</div>
+                  ) : (
+                    dashboardData.todaysLessons
+                      .filter(l => !l.deadline)
+                      .map((cls, i) => (
+                        <div key={cls.id || i} className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl text-left flex justify-between items-center text-xs">
+                          <div>
+                            <span className="text-[8.5px] font-bold text-slate-400 block">{cls.time}</span>
+                            <h5 className="font-bold text-text-heading mt-0.5">{cls.title}</h5>
+                            <p className="text-[9.5px] text-text-muted font-semibold mt-0.5">{cls.description || cls.subject || ''}</p>
+                          </div>
+                          {cls.live && (
+                            <span className="text-[8px] font-bold text-white bg-red-500 px-1.5 py-0.5 rounded animate-pulse shrink-0">
+                              LIVE
+                            </span>
+                          )}
+                        </div>
+                      ))
+                  )}
                 </div>
               </div>
 
@@ -516,51 +569,59 @@ function StudentDashboardOverview() {
                 <h4 className="font-display text-xs font-bold text-slate-400 uppercase tracking-wider">Homework Checklist</h4>
 
                 <div className="space-y-2.5">
-                  {homeworkCheck.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setHomeworkCheck(prev => prev.map(h => h.id === item.id ? { ...h, done: !h.done } : h));
-                        toast.info(item.done ? "Homework active" : "Homework marked completed!");
-                      }}
-                      className="w-full p-2.5 bg-white border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-3 cursor-pointer text-xs text-left"
-                    >
-                      <div className={cn(
-                        "h-4 w-4 rounded border flex items-center justify-center shrink-0 transition-colors",
-                        item.done ? "bg-brand-teal border-brand-teal text-white" : "border-slate-350"
-                      )}>
-                        {item.done && <Check className="h-3 w-3 stroke-[3px]" />}
-                      </div>
-                      <span className={cn("font-bold text-text-heading", item.done && "text-slate-400 line-through")}>
-                        {item.text}
-                      </span>
-                    </button>
-                  ))}
+                  {homeworkCheck.length === 0 ? (
+                    <div className="text-center py-6 text-xs text-text-muted border border-dashed border-slate-100 rounded-xl">No homework checklist items</div>
+                  ) : (
+                    homeworkCheck.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setHomeworkCheck(prev => prev.map(h => h.id === item.id ? { ...h, done: !h.done } : h));
+                          toast.info(item.done ? "Homework active" : "Homework marked completed!");
+                        }}
+                        className="w-full p-2.5 bg-white border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-3 cursor-pointer text-xs text-left"
+                      >
+                        <div className={cn(
+                          "h-4 w-4 rounded border flex items-center justify-center shrink-0 transition-colors",
+                          item.done ? "bg-brand-teal border-brand-teal text-white" : "border-slate-350"
+                        )}>
+                          {item.done && <Check className="h-3 w-3 stroke-[3px]" />}
+                        </div>
+                        <span className={cn("font-bold text-text-heading", item.done && "text-slate-400 line-through")}>
+                          {item.text}
+                        </span>
+                      </button>
+                    ))
+                  )}
                 </div>
 
                 <h4 className="font-display text-xs font-bold text-slate-400 uppercase tracking-wider pt-2">Revision Goals</h4>
 
                 <div className="space-y-2.5">
-                  {revisionGoals.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setRevisionGoals(prev => prev.map(r => r.id === item.id ? { ...r, done: !r.done } : r));
-                        toast.info(item.done ? "Revision active" : "Revision goal met!");
-                      }}
-                      className="w-full p-2.5 bg-white border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-3 cursor-pointer text-xs text-left"
-                    >
-                      <div className={cn(
-                        "h-4 w-4 rounded border flex items-center justify-center shrink-0 transition-colors",
-                        item.done ? "bg-brand-blue border-brand-blue text-white" : "border-slate-350"
-                      )}>
-                        {item.done && <Check className="h-3 w-3 stroke-[3px]" />}
-                      </div>
-                      <span className={cn("font-bold text-text-heading", item.done && "text-slate-400 line-through")}>
-                        {item.text}
-                      </span>
-                    </button>
-                  ))}
+                  {revisionGoals.length === 0 ? (
+                    <div className="text-center py-6 text-xs text-text-muted border border-dashed border-slate-100 rounded-xl">No revision goals set</div>
+                  ) : (
+                    revisionGoals.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setRevisionGoals(prev => prev.map(r => r.id === item.id ? { ...r, done: !r.done } : r));
+                          toast.info(item.done ? "Revision active" : "Revision goal met!");
+                        }}
+                        className="w-full p-2.5 bg-white border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-3 cursor-pointer text-xs text-left"
+                      >
+                        <div className={cn(
+                          "h-4 w-4 rounded border flex items-center justify-center shrink-0 transition-colors",
+                          item.done ? "bg-brand-blue border-brand-blue text-white" : "border-slate-350"
+                        )}>
+                          {item.done && <Check className="h-3 w-3 stroke-[3px]" />}
+                        </div>
+                        <span className={cn("font-bold text-text-heading", item.done && "text-slate-400 line-through")}>
+                          {item.text}
+                        </span>
+                      </button>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
@@ -618,12 +679,156 @@ function StudentDashboardOverview() {
               <p className="text-text-body pl-2.5 leading-relaxed font-semibold italic">
                 "Solve 15 practice questions on Lines & Angles and share it with me on chat."
               </p>
-              <span className="text-[8px] font-bold text-slate-400 block uppercase tracking-wider mt-2 pl-2.5">— Neha Mahta</span>
+              <span className="text-[8px] font-bold text-slate-400 block uppercase tracking-wider mt-2 pl-2.5">— Neha Mehta</span>
             </div>
+          </GlassCard>
+        </div>
+      </motion.div>
+
+      {/* Row 4: Learning DNA, Career Matches, Recommendations, and Notifications */}
+      <motion.div variants={itemVariants} className="grid gap-6 lg:grid-cols-3">
+        {/* Left Column: Learning DNA */}
+        <div className="lg:col-span-1">
+          <GlassCard className="p-5 border border-slate-100 bg-white h-full space-y-4">
+            <h3 className="font-display text-sm font-bold text-text-heading flex items-center gap-2">
+              <Sparkles className="h-4.5 w-4.5 text-brand-orange" />
+              Learning DNA Profile
+            </h3>
+            
+            {dashboardData?.learningDna ? (
+              <div className="space-y-3.5 text-xs text-text-body">
+                <div className="p-3 bg-orange-50/45 border border-brand-orange/10 rounded-2xl">
+                  <span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Cognitive Style</span>
+                  <div className="font-bold text-brand-orange text-sm mt-0.5">{dashboardData.learningDna.learningStyle}</div>
+                  {dashboardData.learningDna.brainDominance && (
+                    <div className="text-[10px] text-text-muted mt-0.5">{dashboardData.learningDna.brainDominance}</div>
+                  )}
+                </div>
+
+                {dashboardData.learningDna.cognitiveStrengths && dashboardData.learningDna.cognitiveStrengths.length > 0 && (
+                  <div>
+                    <span className="block text-[9.5px] uppercase tracking-wider text-slate-400 font-bold mb-1.5">Cognitive Strengths</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {dashboardData.learningDna.cognitiveStrengths.map((str, idx) => (
+                        <span key={idx} className="px-2 py-0.5 bg-slate-50 border border-slate-100 rounded-md text-[9px] font-bold text-text-heading">
+                          {str}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-2 pt-2 border-t border-slate-50">
+                  <span className="block text-[9.5px] uppercase tracking-wider text-slate-400 font-bold">Skill Dimensions</span>
+                  {Object.entries(dashboardData.learningDna.dimensions).map(([key, val]) => (
+                    <div key={key} className="space-y-1">
+                      <div className="flex justify-between text-[10px] font-bold text-text-muted capitalize">
+                        <span>{key}</span>
+                        <span className="text-text-heading">{val}</span>
+                      </div>
+                      <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
+                        <div className="bg-brand-blue h-1 rounded-full" style={{ width: `${val}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-10 text-xs text-text-muted">No Learning DNA details available.</div>
+            )}
+          </GlassCard>
+        </div>
+
+        {/* Center Column: Career Matches */}
+        <div className="lg:col-span-1">
+          <GlassCard className="p-5 border border-slate-100 bg-white h-full flex flex-col justify-between">
+            <div className="w-full">
+              <h3 className="font-display text-sm font-bold text-text-heading flex items-center gap-2 mb-4">
+                <Compass className="h-4.5 w-4.5 text-brand-teal" />
+                Top Career Matches
+              </h3>
+              
+              {!dashboardData?.careerMatches || dashboardData.careerMatches.length === 0 ? (
+                <div className="text-center py-10 text-xs text-text-muted px-4 leading-relaxed">
+                  Complete more assessments to receive career recommendations.
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {dashboardData.careerMatches.map((career) => (
+                    <div key={career.id} className="p-3 bg-slate-50/50 border border-slate-100 rounded-xl flex items-center justify-between text-xs">
+                      <div>
+                        <h4 className="font-bold text-text-heading">{career.title}</h4>
+                        {career.demand && (
+                          <span className="text-[9px] font-bold text-brand-teal bg-teal-50 px-1.5 py-0.2 rounded mt-0.5 inline-block">
+                            {career.demand} Demand
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="font-black text-brand-teal text-sm">{career.matchPercentage}%</span>
+                        <span className="block text-[8px] font-bold text-slate-400">Match</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {dashboardData?.careerMatches && dashboardData.careerMatches.length > 0 && (
+              <Link to="/dashboard/student/career" className="mt-4 text-[10px] font-bold text-brand-blue hover:underline flex items-center justify-center gap-1">
+                Explore Career Paths <ArrowRight className="h-3 w-3" />
+              </Link>
+            )}
+          </GlassCard>
+        </div>
+
+        {/* Right Column: Recommendations & Notifications */}
+        <div className="lg:col-span-1 space-y-6">
+          {/* Notifications */}
+          <GlassCard className="p-5 border border-slate-100 bg-white">
+            <h3 className="font-display text-sm font-bold text-text-heading flex items-center gap-2 mb-4">
+              <Bell className="h-4.5 w-4.5 text-brand-orange" />
+              Notifications
+            </h3>
+            
+            {!notificationsData || notificationsData.length === 0 ? (
+              <div className="text-center py-6 text-xs text-text-muted">You're all caught up.</div>
+            ) : (
+              <div className="space-y-3 max-h-44 overflow-y-auto pr-1">
+                {notificationsData.map((notif) => (
+                  <div key={notif.id} className={cn("p-2.5 border rounded-xl text-left text-xs", notif.isRead ? "bg-slate-50/30 border-slate-100" : "bg-orange-50/10 border-brand-orange/15")}>
+                    <div className="flex justify-between items-start">
+                      <h4 className="font-bold text-text-heading truncate pr-2">{notif.title}</h4>
+                      <span className="text-[9px] font-bold text-slate-400 shrink-0">{notif.createdAt}</span>
+                    </div>
+                    <p className="text-[10px] text-text-muted mt-1 leading-normal">{notif.content}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </GlassCard>
+
+          {/* Recommendations */}
+          <GlassCard className="p-5 border border-slate-100 bg-white">
+            <h3 className="font-display text-sm font-bold text-text-heading flex items-center gap-2 mb-4">
+              <Award className="h-4.5 w-4.5 text-brand-blue" />
+              Recommendations
+            </h3>
+            
+            {!dashboardData?.recommendations || dashboardData.recommendations.length === 0 ? (
+              <div className="text-center py-6 text-xs text-text-muted">No recommendations available.</div>
+            ) : (
+              <div className="space-y-3">
+                {dashboardData.recommendations.map((rec) => (
+                  <div key={rec.id} className="p-3 bg-linear-to-r from-blue-50/10 to-teal-50/10 border border-slate-100 rounded-xl text-left text-xs">
+                    <h4 className="font-bold text-text-heading">{rec.title}</h4>
+                    <p className="text-[10px] text-text-muted mt-0.5 leading-normal">{rec.description}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </GlassCard>
         </div>
       </motion.div>
     </motion.div>
   );
 }
-

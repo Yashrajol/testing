@@ -1,0 +1,453 @@
+import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { Logo } from "@/shared/ui/logo";
+import { FloatingWidgets } from "@/shared/ui/floating-widgets";
+import { Menu, X, Facebook, Instagram, Linkedin, Youtube, Phone, Mail, MapPin, Home } from "lucide-react";
+import React, { useState } from "react";
+import { cn } from "@/shared/utils/utils";
+import { useLenis } from "@/shared/hooks/use-lenis";
+
+// Each top-level nav button links to its page and reveals a hover dropdown of the
+// key sections on that page (deep-linked via hash).
+const NAV_GROUPS: {
+  label: string;
+  to: string;
+  sections: { label: string; desc: string; hash: string }[];
+}[] = [
+    {
+      label: "AI Discovery",
+      to: "/assessment",
+      sections: [
+        { label: "How It Works", desc: "The 3-step discovery flow", hash: "how-it-works" },
+        { label: "Aptitude & Interest Test", desc: "AI-powered assessment", hash: "test" },
+        { label: "Your Discovery Report", desc: "Personalised insights", hash: "report" },
+        { label: "Discovery Engine™", desc: "The AI behind it", hash: "engine" },
+      ],
+    },
+    {
+      label: "Mentoring",
+      to: "/mentoring",
+      sections: [
+        { label: "1:1 Mentor Sessions", desc: "Personal guidance", hash: "sessions" },
+        { label: "Mentor Network", desc: "Verified expert mentors", hash: "network" },
+        { label: "Growth Plans", desc: "Actionable milestones", hash: "plans" },
+        { label: "Book a Mentor", desc: "Start today", hash: "book" },
+      ],
+    },
+    {
+      label: "Growth Studio",
+      to: "/slec",
+      sections: [
+        { label: "SLEC Labs", desc: "Hands-on learning hubs", hash: "labs" },
+        { label: "Skill Programs", desc: "21st-century skills", hash: "programs" },
+        { label: "Innovation & Maker Lab", desc: "Build & create", hash: "maker" },
+        { label: "Studio Experience", desc: "What to expect", hash: "experience" },
+      ],
+    },
+    {
+      label: "Career Blueprint",
+      to: "/career",
+      sections: [
+        { label: "Career Pathways", desc: "50+ future careers", hash: "pathways" },
+        { label: "Personalised Roadmaps", desc: "Step-by-step plans", hash: "roadmaps" },
+        { label: "Industry Insights", desc: "Real-world guidance", hash: "insights" },
+        { label: "Future Identities", desc: "Who you'll become", hash: "identities" },
+      ],
+    },
+    {
+      label: "For Parents",
+      to: "/parents",
+      sections: [
+        { label: "Parent Dashboard", desc: "Everything in one place", hash: "dashboard" },
+        { label: "Live Reports", desc: "Real-time progress", hash: "reports" },
+        { label: "Mentor Feedback", desc: "Notes & recommendations", hash: "feedback" },
+        { label: "Safe & Private", desc: "Your child's data, protected", hash: "safe" },
+      ],
+    },
+    {
+      label: "ILDF Framework",
+      to: "/framework",
+      sections: [
+        { label: "Discover Phase", desc: "Grades 8-9 strengths mapping", hash: "phase-1" },
+        { label: "Explore Phase", desc: "Grades 9-10 career interest", hash: "phase-2" },
+        { label: "Align Phase", desc: "Grades 10-11 stream selection", hash: "phase-3" },
+        { label: "Prepare Phase", desc: "Grades 11-12 profile building", hash: "phase-4" },
+        { label: "Launch Phase", desc: "Grade 12 college readiness", hash: "phase-5" },
+      ],
+    },
+  ];
+
+const MORE_LINKS = [
+  { to: "/stories", label: "Resources" },
+  { to: "/about", label: "About Us" },
+  { to: "/contact", label: "Contact Us" },
+];
+
+export function MarketingLayout() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [scrolled, setScrolled] = useState(false);
+
+  // Lenis smooth scroll — active for all marketing pages
+  useLenis();
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 60) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const isHomeTop = pathname === "/" && !scrolled;
+  const isTransparentHeader = isHomeTop && !open;
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmail("");
+    alert("Thank you for subscribing to Vedhkrit Learner Insights!");
+  };
+
+  const navLinkClass = (toPath: string) => cn(
+    "inline-flex items-center rounded px-2 py-1.5 text-[11px] font-bold transition-all duration-200 whitespace-nowrap",
+    isTransparentHeader
+      ? (pathname === toPath
+        ? "text-brand-navy bg-slate-200/50"
+        : "text-slate-800 hover:text-brand-blue hover:bg-slate-100/50")
+      : (pathname === toPath
+        ? "text-brand-navy bg-bg-secondary"
+        : "text-text-body hover:text-brand-blue hover:bg-bg-secondary")
+  );
+
+  const getDropdownBtnClass = () => cn(
+    "inline-flex items-center gap-1 rounded px-2 py-1.5 text-[11px] font-bold transition-all duration-200 whitespace-nowrap",
+    isTransparentHeader
+      ? "text-slate-800 hover:text-brand-blue hover:bg-slate-100/50"
+      : "text-text-body hover:text-brand-blue hover:bg-bg-secondary"
+  );
+
+  return (
+    <div className="min-h-screen flex flex-col bg-bg-primary text-text-body font-sans overflow-x-clip">
+      {/* 1. HEADER (Frosted Liquid Glassmorphism) */}
+      <header className={cn(
+        "fixed top-0 left-0 right-0 z-40 transition-all duration-300",
+        isTransparentHeader
+          ? "bg-transparent border-b border-transparent shadow-none text-text-body lg:text-white"
+          : "bg-white/70 border-b border-border-default/30 backdrop-blur-lg backdrop-saturate-150 shadow-sm text-text-body"
+      )}>
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-2 xl:gap-3 px-4 sm:px-6 lg:px-8 relative">
+          {/* Left Slot Group: Hamburger menu + Logo Bookmark */}
+          <div className="flex items-center gap-2 sm:gap-3 z-50">
+            {/* Mobile menu trigger (Circular style matching reference) */}
+            <button
+              className={cn(
+                "xl:hidden p-2 rounded-full transition-all duration-200 flex items-center justify-center border",
+                isTransparentHeader
+                  ? "bg-white border-slate-100 shadow-sm text-brand-navy hover:bg-slate-50"
+                  : "bg-white border-slate-100 shadow-xs text-text-body hover:text-brand-blue"
+              )}
+              onClick={() => setOpen(!open)}
+              aria-label="Menu"
+            >
+              {open ? <X className="h-4.5 w-4.5" /> : <Menu className="h-4.5 w-4.5" />}
+            </button>
+
+            {/* Logo Bookmark Wrapper */}
+            <div className="relative w-24 sm:w-32 md:w-36 h-14 flex items-center justify-start">
+              <div className={cn(
+                "transition-all duration-300 flex items-center justify-center",
+                isTransparentHeader
+                  ? "absolute top-0 left-0 bg-white border-x border-b border-slate-200/50 rounded-b-2xl h-[62px] sm:h-[70px] w-full px-2 sm:px-3 shadow-[0_8px_20px_rgba(0,0,0,0.06)] hover:h-[66px] sm:hover:h-[75px] lg:flex"
+                  : "w-full h-full flex items-center justify-start rounded-xl"
+              )}>
+                <Logo variant="light" className={isTransparentHeader ? "h-6 sm:h-8 -translate-y-[3px]" : "h-7 sm:h-9"} />
+              </div>
+            </div>
+          </div>
+
+          <nav className="hidden items-center gap-0.5 xl:flex">
+            {/* Each button links to its page + reveals a hover dropdown of that page's sections */}
+            {NAV_GROUPS.map((group) => (
+              <div key={group.label} className="relative group">
+                <Link to={group.to} className={navLinkClass(group.to)}>
+                  {group.label}
+                </Link>
+                <div className="absolute left-0 top-full pt-2 hidden group-hover:block z-50">
+                  <div className="w-60 rounded-xl border border-slate-100 bg-white p-1.5 shadow-lg">
+                    <div className="px-3 pt-1 pb-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">On this page</div>
+                    {group.sections.map((s) => (
+                      <Link
+                        key={s.label}
+                        to={group.to}
+                        hash={s.hash}
+                        className="block rounded-lg px-3 py-2 text-left hover:bg-bg-secondary transition-colors"
+                      >
+                        <span className="block text-xs font-bold text-text-heading">{s.label}</span>
+                        <span className="block text-[10px] text-text-muted">{s.desc}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* More hover dropdown (ILDF Framework moved here) */}
+            <div className="relative group">
+              <button className={getDropdownBtnClass()}>
+                More
+              </button>
+              <div className="absolute right-0 top-full pt-2 hidden group-hover:block z-50">
+                <div className="w-52 rounded-xl border border-slate-100 bg-white p-1.5 shadow-lg">
+                  {MORE_LINKS.map((item) => (
+                    <Link
+                      key={item.label}
+                      to={item.to}
+                      className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-text-body hover:bg-bg-secondary hover:text-brand-blue transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </nav>
+
+          {/* Desktop Right Actions (10% brand accents) */}
+          <div className="hidden items-center gap-2 xl:flex shrink-0">
+            <Link
+              to="/login"
+              className={cn(
+                "rounded-md px-3.5 py-1.5 text-xs font-bold transition-all duration-200",
+                isTransparentHeader
+                  ? "border border-slate-200 bg-white text-slate-800 hover:bg-slate-50 shadow-2xs"
+                  : "border border-brand-blue bg-btn-secondary text-brand-navy hover:bg-btn-secondary-hover"
+              )}
+            >
+              Login
+            </Link>
+            <Link to="/register" className="rounded-md bg-btn-accent hover:bg-orange-600 px-3.5 py-1.5 text-xs font-bold text-text-inverse transition-colors shadow-sm shadow-orange-600/10">
+              Take Free Assessment
+            </Link>
+          </div>
+
+          {/* Mobile Login Button - Right Side (Visible only on mobile/tablet) */}
+          <Link
+            to="/login"
+            className={cn(
+              "xl:hidden px-3.5 py-1.5 rounded-md text-xs font-bold transition-all duration-200 z-50",
+              isTransparentHeader
+                ? "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 shadow-2xs"
+                : "border border-brand-blue bg-btn-secondary text-brand-navy hover:bg-btn-secondary-hover"
+            )}
+          >
+            Login
+          </Link>
+        </div>
+
+        {/* Mobile slide-out panel */}
+        {open && (
+          <div className="border-t border-border-default bg-card-default px-4 py-3 xl:hidden space-y-1 shadow-sm text-left max-h-[80dvh] overflow-y-auto">
+            <Link to="/assessment" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
+              AI Discovery
+            </Link>
+            <Link to="/mentoring" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
+              Mentoring
+            </Link>
+            <Link to="/slec" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
+              Growth Studio
+            </Link>
+            <Link to="/career" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
+              Career Blueprint
+            </Link>
+            <Link to="/parents" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
+              For Parents
+            </Link>
+            <Link to="/framework" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
+              ILDF Framework
+            </Link>
+
+            {/* More group */}
+            <div className="pt-2 mt-1 border-t border-border-default">
+              <div className="px-2.5 pb-1 pt-1 text-[9px] font-bold uppercase tracking-wider text-slate-400">More</div>
+              {MORE_LINKS.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  onClick={() => setOpen(false)}
+                  className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
+            <div className="flex gap-2 pt-3 border-t border-border-default mt-2">
+              <Link to="/login" onClick={() => setOpen(false)} className="flex-1 rounded-md border border-brand-blue bg-btn-secondary py-2 text-center text-xs font-bold text-brand-navy">
+                Login
+              </Link>
+              <Link to="/register" onClick={() => setOpen(false)} className="flex-1 rounded-md bg-btn-accent py-2 text-center text-xs font-bold text-text-inverse">
+                Take Free Assessment
+              </Link> 
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Main Pages Outlet */}
+      <main className={cn(
+        "flex-grow",
+        pathname === "/" ? "pt-0" : "pt-14"
+      )}>
+        <Outlet />
+      </main>
+
+      {/* 2. FOOTER (Premium White Background Design) */}
+      <footer className="bg-white text-slate-600 border-t border-slate-200 pt-6 pb-4 text-xs">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+          {/* Main Links Row */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-12 pb-4 border-b border-slate-200">
+            {/* Branding Column */}
+            <div className="lg:col-span-3 space-y-3">
+              <Logo variant="light" size="lg" />
+              <p className="text-[11px] leading-relaxed text-slate-500 pr-4 mt-2">
+                An integrated learner development platform helping students discover potential, identify skills, and design their future.
+              </p>
+              {/* Social icons */}
+              <div className="flex items-center gap-2 pt-1">
+                {[
+                  { icon: Facebook, link: "#" },
+                  { icon: Instagram, link: "#" },
+                  { icon: Linkedin, link: "#" },
+                  { icon: Youtube, link: "#" }
+                ].map((social, i) => (
+                  <a key={i} href={social.link} className="h-7 w-7 rounded border border-slate-200 hover:border-brand-teal hover:text-brand-blue text-slate-500 flex items-center justify-center transition-colors">
+                    <social.icon className="h-3.5 w-3.5" />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Explore Column */}
+            <div className="lg:col-span-2 text-left">
+              <h5 className="font-bold text-slate-800 mb-2.5">Explore</h5>
+              <ul className="space-y-1.5 text-slate-500">
+                <li><Link to="/about" className="hover:text-brand-blue transition-colors">Why Vedhkrit</Link></li>
+                <li><Link to="/framework" className="hover:text-brand-blue transition-colors">Solutions</Link></li>
+                <li><Link to="/assessment" className="hover:text-brand-blue transition-colors">Assessment</Link></li>
+                <li><Link to="/career" className="hover:text-brand-blue transition-colors">Career Pathways</Link></li>
+                <li><Link to="/framework" className="hover:text-brand-blue transition-colors">ILDF Framework</Link></li>
+                <li><Link to="/about" className="hover:text-brand-blue transition-colors">About Us</Link></li>
+                <li><Link to="/contact" className="hover:text-brand-blue transition-colors">Contact Us</Link></li>
+              </ul>
+            </div>
+
+            {/* Programs Column */}
+            <div className="lg:col-span-2 text-left">
+              <h5 className="font-bold text-slate-800 mb-2.5">Programs</h5>
+              <ul className="space-y-1.5 text-slate-500">
+                <li><Link to="/assessment" className="hover:text-brand-blue transition-colors">AI Aptitude Test</Link></li>
+                <li><Link to="/career" className="hover:text-brand-blue transition-colors">Career Roadmap</Link></li>
+                <li><Link to="/slec" className="hover:text-brand-blue transition-colors">Skill Portfolio</Link></li>
+                <li><Link to="/mentoring" className="hover:text-brand-blue transition-colors">1:1 Mentoring</Link></li>
+              </ul>
+            </div>
+
+            {/* Ecosystem Column */}
+            <div className="lg:col-span-2 text-left">
+              <h5 className="font-bold text-slate-800 mb-2.5">Ecosystem (Demo)</h5>
+              <ul className="space-y-1.5 text-slate-500">
+                <li><Link to="/dashboard/student" className="hover:text-brand-blue transition-colors">Student Portal</Link></li>
+                <li><Link to="/dashboard/parent" className="hover:text-brand-blue transition-colors">Parent Portal</Link></li>
+                <li><Link to="/dashboard/mentor" className="hover:text-brand-blue transition-colors">Mentor Lounge</Link></li>
+                <li><Link to="/dashboard/admin" className="hover:text-brand-blue transition-colors">Institute Admin</Link></li>
+              </ul>
+            </div>
+
+            {/* Support + Contact Column */}
+            <div className="lg:col-span-3 text-left space-y-2.5 text-slate-500">
+              <h5 className="font-bold text-slate-800 mb-1">Help & Contact</h5>
+              <ul className="space-y-1.5">
+                <li><Link to="/contact" className="hover:text-brand-blue transition-colors">Help Center & FAQs</Link></li>
+                <li><Link to="/contact" className="hover:text-brand-blue transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/contact" className="hover:text-brand-blue transition-colors">Terms of Service</Link></li>
+              </ul>
+              <div className="pt-1.5 space-y-1.5 border-t border-slate-100">
+                <div className="flex items-center gap-2">
+                  <Phone className="h-3.5 w-3.5 text-brand-teal shrink-0" />
+                  <span>+91 9326461381</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-3.5 w-3.5 text-brand-teal shrink-0" />
+                  <span>vedhkrit@gmail.com</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-3.5 w-3.5 text-brand-teal shrink-0" />
+                  <span>Mumbai, Maharashtra </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom segment: Newsletter & QR Mockup panel */}
+          <div className="grid gap-4 md:grid-cols-2 py-2.5 items-center">
+            {/* Newsletter input card */}
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-left flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h6 className="font-bold text-slate-800">Stay Updated</h6>
+                <p className="text-[11px] text-slate-500">Subscribe to our newsletter</p>
+              </div>
+              <form onSubmit={handleSubscribe} className="flex gap-1.5 w-full sm:w-auto">
+                <input
+                  type="email"
+                  required
+                  placeholder="Enter email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="rounded bg-white border border-slate-200 px-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-brand-teal w-full sm:w-37.5"
+                />
+                <button type="submit" className="rounded bg-btn-accent hover:bg-orange-600 px-3 py-1.5 text-xs font-bold text-text-inverse transition-colors">
+                  Subscribe
+                </button>
+              </form>
+            </div>
+
+            {/* QR Code widget */}
+            <div className="flex items-center justify-end gap-3">
+              <div className="text-right">
+                <div className="text-[10px] text-slate-400">Scan to</div>
+                <div className="text-xs font-bold text-brand-teal">Take Free Assessment</div>
+              </div>
+              <div className="h-12 w-12 bg-white rounded-lg p-1 flex items-center justify-center shadow-xs border border-slate-100">
+                <svg viewBox="0 0 24 24" className="h-full w-full text-slate-800" fill="currentColor">
+                  <path d="M2 2h6v6H2V2zm1.5 1.5v3h3v-3h-3zM2 16h6v6H2v-6zm1.5 1.5v3h3v-3h-3zM16 2h6v6h-6V2zm1.5 1.5v3h3v-3h-3zM18 10h2v2h-2v-2zm-4 4h2v2h-2v-2zm4 0h2v4h-2v-4zm-4-4h2v2h-2v-2zm4 4h2v-2h-2v2zm-4 4h2v2h-2v-2z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Copyright section */}
+          <div className="border-t border-slate-200 pt-3 text-center text-[10px] sm:text-[11px] text-slate-500 flex flex-wrap justify-center items-center gap-x-3 gap-y-1">
+            <span>© 2026 Vedhkrit Private Limited. All Rights Reserved.</span>
+            <span className="text-slate-200 hidden sm:inline">|</span>
+            <a href="#" className="hover:underline">Privacy Policy</a>
+            <span className="text-slate-200">|</span>
+            <a href="#" className="hover:underline">Terms of Service</a>
+            <span className="text-slate-200">|</span>
+            <span>
+              Technology & Development Partner:{" "}
+              <a href="https://udyamedge.com" target="_blank" rel="noreferrer" className="font-bold text-brand-teal hover:text-teal-600 transition-colors uppercase tracking-wider ml-1 text-[11px]">
+                Udyamedge Private Limited
+              </a>
+            </span>
+          </div>
+        </div>
+      </footer>
+      <FloatingWidgets />
+    </div>
+  );
+}

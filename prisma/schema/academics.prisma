@@ -1,0 +1,195 @@
+// prisma/schema/academics.prisma
+
+model TeacherProfile {
+  id                String         @id @default(uuid())
+  userId            String         @unique
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName         String?
+  middleName        String?
+  lastName          String?
+  gender            String?
+  dateOfBirth       DateTime?
+  profilePhoto      String?
+  address           String?
+  emergencyContact  String?
+  bloodGroup        String?
+  nationality       String?
+  language          String?
+  timezone          String?        @default("UTC")
+  metadata          Json?
+  employeeCode      String?
+  designation       String?
+  specialization    String?
+  subjects          String[]       // e.g. ["Mathematics", "Science"]
+  approvalStatus    ApprovalStatus @default(PENDING_REVIEW)
+  approvedAt        DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  deletedAt         DateTime?
+}
+
+model AcademicRecord {
+  id              String         @id @default(uuid())
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject         String
+  grade           String?
+  score           Float
+  term            String?
+  year            Int
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([studentId])
+}
+
+model Subject {
+  id          String    @id @default(uuid())
+  code        String    @unique
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  courses   Course[]
+  chapters  Chapter[]
+}
+
+model Course {
+  id          String    @id @default(uuid())
+  subjectId   String
+  subject     Subject   @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+  title       String
+  code        String    @unique
+  description String?
+  version     Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  curriculums Curriculum[]
+}
+
+model Curriculum {
+  id          String    @id @default(uuid())
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  version     Int       @default(1)
+  status      String    @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  chapters    Chapter[]
+}
+
+model Chapter {
+  id           String      @id @default(uuid())
+  subjectId    String?
+  subject      Subject?    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  curriculumId String?
+  curriculum   Curriculum? @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+  title        String
+  sequence     Int         @default(1)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  deletedAt    DateTime?
+
+  topics       Topic[]
+  lessons      Lesson[]
+}
+
+model Topic {
+  id          String    @id @default(uuid())
+  chapterId   String
+  chapter     Chapter   @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  title       String
+  sequence    Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id          String    @id @default(uuid())
+  chapterId   String?
+  chapter     Chapter?  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  topicId     String?
+  topic       Topic?    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title       String
+  content     String?   @db.Text
+  sequence    Int       @default(1)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  objectives  LearningObjective[]
+  resources   LearningResource[]
+}
+
+model LearningObjective {
+  id               String    @id @default(uuid())
+  lessonId         String
+  lesson           Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title            String
+  bloomsTaxonomy   String    @default("KNOWLEDGE") // KNOWLEDGE, COMPREHENSION, APPLICATION, ANALYSIS, SYNTHESIS, EVALUATION
+  difficulty       String    @default("MEDIUM") // EASY, MEDIUM, HARD
+  estimatedMinutes Int?      @default(15)
+  skills           String[]
+  competencies     String[]
+  prerequisites    String[]
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  @@index([lessonId])
+}
+
+model LearningResource {
+  id          String    @id @default(uuid())
+  lessonId    String
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title       String
+  type        String    // PDF, VIDEO, PRESENTATION, QUIZ, ASSIGNMENT, EXTERNAL_URL
+  url         String
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([lessonId])
+}
+
+
+
+model Homework {
+  id        String   @id @default(uuid())
+  batchId   String
+  title     String
+  dueDate   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([batchId])
+}
+
+model DeadlineExtension {
+  id              String         @id @default(uuid())
+  assignmentId    String
+  assignment      Assignment     @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  extendedDueDate DateTime
+  reason          String?        @db.Text
+  grantedBy       String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?
+
+  @@index([assignmentId])
+  @@index([studentId])
+}

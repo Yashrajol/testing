@@ -1,46 +1,41 @@
-# Production image for the NestJS API (apps/platform).
-# Built from the monorepo root: docker build -f Dockerfile .
-
+# Stage 1: Build stage
 FROM node:20-alpine AS builder
 
-RUN apk add --no-cache openssl
+WORKDIR /usr/src/app
 
-WORKDIR /app
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
 
-COPY package.json package-lock.json ./
-COPY apps/platform/package.json apps/platform/package.json
-COPY apps/web/package.json apps/web/package.json
-COPY packages/database/package.json packages/database/package.json
-COPY packages/eslint-config/package.json packages/eslint-config/package.json
-COPY packages/typescript-config/package.json packages/typescript-config/package.json
+COPY package*.json ./
+COPY turbo.json ./
+COPY packages/ ./packages/
+COPY apps/web/package*.json ./apps/web/
+COPY apps/web/ ./apps/web/
 
+# Install packages
 RUN npm ci
 
-COPY packages/ packages/
-COPY apps/platform/ apps/platform/
+# Build web frontend
+RUN npx turbo run build --filter=@vedhkrit/web...
 
-RUN npm run db:generate --workspace=@vedhkrit/database
-RUN npm run build --workspace=@vedhkrit/platform
+# Stage 2: Production Nginx runtime stage
+FROM nginx:1.25-alpine AS runner
 
-# Drop dev dependencies, keeping the generated Prisma client.
-RUN npm prune --omit=dev
+# Non-root user permissions
+RUN chown -R nginx:nginx /var/cache/nginx /var/log/nginx /etc/nginx/conf.d
 
+# Copy custom Nginx configuration
+COPY infra/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY infra/nginx/default.conf /etc/nginx/conf.d/default.conf
 
-FROM node:20-alpine AS runner
+# Copy built frontend static assets
+COPY --from=builder /usr/src/app/apps/web/dist /usr/share/nginx/html
 
-RUN apk add --no-cache openssl
+EXPOSE 80
 
-ENV NODE_ENV=production
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost/healthz || exit 1
 
-WORKDIR /app
+USER nginx
 
-COPY --from=builder /app/node_modules node_modules/
-COPY --from=builder /app/package.json package.json
-COPY --from=builder /app/packages packages/
-COPY --from=builder /app/apps/platform/dist apps/platform/dist/
-COPY --from=builder /app/apps/platform/package.json apps/platform/package.json
-
-# Render injects PORT; main.ts falls back to 5000 locally.
-EXPOSE 5000
-
-CMD ["node", "apps/platform/dist/main.js"]
+CMD ["nginx", "-g", "daemon off;"]

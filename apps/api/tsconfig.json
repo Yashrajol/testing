@@ -1,0 +1,31 @@
+{
+  "extends": "../../packages/tsconfig/base.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "isolatedModules": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": false,
+    "moduleResolution": "node",
+    "rootDir": "../../",
+    "outDir": "./dist",
+    "typeRoots": ["../../node_modules/@types", "./node_modules/@types"],
+    "types": ["jest", "node"],
+    "paths": {
+      "@vedhkrit/config": ["../../packages/config"],
+      "@vedhkrit/database": ["../../packages/database"],
+      "@vedhkrit/logging": ["../../packages/logging/src"],
+      "@vedhkrit/exceptions": ["../../packages/exceptions/src"],
+      "@vedhkrit/cache": ["../../packages/cache/src"],
+      "@vedhkrit/storage": ["../../packages/storage/src"],
+      "@vedhkrit/messaging": ["../../packages/messaging/src"],
+      "@vedhkrit/events": ["../../packages/events/src"],
+      "@vedhkrit/auditing": ["../../packages/auditing/src"],
+      "@vedhkrit/pagination": ["../../packages/pagination/src"],
+      "@vedhkrit/validation": ["../../packages/validation/src"],
+      "@vedhkrit/telemetry": ["../../packages/telemetry/src"],
+      "@vedhkrit/common": ["../../packages/common/src"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

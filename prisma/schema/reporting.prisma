@@ -1,0 +1,162 @@
+// prisma/schema/reporting.prisma
+
+enum DashboardRole {
+  STUDENT
+  TEACHER
+  PARENT
+  SCHOOL_ADMIN
+  ORGANIZATION_ADMIN
+  SUPER_ADMIN
+}
+
+enum ReportType {
+  STUDENT_PROGRESS
+  ATTENDANCE
+  ASSESSMENT
+  ASSIGNMENT
+  LEARNING_DNA
+  VEDHKRIT_INDEX
+  CAREER_READINESS
+  TEACHER_PERFORMANCE
+  SCHOOL_PERFORMANCE
+  ORGANIZATION_PERFORMANCE
+  CUSTOM
+}
+
+enum ExportFormat {
+  PDF
+  EXCEL
+  CSV
+  JSON
+}
+
+enum ExportStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum ScheduleFrequency {
+  ONE_TIME
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+model Report {
+  id             String            @id @default(uuid())
+  organizationId String?
+  tenantId       String?
+  type           ReportType
+  title          String
+  description    String?
+  config         Json?
+  filters        Json?
+  isScheduled    Boolean           @default(false)
+  frequency      ScheduleFrequency @default(ONE_TIME)
+  cronExpression String?
+  recipients     String[]
+  authorId       String
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  deletedAt      DateTime?
+
+  @@index([organizationId])
+  @@index([tenantId])
+  @@index([type])
+  @@index([authorId])
+}
+
+model Dashboard {
+  id             String        @id @default(uuid())
+  organizationId String?
+  tenantId       String?
+  schoolId       String?
+  role           DashboardRole
+  title          String
+  layoutConfig   Json?
+  isDefault      Boolean       @default(false)
+  ownerId        String?
+  widgets        Widget[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
+
+  @@index([organizationId])
+  @@index([tenantId])
+  @@index([schoolId])
+  @@index([role])
+  @@index([ownerId])
+}
+
+model Widget {
+  id           String    @id @default(uuid())
+  dashboardId  String
+  dashboard    Dashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  title        String
+  type         String // KPI, TREND, HEATMAP, RADAR, LEADERBOARD
+  metricKey    String
+  chartType    String // BAR, LINE, PIE, RADAR, CARD
+  gridPosition Json?
+  config       Json?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([dashboardId])
+  @@index([metricKey])
+}
+
+model AnalyticsSnapshot {
+  id                   String    @id @default(uuid())
+  organizationId       String?
+  tenantId             String?
+  schoolId             String?
+  studentId            String?
+  teacherId            String?
+  entityType           String    @default("STUDENT") // STUDENT, TEACHER, SCHOOL, ORG
+  overallMasteryScore  Float     @default(0.0)
+  attendancePercentage Float     @default(0.0)
+  assignmentCompletion Float     @default(0.0)
+  learningVelocity     Float     @default(1.0)
+  retentionScore       Float     @default(85.0)
+  studyTimeMins        Int       @default(0)
+  riskLevel            String    @default("LOW") // LOW, MEDIUM, HIGH
+  weakTopics           String[]
+  strongTopics         String[]
+  kpiMetrics           Json?
+  heatmapData          Json?
+  snapshotDate         DateTime  @default(now())
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  @@index([organizationId])
+  @@index([tenantId])
+  @@index([schoolId])
+  @@index([studentId])
+  @@index([teacherId])
+  @@index([snapshotDate])
+}
+
+model ExportJob {
+  id             String       @id @default(uuid())
+  organizationId String?
+  tenantId       String?
+  reportId       String?
+  reportType     ReportType
+  format         ExportFormat
+  status         ExportStatus @default(QUEUED)
+  fileUrl        String?
+  fileSize       Int?
+  errorMessage   String?
+  requestedBy    String
+  completedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([tenantId])
+  @@index([reportId])
+  @@index([requestedBy])
+  @@index([status])
+}

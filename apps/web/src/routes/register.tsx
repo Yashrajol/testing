@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { AuthShell, AuthInput, AuthButton } from "@/components/auth-shell";
-import { FormError } from "@/components/form-error";
+import { AuthShell, AuthInput, AuthButton } from "@/app/layouts/auth-shell";
+import { FormError } from "@/shared/ui/form-error";
 import { useRegisterMutation } from "@/lib/api";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ function RegisterPage() {
   const navigate = useNavigate();
   const registerMutation = useRegisterMutation();
 
+  const [role, setRole] = useState<"STUDENT" | "PARENT">("STUDENT");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -39,7 +40,7 @@ function RegisterPage() {
     }
 
     registerMutation.mutate(
-      { email, password, name: `${firstName} ${lastName}`.trim() },
+      { email, password, name: `${firstName} ${lastName}`.trim(), role },
       {
         onSuccess: (data) => {
           if (data?.autoActivated) {
@@ -62,6 +63,38 @@ function RegisterPage() {
     <AuthShell mode="register">
       <form onSubmit={handleSubmit} className="space-y-3">
         <FormError error={formError} />
+
+        <div className="space-y-1 text-left">
+          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+            I am registering as a
+          </span>
+          <div className="flex rounded-lg bg-slate-100 border border-slate-200/50 p-0.5 mb-1">
+            <button
+              type="button"
+              onClick={() => setRole("STUDENT")}
+              className={`flex-1 text-center py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer ${
+                role === "STUDENT"
+                  ? "bg-white text-slate-800 shadow-xs border border-slate-200/20"
+                  : "text-slate-400 hover:text-slate-600"
+              }`}
+              disabled={registerMutation.isPending}
+            >
+              Student
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("PARENT")}
+              className={`flex-1 text-center py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer ${
+                role === "PARENT"
+                  ? "bg-white text-slate-800 shadow-xs border border-slate-200/20"
+                  : "text-slate-400 hover:text-slate-600"
+              }`}
+              disabled={registerMutation.isPending}
+            >
+              Parent
+            </button>
+          </div>
+        </div>
 
         <div className="grid grid-cols-2 gap-3.5">
           <AuthInput

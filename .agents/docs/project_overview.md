@@ -1,6 +1,6 @@
-# Project Overview
+# Project Overview: Vedhkrit Learner Development OS
 
-This document describes the codebase structure, repository workspaces, and technology stack of **VEDHKRIT**.
+This document describes the codebase structure, repository workspaces, and technology stack of **VEDHKRIT** — India's AI-Powered Learner Development Operating System.
 
 ---
 

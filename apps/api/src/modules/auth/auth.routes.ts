@@ -1,0 +1,16 @@
+export const AUTH_ROUTES = {
+  BASE: 'auth',
+  REGISTER: 'register',
+  LOGIN: 'login',
+  LOGOUT: 'logout',
+  REFRESH: 'refresh',
+  FORGOT_PASSWORD: 'forgot-password',
+  RESET_PASSWORD: 'reset-password',
+  VERIFY_EMAIL: 'verify-email',
+  VERIFY_OTP: 'verify-otp',
+  RESEND_OTP: 'resend-otp',
+  CHANGE_PASSWORD: 'change-password',
+  ME: 'me',
+  SESSIONS: 'sessions',
+  SESSION_BY_ID: 'sessions/:id',
+} as const;

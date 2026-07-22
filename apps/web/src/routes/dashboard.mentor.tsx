@@ -1,5 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { DashboardShell } from "@/components/dashboard-shell";
+import { DashboardShell } from "@/app/layouts/dashboard-shell";
+import { useAuth } from "@/app/providers/auth-context";
+import { RouteGuard } from "@/shared/security/route-guard";
 import { LayoutDashboard, Users, Calendar, AlertTriangle, ClipboardList, TrendingUp, ClipboardCheck } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/mentor")({
@@ -18,9 +20,12 @@ const items = [
 ];
 
 function MentorDashboardLayout() {
+  const { user } = useAuth();
   return (
-    <DashboardShell role="mentor" roleLabel="Mentor" userName="Priya Iyer" items={items}>
-      <Outlet />
-    </DashboardShell>
+    <RouteGuard allowedRoles={["mentor", "admin", "super"]}>
+      <DashboardShell role="mentor" roleLabel="Mentor" userName={user?.name || "Mentor"} items={items}>
+        <Outlet />
+      </DashboardShell>
+    </RouteGuard>
   );
 }

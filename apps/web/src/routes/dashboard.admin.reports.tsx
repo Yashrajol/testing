@@ -1,15 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
-import { FileText, Download, CheckCircle2, AlertCircle } from "lucide-react";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
+import { FileText, Download, Plus } from "lucide-react";
 import { motion } from "motion/react";
+import { useReports } from "@/features/admin/queries";
+import { SkeletonCards } from "@/features/admin/components";
+import { useMemo } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard/admin/reports")({
   component: AdminReportsPage,
   head: () => ({ meta: [{ title: "School Reports — School Admin" }] }),
 });
 
-const reportCards = [
+const defaultReportCards = [
   { id: "REP001", name: "Academic Diagnostic Term 1 Summary", date: "Released Mar 12, 2026", size: "4.2 MB", status: "Published" },
   { id: "REP002", name: "School-wide DBDA Aptitude Spread", date: "Released Feb 28, 2026", size: "12.8 MB", status: "Published" },
   { id: "REP003", name: "ILDF Explorer Stage Cohort Analysis", date: "Released Feb 15, 2026", size: "3.5 MB", status: "Published" },
@@ -17,6 +21,17 @@ const reportCards = [
 ];
 
 function AdminReportsPage() {
+  const { data: reportsData, isLoading } = useReports();
+
+  const reportList = useMemo(() => {
+    if (reportsData && reportsData.length > 0) return reportsData;
+    return defaultReportCards;
+  }, [reportsData]);
+
+  const handleGenerateReport = () => {
+    toast.success("Generating diagnostic report", { description: "Compiling school-wide cognitive and growth metrics PDF." });
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -30,26 +45,38 @@ function AdminReportsPage() {
     show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6 text-left">
+        <PageHeader title="Diagnostic Reports" subtitle="Loading school diagnostic outcomes..." />
+        <SkeletonCards count={4} />
+      </div>
+    );
+  }
+
   return (
     <motion.div 
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="space-y-6"
+      className="space-y-6 text-left"
     >
       <PageHeader 
         title="Diagnostic Reports" 
         subtitle="Manage, download, and publish school-wide diagnostic outcomes." 
         action={
-          <button className="rounded-xl gradient-brand px-4 py-2 text-xs font-bold text-white shadow-md hover:opacity-95 transition-all cursor-pointer">
-            + Generate Report
+          <button 
+            onClick={handleGenerateReport}
+            className="rounded-xl gradient-brand px-4 py-2 text-xs font-bold text-white shadow-md hover:opacity-95 transition-all cursor-pointer inline-flex items-center gap-1.5"
+          >
+            <Plus className="h-4 w-4" /> Generate Report
           </button>
         }
       />
 
       <div className="grid gap-4">
-        {reportCards.map((report, i) => (
-          <motion.div key={i} variants={itemVariants}>
+        {reportList.map((report: any, i: number) => (
+          <motion.div key={report.id || i} variants={itemVariants}>
             <GlassCard className="p-4 border border-border-default/50 bg-white/60 hover:bg-white/80 transition-all text-left">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5 flex-1 min-w-0">

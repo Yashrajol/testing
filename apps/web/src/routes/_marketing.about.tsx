@@ -11,45 +11,45 @@ export const Route = createFileRoute("/_marketing/about")({
 });
 
 const stats = [
-  { value: "10M", label: "Learners we aim to reach by 2030" },
+  { value: "Grades 8-12", label: "Focused development ages" },
   { value: "20+", label: "Partner schools across India" },
-  { value: "8", label: "Cities and growing" },
-  { value: "50+", label: "Career pathways mapped" },
+  { value: "50+", label: "Future career pathways mapped" },
+  { value: "100%", label: "Stress-free assessment guidance" },
 ];
 
 const values = [
   {
     icon: Target,
     title: "Our Mission",
-    desc: "Empower 10 million learners in India to discover their strengths, find future career pathways, and build the skills they need — by 2030.",
+    desc: "Help students in Grades 8-12 discover their unique cognitive strengths, choose their perfect stream, and build real-world skills.",
     color: "text-brand-blue bg-blue-50 border-blue-100",
   },
   {
     icon: Heart,
     title: "Our Values",
-    desc: "Caring guidance, honest assessments backed by science, and equal learning opportunities for every student, whatever their background.",
+    desc: "Stress-free guidance, honest scientific insights, and equal growth opportunities for every young learner.",
     color: "text-brand-orange bg-orange-50 border-orange-100",
   },
   {
     icon: Globe,
-    title: "Our Reach",
-    desc: "Partnering with 20+ progressive schools across 8 major cities today, on a clear path to support 200+ schools by 2027.",
+    title: "Our Focus",
+    desc: "Partnering directly with progressive schools and parents to create structured growth plans during critical schooling years.",
     color: "text-brand-teal bg-teal-50 border-teal-100",
   },
 ];
 
 const approach = [
-  { icon: Sparkles, title: "Discover, don't just test", desc: "We map how a child thinks, learns and what excites them — not just what they can memorise." },
-  { icon: Compass, title: "Turn insight into action", desc: "Every assessment leads to a real plan: mentoring, skill labs, and a career roadmap." },
-  { icon: Users, title: "Bring parents in", desc: "Families see live progress, mentor feedback and clear next steps — never left in the dark." },
-  { icon: ShieldCheck, title: "Keep data safe", desc: "Student profiles are private and never shared with advertisers. Full stop." },
+  { icon: Sparkles, title: "Discover Strengths", desc: "We map cognitive strengths and natural learning styles — not just memorization." },
+  { icon: Compass, title: "Confident Stream Selection", desc: "We help students confidently choose between Science, Commerce, and Humanities." },
+  { icon: Users, title: "Involve Parents", desc: "Parents get clear insights, mentor feedback, and a unified view of their child's progression." },
+  { icon: ShieldCheck, title: "Private & Secure", desc: "Student data is private, secure, and never shared with third-party advertisers." },
 ];
 
 const timeline = [
-  { year: "2023", title: "The idea", desc: "Educators noticed students acing exams yet unsure of their own strengths and future." },
-  { year: "2024", title: "First schools", desc: "We piloted the Vedhkrit assessment and mentoring model in a handful of schools." },
-  { year: "2025", title: "Growth Studios", desc: "Physical SLEC labs opened, blending digital insight with hands-on learning." },
-  { year: "2026", title: "Scaling up", desc: "Now serving 20+ schools across 8 cities, with AI-powered growth tracking for every learner." },
+  { year: "2023", title: "The Spark", desc: "Educators noticed high-scoring students feeling anxious and unsure about stream choices and future careers." },
+  { year: "2024", title: "School Pilots", desc: "Launched our first student strength assessments and mentoring in key schools." },
+  { year: "2025", title: "SLEC Labs", desc: "Opened physical skill labs to help high schoolers build active profiles and projects." },
+  { year: "2026", title: "AI Integration", desc: "Empowering students in Grades 8-12 with digital growth tracking and expert mentoring." },
 ];
 
 const containerVariants = {
@@ -81,7 +81,7 @@ function About() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-teal to-brand-blue">For Every Learner.</span>
           </motion.h1>
           <motion.p variants={itemVariants} className="mt-6 text-sm sm:text-base leading-relaxed text-slate-600 max-w-2xl mx-auto">
-            Vedhkrit was founded to solve one problem: helping secondary-school students move from passive exam-taking to purposeful, confident readiness for their future.
+            Vedhkrit is built for students in Grades 8 to 12. We help you move from stressful exam-taking to finding your natural strengths, confidently choosing your streams, and building a profile for the future.
           </motion.p>
           <motion.div variants={itemVariants} className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/register" className="inline-flex items-center gap-1.5 rounded-xl bg-brand-blue hover:bg-brand-navy text-white px-5 py-2.5 text-xs font-bold shadow-md transition-colors">
@@ -126,13 +126,13 @@ function About() {
         <div className="rounded-3xl overflow-hidden bg-gradient-to-br from-brand-blue to-indigo-900 shadow-lg">
           <div className="grid md:grid-cols-5 gap-8 p-8 md:p-12 items-center">
             <div className="md:col-span-3">
-              <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Our Origin Story</h2>
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Why Vedhkrit?</h2>
               <div className="space-y-4 text-white/85 text-sm leading-relaxed">
                 <p>
-                  The seed for Vedhkrit was planted when educators kept seeing the same pattern: students who scored well in exams but froze when it came to real problem-solving or choosing a direction for their future.
+                  Students score well in school, yet are often anxious when selecting streams in Class 10, or deciding on a university major. Memory-based tests leave a huge gap in finding real strengths.
                 </p>
                 <p>
-                  Traditional schooling optimised for memory left a gap where real aptitude discovery should be. Vedhkrit was built to close that gap — bringing psychometric insight and hands-on labs directly into schools.
+                  Vedhkrit was built to bridge this gap. We bring adaptive cognitive profiling and mentor-led support to students in Grades 8–12, helping them find their direction early.
                 </p>
               </div>
             </div>
@@ -210,8 +210,8 @@ function About() {
           <div className="h-12 w-12 rounded-2xl bg-brand-blue text-white flex items-center justify-center mx-auto mb-4">
             <Rocket className="h-6 w-6" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900">Ready to help your learner find their path?</h2>
-          <p className="text-sm text-slate-600 mt-2 max-w-xl mx-auto">Start with a free AI aptitude assessment and see the Vedhkrit difference for yourself.</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900">Find your best path early</h2>
+          <p className="text-sm text-slate-600 mt-2 max-w-xl mx-auto">Designed for students in Grades 8–12. Start with a stress-free strengths assessment today.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link to="/register" className="inline-flex items-center gap-1.5 rounded-xl bg-brand-blue hover:bg-brand-navy text-white px-6 py-3 text-xs font-bold shadow-md transition-colors">
               Get Started Free <ArrowRight className="h-3.5 w-3.5" />

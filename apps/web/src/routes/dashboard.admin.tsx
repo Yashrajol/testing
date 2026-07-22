@@ -1,5 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { DashboardShell } from "@/components/dashboard-shell";
+import { DashboardShell } from "@/app/layouts/dashboard-shell";
+import { useAuth } from "@/app/providers/auth-context";
+import { RouteGuard } from "@/shared/security/route-guard";
 import { LayoutDashboard, Users, GraduationCap, BarChart3, FileText, Building2, UserCog, CreditCard, Sliders } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/admin")({
@@ -20,9 +22,12 @@ const items = [
 ];
 
 function AdminDashboardLayout() {
+  const { user } = useAuth();
   return (
-    <DashboardShell role="admin" roleLabel="School Admin" userName="Dr. Meera Banerjee" items={items}>
-      <Outlet />
-    </DashboardShell>
+    <RouteGuard allowedRoles={["admin", "super"]}>
+      <DashboardShell role="admin" roleLabel="School Admin" userName={user?.name || "School Admin"} items={items}>
+        <Outlet />
+      </DashboardShell>
+    </RouteGuard>
   );
 }

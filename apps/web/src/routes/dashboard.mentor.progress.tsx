@@ -1,16 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
 import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
-import { TrendingUp, Award, Calendar } from "lucide-react";
+import { Award, Download } from "lucide-react";
 import { motion } from "motion/react";
+import { useMentorDashboard, useMentorAttendance } from "@/features/mentor/queries";
+import { useMentorAnalytics } from "@/features/analytics/queries";
+import { ExportModal, SkeletonCharts } from "@/features/analytics/components";
+import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/dashboard/mentor/progress")({
   component: MentorProgressPage,
   head: () => ({ meta: [{ title: "Cohort Progress — Mentor Portal" }] }),
 });
 
-const cohortWeeklyTrend = [
+const defaultCohortWeeklyTrend = [
   { week: "Week 1", score: 62, attendance: 90 },
   { week: "Week 2", score: 65, attendance: 92 },
   { week: "Week 3", score: 64, attendance: 91 },
@@ -22,6 +26,30 @@ const cohortWeeklyTrend = [
 ];
 
 function MentorProgressPage() {
+  const [showExportModal, setShowExportModal] = useState(false);
+  const { data: dashboardData, isLoading: dashboardLoading } = useMentorDashboard();
+  const { data: attendanceData, isLoading: attendanceLoading } = useMentorAttendance();
+  const { data: mentorAnalytics } = useMentorAnalytics();
+
+  const isLoading = dashboardLoading || attendanceLoading;
+
+  const chartData = useMemo(() => {
+    if (mentorAnalytics?.growthTrends && mentorAnalytics.growthTrends.length > 0) {
+      return mentorAnalytics.growthTrends.map((g, idx) => ({
+        week: g.month || `Week ${idx + 1}`,
+        score: g.overall,
+        attendance: g.attendance,
+      }));
+    }
+    if (attendanceData && attendanceData.length > 0) {
+      return defaultCohortWeeklyTrend.map((w, idx) => ({
+        ...w,
+        attendance: Math.round(attendanceData[idx % attendanceData.length]?.percentage || w.attendance),
+      }));
+    }
+    return defaultCohortWeeklyTrend;
+  }, [mentorAnalytics, attendanceData]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -35,14 +63,34 @@ function MentorProgressPage() {
     show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6 text-left">
+        <PageHeader title="Cohort Progress" subtitle="Loading analytics and progress trends..." />
+        <SkeletonCharts />
+      </div>
+    );
+  }
+
   return (
     <motion.div 
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="space-y-6"
+      className="space-y-6 text-left"
     >
-      <PageHeader title="Cohort Progress" subtitle="Observe weekly academic and skill maturation indices across your cohorts." />
+      <PageHeader 
+        title="Cohort Progress" 
+        subtitle="Observe weekly academic and skill maturation indices across your cohorts." 
+        action={
+          <button
+            onClick={() => setShowExportModal(true)}
+            className="px-4 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold shadow-md hover:bg-blue-800 transition-all cursor-pointer inline-flex items-center gap-1.5"
+          >
+            <Download className="h-4 w-4" /> Export Cohort Report
+          </button>
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Weekly line chart */}
@@ -51,7 +99,7 @@ function MentorProgressPage() {
             <h3 className="font-display text-base font-bold text-text-heading mb-4">Cohort Weekly Performance</h3>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={cohortWeeklyTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border-default)" opacity={0.6} />
                   <XAxis dataKey="week" tick={{ fill: "var(--text-muted)", fontSize: 10 }} tickLine={false} />
                   <YAxis tick={{ fill: "var(--text-muted)", fontSize: 10 }} tickLine={false} />
@@ -90,6 +138,14 @@ function MentorProgressPage() {
           </GlassCard>
         </motion.div>
       </div>
+
+      {/* Export Report Modal */}
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        reportType="mentor"
+        title="Export Cohort Analytics Report"
+      />
     </motion.div>
   );
 }

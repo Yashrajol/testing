@@ -23,7 +23,7 @@ VEDHKRIT (Root)
 │   ├── platform_demo_guide.md  # [NEW] Interactive demo guide and script
 │   └── project_directory_map.md # [NEW] Detailed project file explanations
 ├── apps/                       # Applications workspace folder
-│   ├── platform/               # Administrative & cohort NestJS backend REST API
+│   ├── api/                    # NestJS backend REST API
 │   │   ├── src/                # NestJS source code modules
 │   │   ├── dist/               # Compiled backend bundles
 │   │   ├── nest-cli.json       # NestJS CLI parameters
@@ -38,8 +38,8 @@ VEDHKRIT (Root)
 │   │   ├── prisma/             # Schema configuration folder
 │   │   │   └── schema.prisma   # PostgreSQL relational data schema
 │   │   └── package.json        # Prisma dependencies
-│   ├── eslint-config/          # Standardized ESLint rule packages
-│   └── typescript-config/      # Standardized TypeScript compiler files
+│   ├── eslint/                 # Standardized ESLint rule packages
+│   └── tsconfig/               # Standardized TypeScript compiler files
 ├── package.json                # Monorepo workspaces definition
 ├── turbo.json                  # Turborepo task pipeline rules
 └── setup-vps.sh                # Shell script to configure production VPS
@@ -64,18 +64,18 @@ Shared components and configuration settings utilized by applications:
 
 ### 1. Database Package (`packages/database/`)
 *   **`prisma/schema.prisma`:** Defines the main PostgreSQL database schema. Outlines roles (`STUDENT`, `PARENT`, `MENTOR`, `SCHOOL_ADMIN`), account verification statuses (`PENDING_VERIFICATION`, `ONBOARDING`), user profiles, payment tracking models, dynamic CMS page inputs, and relation tables.
-*   **`index.js`:** Exports the instantiated Prisma client and models for easy import in backend and platform services.
+*   **`index.js`:** Exports the instantiated Prisma client and models for easy import in backend and API services.
 *   **`package.json`:** Declares dependencies on `@prisma/client` and developer tools.
 
-### 2. ESLint Configuration (`packages/eslint-config/`)
+### 2. ESLint Configuration (`packages/eslint/`)
 *   **`index.js`:** Contains common ESLint syntax validation checks, styling limits, and import guidelines shared across the frontend and backend.
 
-### 3. TypeScript Configurations (`packages/typescript-config/`)
+### 3. TypeScript Configurations (`packages/tsconfig/`)
 *   **`base.json`:** Contains standard TypeScript compiler variables (such as target specifications, DOM libraries, and strict module flags) to ensure consistent builds.
 
 ---
 
-## 📁 Administrative Backend (`apps/platform/`)
+## 📁 Core Backend REST API (`apps/api/`)
 
 A **NestJS** REST API server managing administration queues and cohorts:
 

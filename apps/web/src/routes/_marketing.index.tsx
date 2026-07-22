@@ -6,7 +6,7 @@ import {
   CheckCircle2, Cpu, Rocket, Gamepad2, Leaf, Bot, Briefcase, Brain,
   BarChart3, Compass, UsersRound, Check, ChevronRight
 } from "lucide-react";
-import { FadeIn } from "@/components/fade-in";
+import { FadeIn } from "@/shared/ui/fade-in";
 
 export const Route = createFileRoute("/_marketing/")({
   component: HomePage,
@@ -1082,15 +1082,15 @@ function HomePage() {
                       <div className="bg-white rounded-2xl border border-slate-100/70 p-3 shadow-xs my-3 flex flex-col items-center">
                         <div className="relative w-20 h-20 flex items-center justify-center rounded-full bg-slate-50 border border-slate-100/50 shadow-inner">
                           <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full rotate-[-90deg]">
+                            <defs>
+                              <linearGradient id="phoneRadarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stopColor="#0488A2" />
+                                <stop offset="100%" stopColor="#052261" />
+                              </linearGradient>
+                            </defs>
                             <circle cx="50" cy="50" r="41" fill="none" stroke="#f1f5f9" strokeWidth="8" />
                             <circle cx="50" cy="50" r="41" fill="none" stroke="url(#phoneRadarGrad)" strokeWidth="8" strokeDasharray="257" strokeDashoffset="46" strokeLinecap="round" />
                           </svg>
-                          <defs>
-                            <linearGradient id="phoneRadarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#0488A2" />
-                              <stop offset="100%" stopColor="#052261" />
-                            </linearGradient>
-                          </defs>
                           <div className="flex flex-col items-center relative z-10">
                             <div className="text-2xl font-black text-slate-800 leading-none">82</div>
                             <div className="text-[7px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Index</div>

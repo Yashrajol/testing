@@ -1,0 +1,126 @@
+// prisma/schema/ai.prisma
+
+model AIRequest {
+  id             String      @id @default(uuid())
+  organizationId String?
+  tenantId       String?
+  provider       String // OPENAI, GEMINI, ANTHROPIC, AZURE_OPENAI
+  model          String
+  promptType     String
+  inputTokens    Int         @default(0)
+  estimatedCost  Float       @default(0.0)
+  userId         String?
+  createdAt      DateTime    @default(now())
+  response       AIResponse?
+
+  @@index([organizationId])
+  @@index([tenantId])
+  @@index([userId])
+}
+
+model AIResponse {
+  id             String    @id @default(uuid())
+  requestId      String    @unique
+  request        AIRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  organizationId String?
+  tenantId       String?
+  content        String
+  outputTokens   Int       @default(0)
+  latencyMs      Int       @default(0)
+  cost           Float     @default(0.0)
+  cachedHit      Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+
+  @@index([organizationId])
+  @@index([tenantId])
+}
+
+model StudyPlan {
+  id             String    @id @default(uuid())
+  organizationId String?
+  tenantId       String?
+  studentId      String
+  title          String
+  planData       Json
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@index([organizationId])
+  @@index([tenantId])
+  @@index([studentId])
+}
+
+model AIRecommendation {
+  id             String    @id @default(uuid())
+  organizationId String?
+  tenantId       String?
+  targetId       String
+  targetType     String // STUDENT, TEACHER, PARENT
+  title          String
+  content        String
+  contextData    Json?
+  isApplied      Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@index([organizationId])
+  @@index([tenantId])
+  @@index([targetId])
+}
+
+model RiskAnalysis {
+  id             String    @id @default(uuid())
+  organizationId String?
+  tenantId       String?
+  studentId      String
+  riskLevel      String // LOW, MEDIUM, HIGH
+  summary        String
+  riskFactors    String[]
+  interventions  String[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@index([organizationId])
+  @@index([tenantId])
+  @@index([studentId])
+}
+
+model CareerAdvice {
+  id               String    @id @default(uuid())
+  organizationId   String?
+  tenantId         String?
+  studentId        String
+  industry         String
+  recommendedRoles String[]
+  skillGaps        String[]
+  adviceText       String
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  @@index([organizationId])
+  @@index([tenantId])
+  @@index([studentId])
+}
+
+model LearningInsight {
+  id             String    @id @default(uuid())
+  organizationId String?
+  tenantId       String?
+  studentId      String
+  focusScore     Float     @default(0.0)
+  retentionRate  Float     @default(0.0)
+  velocityIndex  Float     @default(1.0)
+  insights       Json
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  @@index([organizationId])
+  @@index([tenantId])
+  @@index([studentId])
+}

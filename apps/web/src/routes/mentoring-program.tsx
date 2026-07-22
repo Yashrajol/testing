@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GlassCard } from "@/components/glass-card";
-import { Logo } from "@/components/logo";
-import { ildfStages, mentors } from "@/lib/mock-data";
+import { GlassCard } from "@/shared/ui/glass-card";
+import { Logo } from "@/shared/ui/logo";
+import { ildfStages, mentors } from "@/shared/constants/mock-data";
 import { Star, Clock, Calendar, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/mentoring-program")({

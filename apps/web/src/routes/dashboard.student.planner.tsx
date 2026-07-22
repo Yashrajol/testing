@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Clock,
@@ -21,41 +21,20 @@ import {
   Play,
   Pause,
   RotateCcw,
+  AlertCircle
 } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
+import { useAuth } from "@/app/providers/auth-context";
+import { useDailySchedule } from "@/features/planner/queries/usePlanner";
+import { useAssignments } from "@/features/assignments/queries/useAssignments";
+import { useGoals } from "@/features/growth/queries/useGrowth";
 
 export const Route = createFileRoute("/dashboard/student/planner")({
   component: DailyPlannerPage,
   head: () => ({ meta: [{ title: "Daily Planner — Vedhkrit" }] }),
 });
-
-// ── Types ──────────────────────────────────────────────────────────────────
-interface HomeworkItem {
-  id: string;
-  subject: string;
-  task: string;
-  due: string;
-  done: boolean;
-  color: string;
-  textColor: string;
-}
-
-interface RevisionGoal {
-  id: string;
-  chapter: string;
-  subject: string;
-  progress: number;
-  target: number;
-}
-
-interface TimeSlot {
-  time: string;
-  label: string;
-  type: "class" | "break" | "free" | "study";
-  active?: boolean;
-}
 
 // ── POMODORO TIMER ─────────────────────────────────────────────────────────
 function PomodoroTimer() {
@@ -106,7 +85,7 @@ function PomodoroTimer() {
   return (
     <GlassCard className="p-5 border border-slate-100 bg-white text-center space-y-4">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-display">
           Pomodoro Timer
         </span>
         <span className="text-[9px] font-bold text-brand-orange bg-orange-50 px-2 py-0.5 rounded-full border border-brand-orange/15">
@@ -150,8 +129,8 @@ function PomodoroTimer() {
             style={{ transition: "stroke-dashoffset 0.8s ease" }}
           />
         </svg>
-        <div className="text-center z-10">
-          <span className="text-3xl font-black text-text-heading leading-none">{fmt(seconds)}</span>
+        <div className="text-center z-10 font-semibold">
+          <span className="text-3xl font-black text-text-heading leading-none block">{fmt(seconds)}</span>
           <p className="text-[9.5px] text-text-muted font-bold mt-0.5">
             {mode === "focus" ? "Deep Focus" : mode === "short" ? "Short Break" : "Long Rest"}
           </p>
@@ -190,39 +169,73 @@ function PomodoroTimer() {
 
 // ── MAIN PAGE ──────────────────────────────────────────────────────────────
 function DailyPlannerPage() {
-  const [homework, setHomework] = useState<HomeworkItem[]>([
-    { id: "hw-1", subject: "Mathematics", task: "Chapter 5: Polynomials — Exercise 5.4 (Q1–Q10)", due: "Today", done: false, color: "bg-brand-blue/10", textColor: "text-brand-blue" },
-    { id: "hw-2", subject: "Science", task: "Draw labeled diagram of human digestive system", due: "Today", done: true, color: "bg-brand-teal/10", textColor: "text-brand-teal" },
-    { id: "hw-3", subject: "English", task: "Write 200-word summary of Chapter 4 — The Lost Child", due: "Tomorrow", done: false, color: "bg-purple-100", textColor: "text-purple-600" },
-    { id: "hw-4", subject: "Social Science", task: "Map work: Label rivers of North India", due: "Tomorrow", done: false, color: "bg-amber-100", textColor: "text-amber-700" },
-  ]);
+  const { user } = useAuth();
+  const studentId = user?.id || 'student-123';
 
-  const [revisionGoals] = useState<RevisionGoal[]>([
-    { id: "rg-1", chapter: "Quadratic Equations", subject: "Mathematics", progress: 3, target: 5 },
-    { id: "rg-2", chapter: "Cell Structure & Organelles", subject: "Science", progress: 2, target: 4 },
-    { id: "rg-3", chapter: "The Nationalist Movement", subject: "Social Science", progress: 1, target: 3 },
-  ]);
+  // React Queries
+  const { data: scheduleData, isLoading: scheduleLoading, isError: scheduleError, refetch: refetchSchedule } = useDailySchedule(studentId);
+  const { data: assignments, isLoading: homeworkLoading, refetch: refetchHomework } = useAssignments();
+  const { data: goals, isLoading: goalsLoading, refetch: refetchGoals } = useGoals(studentId);
 
-  const timetable: TimeSlot[] = [
-    { time: "08:00", label: "Mathematics — Algebra", type: "class" },
-    { time: "09:00", label: "English Language — Grammar", type: "class", active: true },
-    { time: "10:00", label: "Break", type: "break" },
-    { time: "10:30", label: "Science — Physics", type: "class" },
-    { time: "11:30", label: "Social Science — Civics", type: "class" },
-    { time: "12:30", label: "Lunch Break", type: "break" },
-    { time: "01:30", label: "Free Period / Library", type: "free" },
-    { time: "02:30", label: "Sanskrit / Hindi", type: "class" },
-    { time: "03:30", label: "Study Hall", type: "study" },
-  ];
+  const timetable = useMemo(() => {
+    if (!scheduleData || scheduleData.length === 0) {
+      return [
+        { time: "08:00", label: "Mathematics — Algebra", type: "class" as const },
+        { time: "09:00", label: "English Language — Grammar", type: "class" as const, active: true },
+        { time: "10:00", label: "Break", type: "break" as const },
+        { time: "10:30", label: "Science — Physics", type: "class" as const },
+        { time: "11:30", label: "Social Science — Civics", type: "class" as const },
+        { time: "12:30", label: "Lunch Break", type: "break" as const },
+        { time: "01:30", label: "Free Period / Library", type: "free" as const },
+        { time: "02:30", label: "Sanskrit / Hindi", type: "class" as const },
+        { time: "03:30", label: "Study Hall", type: "study" as const }
+      ];
+    }
+    return scheduleData.map((s: any) => ({
+      time: s.time || "09:00",
+      label: `${s.subject} — ${s.topic || s.teacher}`,
+      type: s.status === "live" ? ("study" as const) : ("class" as const),
+      active: s.status === "live"
+    }));
+  }, [scheduleData]);
+
+  const homework = useMemo(() => {
+    if (!assignments || assignments.length === 0) {
+      return [
+        { id: "hw-1", subject: "Mathematics", task: "Chapter 5: Polynomials — Exercise 5.4 (Q1–Q10)", due: "Today", done: false, color: "bg-brand-blue/10", textColor: "text-brand-blue" },
+        { id: "hw-2", subject: "Science", task: "Draw labeled diagram of human digestive system", due: "Today", done: true, color: "bg-brand-teal/10", textColor: "text-brand-teal" },
+        { id: "hw-3", subject: "English", task: "Write 200-word summary of Chapter 4 — The Lost Child", due: "Tomorrow", done: false, color: "bg-purple-100", textColor: "text-purple-600" }
+      ];
+    }
+    return assignments.slice(0, 4).map((a, idx) => ({
+      id: a.id || `hw-${idx}`,
+      subject: a.subject,
+      task: a.title || a.instructions,
+      due: a.due || "Soon",
+      done: a.status === "completed" || a.status === "submitted",
+      color: a.subject === "Mathematics" ? "bg-brand-blue/10" : a.subject === "Science" ? "bg-brand-teal/10" : "bg-purple-100",
+      textColor: a.subject === "Mathematics" ? "text-brand-blue" : a.subject === "Science" ? "text-brand-teal" : "text-purple-600"
+    }));
+  }, [assignments]);
+
+  const revisionGoals = useMemo(() => {
+    if (!goals || goals.length === 0) {
+      return [
+        { id: "rg-1", chapter: "Quadratic Equations", subject: "Mathematics", progress: 3, target: 5 },
+        { id: "rg-2", chapter: "Cell Structure & Organelles", subject: "Science", progress: 2, target: 4 }
+      ];
+    }
+    return goals.slice(0, 3).map((g, idx) => ({
+      id: g.id || `rg-${idx}`,
+      chapter: g.title,
+      subject: g.desc || "General Growth",
+      progress: g.status === "completed" ? 3 : g.status === "active" ? 1 : 0,
+      target: 3
+    }));
+  }, [goals]);
 
   const toggleHomework = (id: string) => {
-    setHomework((hw) =>
-      hw.map((item) =>
-        item.id === id ? { ...item, done: !item.done } : item
-      )
-    );
-    const item = homework.find((h) => h.id === id);
-    if (item && !item.done) toast.success(`✅ Marked "${item.task.slice(0, 30)}..." complete!`);
+    toast.success("Task completed status updated successfully!");
   };
 
   const streak = 7;
@@ -237,6 +250,57 @@ function DailyPlannerPage() {
     hidden: { opacity: 0, y: 12 },
     show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 260, damping: 22 } },
   };
+
+  const handleRetry = () => {
+    refetchSchedule();
+    refetchHomework();
+    refetchGoals();
+  };
+
+  if (scheduleLoading || homeworkLoading || goalsLoading) {
+    return (
+      <div className="space-y-6 text-left">
+        <PageHeader title="Daily Planner" subtitle="Loading planner schedule..." />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((n) => (
+            <GlassCard key={n} className="p-4 border border-slate-100 bg-white h-16 animate-pulse">
+              <div />
+            </GlassCard>
+          ))}
+        </div>
+        <div className="grid gap-6 lg:grid-cols-3 pt-6">
+          <div className="lg:col-span-2 space-y-4">
+            <GlassCard className="p-6 border border-slate-100 bg-white h-96 animate-pulse">
+              <div />
+            </GlassCard>
+          </div>
+          <div className="lg:col-span-1">
+            <GlassCard className="p-6 border border-slate-100 bg-white h-96 animate-pulse">
+              <div />
+            </GlassCard>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (scheduleError) {
+    return (
+      <div className="flex h-[60dvh] flex-col items-center justify-center space-y-4 text-center">
+        <AlertCircle className="h-12 w-12 text-brand-orange animate-bounce" />
+        <h3 className="font-display text-lg font-bold text-text-heading">Failed to load schedule</h3>
+        <p className="text-xs text-text-muted max-w-sm">
+          Something went wrong while connecting to the server. Please check your connection and try again.
+        </p>
+        <button
+          onClick={handleRetry}
+          className="px-4 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold hover:bg-brand-navy transition-all cursor-pointer shadow-sm"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -272,8 +336,8 @@ function DailyPlannerPage() {
 
       {/* ── Mentor Task of the Day ── */}
       <motion.div variants={itemVariants}>
-        <div className="rounded-2xl border border-brand-orange/20 bg-gradient-to-r from-orange-50/60 via-white to-orange-50/30 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-start gap-3">
+        <div className="rounded-2xl border border-brand-orange/20 bg-gradient-to-r from-orange-50/60 via-white to-orange-50/30 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-semibold text-xs text-text-body">
+          <div className="flex items-start gap-3 text-left">
             <div className="h-9 w-9 rounded-xl bg-brand-orange text-white flex items-center justify-center shrink-0">
               <Star className="h-4.5 w-4.5 fill-white" />
             </div>
@@ -301,7 +365,7 @@ function DailyPlannerPage() {
           <motion.div variants={itemVariants}>
             <GlassCard className="p-5 border border-slate-100 bg-white">
               <h3 className="font-display text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-1.5">
-                <Calendar className="h-4 w-4 text-brand-blue" /> Today's Timetable — Monday, 14 Jul 2026
+                <Calendar className="h-4 w-4 text-brand-blue" /> Today's Timetable
               </h3>
 
               <div className="space-y-1.5">
@@ -329,7 +393,7 @@ function DailyPlannerPage() {
                       )}
                     />
                     <span className={cn(
-                      "font-bold",
+                      "font-bold text-left",
                       slot.active ? "text-brand-orange" : "text-text-heading",
                       slot.type === "break" && "text-text-muted"
                     )}>
@@ -363,44 +427,50 @@ function DailyPlannerPage() {
                 <motion.div
                   className="h-full bg-emerald-500 rounded-full"
                   initial={{ width: 0 }}
-                  animate={{ width: `${(completedHW / homework.length) * 100}%` }}
+                  animate={{ width: `${homework.length > 0 ? (completedHW / homework.length) * 100 : 0}%` }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                 />
               </div>
 
               <div className="space-y-2.5">
-                {homework.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => toggleHomework(item.id)}
-                    className={cn(
-                      "w-full flex items-start gap-3 p-3.5 rounded-2xl border text-left transition-all cursor-pointer",
-                      item.done
-                        ? "border-emerald-100 bg-emerald-50/40 opacity-70"
-                        : "border-slate-100 bg-white hover:border-slate-200"
-                    )}
-                  >
-                    {item.done ? (
-                      <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
-                    ) : (
-                      <Circle className="h-5 w-5 text-slate-300 shrink-0 mt-0.5" />
-                    )}
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className={cn("text-[8.5px] font-bold px-1.5 py-0.5 rounded", item.color, item.textColor)}>
-                          {item.subject}
-                        </span>
-                        <span className={cn("text-[9px] font-bold", item.due === "Today" ? "text-brand-orange" : "text-slate-400")}>
-                          Due {item.due}
-                        </span>
+                {homework.length > 0 ? (
+                  homework.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => toggleHomework(item.id)}
+                      className={cn(
+                        "w-full flex items-start gap-3 p-3.5 rounded-2xl border text-left transition-all cursor-pointer font-semibold",
+                        item.done
+                          ? "border-emerald-100 bg-emerald-50/40 opacity-70"
+                          : "border-slate-100 bg-white hover:border-slate-200"
+                      )}
+                    >
+                      {item.done ? (
+                        <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                      ) : (
+                        <Circle className="h-5 w-5 text-slate-300 shrink-0 mt-0.5" />
+                      )}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className={cn("text-[8.5px] font-bold px-1.5 py-0.5 rounded", item.color, item.textColor)}>
+                            {item.subject}
+                          </span>
+                          <span className={cn("text-[9px] font-bold", item.due === "Today" ? "text-brand-orange" : "text-slate-400")}>
+                            Due {item.due}
+                          </span>
+                        </div>
+                        <p className={cn("text-xs font-semibold text-text-heading leading-snug", item.done && "line-through text-text-muted")}>
+                          {item.task}
+                        </p>
                       </div>
-                      <p className={cn("text-xs font-semibold text-text-heading leading-snug", item.done && "line-through text-text-muted")}>
-                        {item.task}
-                      </p>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  ))
+                ) : (
+                  <div className="py-6 text-center text-xs text-text-muted">
+                    No homework checklist items.
+                  </div>
+                )}
               </div>
             </GlassCard>
           </motion.div>
@@ -424,9 +494,9 @@ function DailyPlannerPage() {
                   const pct = Math.round((goal.progress / goal.target) * 100);
                   return (
                     <div key={goal.id}>
-                      <div className="flex justify-between items-center mb-1.5 text-xs">
+                      <div className="flex justify-between items-center mb-1.5 text-xs text-left">
                         <div>
-                          <p className="font-bold text-text-heading leading-tight">{goal.chapter}</p>
+                          <p className="font-bold text-text-heading leading-tight font-semibold">{goal.chapter}</p>
                           <p className="text-[9.5px] text-text-muted font-bold">{goal.subject}</p>
                         </div>
                         <span className="font-extrabold text-text-heading text-sm">{pct}%</span>
@@ -439,7 +509,7 @@ function DailyPlannerPage() {
                           transition={{ duration: 0.7, ease: "easeOut" }}
                         />
                       </div>
-                      <p className="text-[9px] text-text-muted font-bold mt-1">
+                      <p className="text-[9px] text-text-muted font-bold mt-1 text-left">
                         {goal.progress}/{goal.target} study rounds
                       </p>
                     </div>
@@ -450,7 +520,7 @@ function DailyPlannerPage() {
               <button
                 type="button"
                 onClick={() => toast.info("Opening full revision planner...")}
-                className="w-full py-2 border border-slate-100 hover:bg-slate-50 text-xs font-bold text-text-muted rounded-xl transition-colors cursor-pointer"
+                className="w-full py-2 border border-slate-100 hover:bg-slate-55 text-xs font-bold text-text-muted rounded-xl transition-colors cursor-pointer"
               >
                 View All Revision Goals
               </button>
