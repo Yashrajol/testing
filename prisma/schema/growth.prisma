@@ -1,0 +1,477 @@
+// prisma/schema/growth.prisma
+
+model StudentProfile {
+  id                String         @id @default(uuid())
+  userId            String         @unique
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName         String?
+  middleName        String?
+  lastName          String?
+  gender            String?
+  dateOfBirth       DateTime?
+  profilePhoto      String?
+  address           String?
+  emergencyContact  String?
+  bloodGroup        String?
+  nationality       String?
+  language          String?
+  timezone          String?        @default("UTC")
+  metadata          Json?
+  admissionNumber   String?
+  rollNumber        String?
+  organizationId    String?
+  schoolId          String?
+  grade             String?
+  schoolName        String?
+  parentLinkId      String?
+  parent            ParentProfile? @relation(fields: [parentLinkId], references: [id], onDelete: SetNull)
+  membershipId      String?
+  membership        Membership?    @relation(fields: [membershipId], references: [id])
+  batchId           String?
+  batch             Batch?         @relation(fields: [batchId], references: [id])
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  deletedAt         DateTime?
+
+  assessmentResults AssessmentResult[]
+  goals             Goal[]
+  badges            Badge[]
+  mentorSessions    MentorSession[]
+  academicRecords   AcademicRecord[]
+  consentRecords    ConsentRecord[]
+  studentAnswers    StudentAnswer[]
+  attendanceRecords AttendanceRecord[]
+  leaveRequests     LeaveRequest[]
+  enrollments       Enrollment[]
+  assessmentAttempts AssessmentAttempt[]
+  submissions           Submission[]
+  deadlineExtensions    DeadlineExtension[]
+  velocityLogs          LearningVelocityLog[]
+  learningDna           LearningDNA?
+  adaptiveNodes         AdaptivePathNode[]
+  vedhkritIndex         VedhkritIndex?
+  careerProfile         CareerProfile?
+  milestones            Milestone[]
+
+  @@index([parentLinkId])
+  @@index([membershipId])
+  @@index([batchId])
+  @@index([organizationId])
+}
+
+model ParentProfile {
+  id                String           @id @default(uuid())
+  userId            String           @unique
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName         String?
+  middleName        String?
+  lastName          String?
+  gender            String?
+  dateOfBirth       DateTime?
+  profilePhoto      String?
+  address           String?
+  emergencyContact  String?
+  bloodGroup        String?
+  nationality       String?
+  language          String?
+  timezone          String?          @default("UTC")
+  metadata          Json?
+  occupation        String?
+  relationToStudent String?
+  children          StudentProfile[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  deletedAt         DateTime?
+}
+
+model MentorProfile {
+  id                String         @id @default(uuid())
+  userId            String         @unique
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName         String?
+  middleName        String?
+  lastName          String?
+  gender            String?
+  dateOfBirth       DateTime?
+  profilePhoto      String?
+  address           String?
+  emergencyContact  String?
+  bloodGroup        String?
+  nationality       String?
+  language          String?
+  timezone          String?        @default("UTC")
+  metadata          Json?
+  expertise         String[]
+  yearsOfExperience Int?           @default(0)
+  resumeUrl         String?
+  approvalStatus    ApprovalStatus @default(PENDING_REVIEW)
+  approvedAt        DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  deletedAt         DateTime?
+
+  mentorSessions  MentorSession[]
+}
+
+model StaffProfile {
+  id                String    @id @default(uuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName         String?
+  middleName        String?
+  lastName          String?
+  gender            String?
+  dateOfBirth       DateTime?
+  profilePhoto      String?
+  address           String?
+  emergencyContact  String?
+  bloodGroup        String?
+  nationality       String?
+  language          String?
+  timezone          String?   @default("UTC")
+  metadata          Json?
+  department        String?
+  employeeId        String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+}
+
+model LearningDNA {
+  id                      String         @id @default(uuid())
+  studentProfileId        String         @unique
+  student                 StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  softSkillMatrix         Json?          // e.g. { "leadership": 80, "consistency": 75 }
+  primaryLearningStyle    String   @default("VISUAL") // VISUAL, AUDITORY, KINESTHETIC, READING_WRITING
+  preferredMode           String   @default("INTERACTIVE_PRACTICE")
+  masteryScore            Float    @default(75.0)
+  growthScore             Float    @default(80.0)
+  confidenceScore         Float    @default(85.0)
+  retentionScore          Float    @default(82.0)
+  riskScore               Float    @default(15.0)
+  knowledgeGraph          Json?
+  skillProfile            Json?
+  competencyProfile       Json?
+  recommendations         Json?
+  lastCalculatedAt        DateTime @default(now())
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  deletedAt               DateTime?
+
+  knowledgeProfiles       KnowledgeProfile[]
+  competencyProfiles      CompetencyProfile[]
+  masteryProfiles         MasteryProfile[]
+  riskProfiles            RiskProfile[]
+  recommendationItems     Recommendation[]
+  learningPatterns        LearningPattern[]
+  learningMetricsList     LearningMetrics[]
+}
+
+model VedhkritIndex {
+  id               String         @id @default(uuid())
+  studentProfileId String         @unique
+  student          StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  score            Float          @default(750.0) // 0-1000
+  growthRate       Float          @default(12.5)
+  readinessLevel   String         @default("READY")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model CareerProfile {
+  id               String         @id @default(uuid())
+  studentId        String         @unique
+  student          StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  topMatches       Json?          // e.g. [{ "role": "Data Scientist", "matchPercentage": 92 }]
+  skillRadar       Json?          // e.g. { "Coding": 85, "Math": 90, "Logic": 88 }
+  competencyRadar  Json?          // e.g. { "Problem Solving": 90, "Communication": 75 }
+  careerReadiness  Float          @default(85.0)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([studentId])
+}
+
+model Milestone {
+  id               String         @id @default(uuid())
+  studentId        String
+  student          StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title            String
+  targetDate       DateTime
+  achievedAt       DateTime?
+  status           String         @default("PENDING") // PENDING, ACHIEVED, OVERDUE
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([studentId])
+}
+
+model Goal {
+  id              String         @id @default(uuid())
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title           String
+  description     String?
+  targetDate      DateTime?
+  progress        Float          @default(0) // 0 to 100
+  status          String         @default("ON_TRACK") // ON_TRACK, AT_RISK, COMPLETED
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([studentId])
+}
+
+model Badge {
+  id              String         @id @default(uuid())
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title           String
+  imageUrl        String?
+  earnedAt        DateTime       @default(now())
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([studentId])
+}
+
+model MentorSession {
+  id              String         @id @default(uuid())
+  studentId       String
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  mentorId        String
+  mentor          MentorProfile  @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  topic           String
+  scheduledAt     DateTime
+  status          String         @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  notes           String?        @db.Text
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([studentId])
+  @@index([mentorId])
+}
+
+model ConsentRecord {
+  id             String         @id @default(uuid())
+  studentId      String
+  student        StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  type           String         // e.g., "AUDIO_RECORDING", "VIDEO_TELEMETRY"
+  granted        Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([studentId])
+}
+
+model PricingPlan {
+  id            String        @id @default(uuid())
+  name          String        
+  priceINR      Float
+  billingCycle  String        // MONTHLY, ANNUALLY
+  features      String[]
+  isActive      Boolean       @default(true)
+  memberships   Membership[]
+  transactions  Transaction[]
+}
+
+model Membership {
+  id            String             @id @default(uuid())
+  planId        String
+  plan          PricingPlan        @relation(fields: [planId], references: [id])
+  status        SubscriptionStatus @default(INACTIVE)
+  startedAt     DateTime?
+  expiresAt     DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  students      StudentProfile[]
+  
+  @@index([planId])
+}
+
+model Transaction {
+  id            String      @id @default(uuid())
+  orderId       String      @unique 
+  paymentId     String?     @unique 
+  planId        String
+  plan          PricingPlan @relation(fields: [planId], references: [id])
+  amount        Float
+  currency      String      @default("INR")
+  status        String      // PENDING, SUCCESSFUL, FAILED, REFUNDED
+  rawPayload    Json?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([planId])
+}
+
+model CmsPage {
+  id             String       @id @default(uuid())
+  slug           String       @unique // e.g. "homepage", "about"
+  title          String
+  metaTitle      String?
+  metaDesc       String?
+  sections       CmsSection[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model CmsSection {
+  id          String    @id @default(uuid())
+  pageId      String
+  page        CmsPage   @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  sectionName String    // HERO, PILLARS, PATHWAYS, STEPS, SEC_COE, logo_groups, NEWSLETTER, FOOTER
+  layoutIndex Int       @default(0)
+  title       String?
+  subtitle    String?
+  desc        String?   @db.Text
+  ctaLabel    String?
+  ctaLink     String?
+  cards       Json?     
+  createdAt   DateTime  @default(now()) @db.Timestamp
+  updatedAt   DateTime  @updatedAt @db.Timestamp
+
+  @@index([pageId])
+}
+
+model ContactQuery {
+  id          String    @id @default(uuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String?
+  message     String    @db.Text
+  isResolved  Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model LearningVelocityLog {
+  id                    String         @id @default(uuid())
+  studentId             String
+  student               StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  topicId               String?
+  velocityScore         Float          @default(1.0)
+  timeSpentMins         Int            @default(0)
+  loggedAt              DateTime       @default(now())
+
+  @@index([studentId])
+}
+
+model AdaptivePathNode {
+  id                      String         @id @default(uuid())
+  studentId               String
+  student                 StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  topicId                 String
+  recommendedAction       String         // REVISION, PRACTICE_QUIZ, ADVANCED_LESSON, CONCEPT_VIDEO
+  priority                Int            @default(1)
+  status                  String         @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+
+  @@index([studentId])
+}
+
+model KnowledgeProfile {
+  id              String         @id @default(uuid())
+  learningDnaId   String
+  learningDna     LearningDNA    @relation(fields: [learningDnaId], references: [id], onDelete: Cascade)
+  topicId         String
+  topicName       String
+  masteryLevel    Float          @default(0.0)
+  strongTopics    String[]
+  weakTopics      String[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?
+
+  @@index([learningDnaId])
+}
+
+model CompetencyProfile {
+  id              String         @id @default(uuid())
+  learningDnaId   String
+  learningDna     LearningDNA    @relation(fields: [learningDnaId], references: [id], onDelete: Cascade)
+  competencyName  String
+  level           String         @default("INTERMEDIATE") // NOVICE, INTERMEDIATE, ADVANCED, EXPERT
+  score           Float          @default(75.0)
+  gapAnalysis     String?        @db.Text
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?
+
+  @@index([learningDnaId])
+}
+
+model MasteryProfile {
+  id              String         @id @default(uuid())
+  learningDnaId   String
+  learningDna     LearningDNA    @relation(fields: [learningDnaId], references: [id], onDelete: Cascade)
+  subjectId       String
+  masteryScore    Float          @default(0.0)
+  retentionScore  Float          @default(0.0)
+  velocityScore   Float          @default(1.0)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?
+
+  @@index([learningDnaId])
+}
+
+model RiskProfile {
+  id              String         @id @default(uuid())
+  learningDnaId   String
+  learningDna     LearningDNA    @relation(fields: [learningDnaId], references: [id], onDelete: Cascade)
+  riskScore       Float          @default(0.0)
+  riskLevel       String         @default("LOW") // LOW, MEDIUM, HIGH
+  reasons         String[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?
+
+  @@index([learningDnaId])
+}
+
+model Recommendation {
+  id              String         @id @default(uuid())
+  learningDnaId   String
+  learningDna     LearningDNA    @relation(fields: [learningDnaId], references: [id], onDelete: Cascade)
+  title           String
+  description     String         @db.Text
+  actionType      String         // REVISION, PRACTICE_QUIZ, ADVANCED_LESSON, CONCEPT_VIDEO
+  priority        String         @default("MEDIUM") // LOW, MEDIUM, HIGH
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  deletedAt       DateTime?
+
+  @@index([learningDnaId])
+}
+
+model LearningPattern {
+  id                    String         @id @default(uuid())
+  learningDnaId         String
+  learningDna           LearningDNA    @relation(fields: [learningDnaId], references: [id], onDelete: Cascade)
+  preferredTimeOfDay    String         @default("EVENING") // MORNING, AFTERNOON, EVENING, NIGHT
+  preferredContentType  String         @default("INTERACTIVE")
+  consistencyScore      Float          @default(80.0)
+  engagementScore       Float          @default(85.0)
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  deletedAt             DateTime?
+
+  @@index([learningDnaId])
+}
+
+model LearningMetrics {
+  id                    String         @id @default(uuid())
+  learningDnaId         String
+  learningDna           LearningDNA    @relation(fields: [learningDnaId], references: [id], onDelete: Cascade)
+  confidenceScore       Float          @default(80.0)
+  adaptiveDifficulty    String         @default("MEDIUM") // EASY, MEDIUM, HARD
+  totalStudyMins        Int            @default(0)
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  deletedAt             DateTime?
+
+  @@index([learningDnaId])
+}

@@ -40,7 +40,7 @@ To prevent brute-force attacks on identity verification routes, NestJS employs a
 RBAC is enforced programmatically at both the backend gateway (NestJS) and frontend router (TanStack Start).
 
 ### 2.1 Backend Guard Interceptors
-In NestJS (`apps/platform`), we define a custom `@Roles()` metadata decorator paired with a global `RolesGuard` processor:
+In NestJS (`apps/api`), we define a custom `@Roles()` metadata decorator paired with a global `RolesGuard` processor:
 
 ```typescript
 // Example NestJS Roles Guard (Conceptual Implementation)

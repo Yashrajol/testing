@@ -1,0 +1,35 @@
+export const LEARNING_REPOSITORY_TOKEN = Symbol('ILearningRepository');
+
+export enum LearningEntityType {
+  COURSE = 'COURSE',
+  CURRICULUM = 'CURRICULUM',
+  CHAPTER = 'CHAPTER',
+  TOPIC = 'TOPIC',
+  LESSON = 'LESSON',
+  LEARNING_OBJECTIVE = 'LEARNING_OBJECTIVE',
+  RESOURCE = 'RESOURCE',
+}
+
+export enum ResourceType {
+  PDF = 'PDF',
+  VIDEO = 'VIDEO',
+  PRESENTATION = 'PRESENTATION',
+  QUIZ = 'QUIZ',
+  ASSIGNMENT = 'ASSIGNMENT',
+  EXTERNAL_URL = 'EXTERNAL_URL',
+}
+
+export enum BloomsTaxonomy {
+  KNOWLEDGE = 'KNOWLEDGE',
+  COMPREHENSION = 'COMPREHENSION',
+  APPLICATION = 'APPLICATION',
+  ANALYSIS = 'ANALYSIS',
+  SYNTHESIS = 'SYNTHESIS',
+  EVALUATION = 'EVALUATION',
+}
+
+export enum DifficultyLevel {
+  EASY = 'EASY',
+  MEDIUM = 'MEDIUM',
+  HARD = 'HARD',
+}

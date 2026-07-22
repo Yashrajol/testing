@@ -1,0 +1,71 @@
+// prisma/schema/enums.prisma
+
+enum RoleType {
+  STUDENT
+  PARENT
+  SCHOOL_ADMIN
+  MENTOR
+  TEACHER
+  ADMIN
+  SUPERADMIN
+}
+
+enum AccountStatus {
+  PENDING_VERIFICATION
+  ONBOARDING
+  PENDING_APPROVAL
+  ACTIVE
+  SUSPENDED
+}
+
+enum ApprovalStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum SubscriptionStatus {
+  INACTIVE
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+}
+
+enum SessionStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+enum OtpPurpose {
+  REGISTRATION
+  LOGIN
+  PASSWORD_RESET
+  PHONE_CHANGE
+  EMAIL_CHANGE
+}
+
+enum OtpChannel {
+  SMS
+  EMAIL
+  WHATSAPP
+}
+
+enum PermissionAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  MANAGE
+}
+
+enum AuditAction {
+  LOGIN
+  LOGOUT
+  REGISTER
+  VERIFY_OTP
+  PASSWORD_RESET
+  CREATE_RECORD
+  UPDATE_RECORD
+  DELETE_RECORD
+}

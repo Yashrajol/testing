@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
 import { 
   User, School, Phone, Bell, Shield, Link2, 
   Save, Eye, EyeOff, Edit3, CheckCircle2
 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "motion/react";
-import { studentAvatar } from "@/lib/avatars";
+import { studentAvatar } from "@/shared/utils/avatars";
 
 export const Route = createFileRoute("/dashboard/parent/profile")({
   component: ParentProfilePage,

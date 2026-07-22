@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
-import { StatCard } from "@/components/stat-card";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
+import { StatCard } from "@/shared/ui/stat-card";
 import { CreditCard, Award, Calendar, RefreshCw, FileText, Download, Check } from "lucide-react";
-import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { useState, useMemo } from "react";
+import { motion } from "motion/react";
 import { toast } from "sonner";
+import { useSettings, useCourses } from "@/features/admin/queries";
 
 export const Route = createFileRoute("/dashboard/admin/membership")({
   component: SchoolMembershipPage,
@@ -25,10 +26,17 @@ const initialTransactions = [
 ];
 
 function SchoolMembershipPage() {
+  const { data: settingsData } = useSettings();
+  const { data: coursesData } = useCourses();
+
   const [activePlan, setActivePlan] = useState("growth");
   const [billingCycle, setBillingCycle] = useState("annually");
   const [transactions, setTransactions] = useState(initialTransactions);
   const [isUpgrading, setIsUpgrading] = useState<string | null>(null);
+
+  const capacity = useMemo(() => {
+    return settingsData?.registeredCapacity || 500;
+  }, [settingsData]);
 
   const currentPlan = billingPlans.find(p => p.id === activePlan) || billingPlans[1];
 
@@ -39,7 +47,6 @@ function SchoolMembershipPage() {
     }
     setIsUpgrading(planId);
     
-    // Simulate payment transaction
     setTimeout(() => {
       setActivePlan(planId);
       setIsUpgrading(null);
@@ -102,18 +109,18 @@ function SchoolMembershipPage() {
             <div className="space-y-4">
               <div className="flex justify-between text-xs font-semibold">
                 <span className="text-text-heading">Student Seats Filled</span>
-                <span className="text-brand-blue">412 / 500 Slots</span>
+                <span className="text-brand-blue">412 / {capacity} Slots</span>
               </div>
               <div className="h-3 overflow-hidden rounded-full bg-slate-100 border border-border-default/30">
                 <motion.div 
                   initial={{ width: 0 }}
-                  animate={{ width: "82.4%" }}
+                  animate={{ width: `${(412 / capacity) * 100}%` }}
                   transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
                   className="h-full rounded-full gradient-brand"
                 />
               </div>
               <p className="text-[11px] text-text-muted leading-relaxed">
-                You have used <b>82.4%</b> of your active slots. Mapped students can access cognitive testing suite, AI portfolios, and direct advisor chats.
+                You have used <b>{Math.round((412 / capacity) * 100)}%</b> of your active slots. Mapped students can access cognitive testing suite, AI portfolios, and direct advisor chats.
               </p>
             </div>
           </GlassCard>

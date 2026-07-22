@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
 import {
   User, Calendar, CheckSquare, MessageSquare,
   Sparkles, BookOpen, Heart, Award, Clock, Download, Video, Phone
 } from "lucide-react";
 import { motion } from "motion/react";
-import { mentorAvatar } from "@/lib/avatars";
+import { mentorAvatar } from "@/shared/utils/avatars";
 
 export const Route = createFileRoute("/dashboard/parent/mentor")({
   component: ParentMentorPage,

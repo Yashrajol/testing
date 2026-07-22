@@ -1,5 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { DashboardShell } from "@/components/dashboard-shell";
+import { DashboardShell } from "@/app/layouts/dashboard-shell";
+import { useAuth } from "@/app/providers/auth-context";
+import { RouteGuard } from "@/shared/security/route-guard";
 import { LayoutDashboard, Building2, DollarSign, Users, CreditCard, Activity } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/super")({
@@ -17,9 +19,12 @@ const items = [
 ];
 
 function SuperLayout() {
+  const { user } = useAuth();
   return (
-    <DashboardShell role="super" roleLabel="Super Admin" userName="Vedhkrit Ops" items={items}>
-      <Outlet />
-    </DashboardShell>
+    <RouteGuard allowedRoles={["super"]}>
+      <DashboardShell role="super" roleLabel="Super Admin" userName={user?.name || "Vedhkrit Ops"} items={items}>
+        <Outlet />
+      </DashboardShell>
+    </RouteGuard>
   );
 }

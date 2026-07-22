@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
 import { FileText, Download, Eye, Share2, Award, Calendar, CreditCard, MessageSquare, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 

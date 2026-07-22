@@ -1,0 +1,165 @@
+// prisma/schema/organization.prisma
+
+model SchoolProfile {
+  id              String         @id @default(uuid())
+  userId          String         @unique
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  board           String         // CBSE, ICSE, IB, STATE
+  address         String
+  licenseDocUrl   String?
+  approvalStatus  ApprovalStatus @default(PENDING_REVIEW)
+  approvedAt      DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model Organization {
+  id                 String    @id @default(uuid())
+  name               String
+  slug               String    @unique
+  legalName          String?
+  registrationNumber String?
+  taxNumber          String?
+  logoUrl            String?
+  website            String?
+  email              String?
+  phone              String?
+  address            String?
+  timezone           String    @default("UTC")
+  locale             String    @default("en-US")
+  currency           String    @default("USD")
+  status             String    @default("ACTIVE") // ACTIVE, SUSPENDED, ARCHIVED
+  subscriptionPlan   String    @default("FREE")   // FREE, PRO, ENTERPRISE
+  subscriptionStatus String    @default("ACTIVE") // ACTIVE, TRIAL, PAST_DUE, CANCELLED
+  featureFlags       Json?
+  metadata           Json?
+  licenseStatus      String    @default("ACTIVE") // ACTIVE, SUSPENDED, EXPIRED
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+
+  schools       School[]
+}
+
+model School {
+  id             String         @id @default(uuid())
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  name           String
+  board          String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?
+
+  campuses       Campus[]
+  academicYears  AcademicYear[]
+}
+
+model Campus {
+  id        String    @id @default(uuid())
+  schoolId  String
+  school    School    @relation(fields: [schoolId], references: [id], onDelete: Restrict)
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  batches   Batch[]
+}
+
+model AcademicYear {
+  id            String         @id @default(uuid())
+  schoolId      String
+  school        School         @relation(fields: [schoolId], references: [id], onDelete: Restrict)
+  startDate     DateTime
+  endDate       DateTime
+  status        String         @default("UPCOMING") // UPCOMING, ACTIVE, ARCHIVED
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?
+
+  terms         AcademicTerm[]
+  batches       Batch[]
+  enrollments   Enrollment[]
+}
+
+model AcademicTerm {
+  id             String       @id @default(uuid())
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  name           String       // e.g. "Term 1", "Semester 1"
+  startDate      DateTime
+  endDate        DateTime
+  status         String       @default("UPCOMING")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deletedAt      DateTime?
+}
+
+model Class {
+  id          String       @id @default(uuid())
+  name        String       // e.g. "Grade 10"
+  code        String?
+  description String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  sections    Section[]
+  enrollments Enrollment[]
+}
+
+model Section {
+  id          String       @id @default(uuid())
+  classId     String
+  class       Class        @relation(fields: [classId], references: [id], onDelete: Cascade)
+  name        String       // e.g. "Section A"
+  capacity    Int?         @default(40)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  batches     Batch[]
+  enrollments Enrollment[]
+}
+
+model Batch {
+  id             String           @id @default(uuid())
+  campusId       String
+  campus         Campus           @relation(fields: [campusId], references: [id], onDelete: Restrict)
+  academicYearId String
+  academicYear   AcademicYear     @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  sectionId      String
+  section        Section          @relation(fields: [sectionId], references: [id], onDelete: Restrict)
+  name           String           // e.g. "Grade 10 - Section A (2026)"
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+
+  students       StudentProfile[]
+  enrollments    Enrollment[]
+}
+
+model Enrollment {
+  id             String         @id @default(uuid())
+  studentId      String
+  student        StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  classId        String
+  class          Class          @relation(fields: [classId], references: [id], onDelete: Restrict)
+  sectionId      String
+  section        Section        @relation(fields: [sectionId], references: [id], onDelete: Restrict)
+  batchId        String
+  batch          Batch          @relation(fields: [batchId], references: [id], onDelete: Restrict)
+  academicYearId String
+  academicYear   AcademicYear   @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+  rollNumber     String?
+  admissionDate  DateTime       @default(now())
+  status         String         @default("ACTIVE") // ACTIVE, COMPLETED, WITHDRAWN, TRANSFERRED
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?
+
+  @@index([studentId])
+  @@index([batchId])
+  @@index([academicYearId])
+}

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AuthShell, AuthInput, AuthButton } from "@/components/auth-shell";
+import { AuthShell, AuthInput, AuthButton } from "@/app/layouts/auth-shell";
 
 export const Route = createFileRoute("/forgot")({
   component: ForgotPage,

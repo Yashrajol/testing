@@ -1,9 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
-import { platformRevenue } from "@/lib/mock-data";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Legend } from "recharts";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
+import { platformRevenue as mockPlatformRevenue } from "@/shared/constants/mock-data";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { Download } from "lucide-react";
 import { motion } from "motion/react";
+import { useBilling } from "@/features/super-admin/queries";
+import { usePlatformAnalytics } from "@/features/analytics/queries";
+import { ExportModal, SkeletonCharts } from "@/features/analytics/components";
+import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/dashboard/super/revenue")({
   component: SuperRevenuePage,
@@ -11,6 +16,17 @@ export const Route = createFileRoute("/dashboard/super/revenue")({
 });
 
 function SuperRevenuePage() {
+  const [showExportModal, setShowExportModal] = useState(false);
+  const { data: billingData } = useBilling();
+  const { data: analyticsData, isLoading } = usePlatformAnalytics();
+
+  const revenueData = useMemo(() => {
+    if (analyticsData?.revenueTrends && analyticsData.revenueTrends.length > 0) {
+      return analyticsData.revenueTrends;
+    }
+    return mockPlatformRevenue;
+  }, [analyticsData]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -24,14 +40,34 @@ function SuperRevenuePage() {
     show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6 text-left">
+        <PageHeader title="Revenue Dashboards" subtitle="Loading monetization trends..." />
+        <SkeletonCharts />
+      </div>
+    );
+  }
+
   return (
     <motion.div 
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="space-y-6"
+      className="space-y-6 text-left"
     >
-      <PageHeader title="Revenue Dashboards" subtitle="Audit platform monetization, invoicing indices, and MRR progression." />
+      <PageHeader 
+        title="Revenue Dashboards" 
+        subtitle="Audit platform monetization, invoicing indices, and MRR progression." 
+        action={
+          <button
+            onClick={() => setShowExportModal(true)}
+            className="px-4 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold shadow-md hover:bg-blue-800 transition-all cursor-pointer inline-flex items-center gap-1.5"
+          >
+            <Download className="h-4 w-4" /> Export Platform Financials
+          </button>
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* MRR progression */}
@@ -40,7 +76,7 @@ function SuperRevenuePage() {
             <h3 className="font-display text-base font-bold text-text-heading mb-4">Monthly Recurring Revenue Trends</h3>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={platformRevenue} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="revenueAnalytics" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="var(--brand-blue)" stopOpacity={0.25} />
@@ -79,6 +115,14 @@ function SuperRevenuePage() {
           </GlassCard>
         </motion.div>
       </div>
+
+      {/* Export Report Modal */}
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        reportType="financial"
+        title="Export Platform Financials Report"
+      />
     </motion.div>
   );
 }

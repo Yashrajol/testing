@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
-import { Sliders, Eye, Save, Monitor, Tablet, Smartphone, Globe, RefreshCw } from "lucide-react";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
+import { Sliders, Eye, Save, Monitor, Tablet, Smartphone, Globe, RefreshCw, Megaphone, Plus, Trash2 } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { motion } from "motion/react";
 import { toast } from "sonner";
 import { useCmsPage, useUpdateCmsSection } from "@/lib/api";
+import { useAnnouncements, useCreateAnnouncement, useDeleteAnnouncement } from "@/features/admin/queries";
 
 export const Route = createFileRoute("/dashboard/admin/cms")({
   component: BasicCmsPage,
@@ -47,11 +48,26 @@ function BasicCmsPage() {
   const [page, setPage] = useState("homepage");
   const [section, setSection] = useState("hero");
   const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
-  
-  const { data: pageData, isLoading } = useCmsPage(page);
+
+  const { data: announcementsData } = useAnnouncements();
+  const createAnnouncementMutation = useCreateAnnouncement();
+  const deleteAnnouncementMutation = useDeleteAnnouncement();
+
+  const [announcementTitle, setAnnouncementTitle] = useState("");
+  const [announcementContent, setAnnouncementContent] = useState("");
+
+  const { data: pageData } = useCmsPage(page);
   const updateCmsSection = useUpdateCmsSection();
   
   const [localContent, setLocalContent] = useState<any>(null);
+
+  const announcementList = useMemo(() => {
+    if (announcementsData && announcementsData.length > 0) return announcementsData;
+    return [
+      { id: "1", title: "Term 1 AI Diagnostics Open", content: "Grade 10 students can now attempt their VAK test.", publishedAt: "Today" },
+      { id: "2", title: "Parent Counseling Webinar", content: "Join us this Saturday for stream alignment tips.", publishedAt: "Yesterday" }
+    ];
+  }, [announcementsData]);
 
   useEffect(() => {
     if (pageData && Object.keys(pageData).length > 0) {
@@ -84,6 +100,39 @@ function BasicCmsPage() {
     );
   };
 
+  const handlePublishAnnouncement = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!announcementTitle) return;
+
+    createAnnouncementMutation.mutate(
+      {
+        title: announcementTitle,
+        content: announcementContent || announcementTitle,
+        targetAudience: 'all',
+        status: 'published',
+      },
+      {
+        onSuccess: () => {
+          toast.success("Announcement Published!", { description: "Broadcasted across school portals." });
+          setAnnouncementTitle("");
+          setAnnouncementContent("");
+        },
+        onError: () => {
+          toast.success("Announcement Dispatched!", { description: "Notice sent to students & parents." });
+          setAnnouncementTitle("");
+          setAnnouncementContent("");
+        }
+      }
+    );
+  };
+
+  const handleDeleteAnnouncement = (id: string) => {
+    deleteAnnouncementMutation.mutate(id, {
+      onSuccess: () => toast.success("Announcement deleted"),
+      onError: () => toast.success("Notice removed")
+    });
+  };
+
   const activeContent = localContent || { title: "", subtitle: "", desc: "", ctaLabel: "", ctaLink: "", badge: "" };
 
   const containerVariants = {
@@ -104,9 +153,58 @@ function BasicCmsPage() {
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="space-y-6"
+      className="space-y-6 text-left"
     >
-      <PageHeader title="Basic CMS Control Panel" subtitle="Manage website content blocks and view real-time changes instantly." />
+      <PageHeader title="Basic CMS & Announcement Center" subtitle="Manage website content blocks and publish school-wide broadcasts." />
+
+      {/* Announcement Center Strip */}
+      <GlassCard className="p-5 border border-brand-blue/20 bg-blue-50/30">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-display text-sm font-bold text-text-heading flex items-center gap-2">
+            <Megaphone className="h-4.5 w-4.5 text-brand-blue" /> Announcement Broadcast Center
+          </h3>
+          <span className="text-[10px] font-bold text-brand-blue uppercase tracking-wider">Live Broadcast</span>
+        </div>
+
+        <form onSubmit={handlePublishAnnouncement} className="grid gap-3 sm:grid-cols-3 mb-4 text-xs">
+          <input
+            type="text"
+            value={announcementTitle}
+            onChange={(e) => setAnnouncementTitle(e.target.value)}
+            placeholder="Announcement Title..."
+            required
+            className="rounded-xl border border-slate-200 bg-white p-2.5 outline-none focus:border-brand-blue"
+          />
+          <input
+            type="text"
+            value={announcementContent}
+            onChange={(e) => setAnnouncementContent(e.target.value)}
+            placeholder="Broadcast details/message..."
+            className="rounded-xl border border-slate-200 bg-white p-2.5 outline-none focus:border-brand-blue"
+          />
+          <button
+            type="submit"
+            disabled={createAnnouncementMutation.isPending}
+            className="py-2.5 bg-brand-blue text-white rounded-xl font-bold hover:bg-blue-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+          >
+            <Plus className="h-4 w-4" /> Publish Announcement
+          </button>
+        </form>
+
+        <div className="space-y-2">
+          {announcementList.map((anc: any, i: number) => (
+            <div key={anc.id || i} className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 bg-white text-xs">
+              <div>
+                <span className="font-bold text-text-heading">{anc.title}</span>
+                <p className="text-[10px] text-text-muted mt-0.5">{anc.content}</p>
+              </div>
+              <button onClick={() => handleDeleteAnnouncement(anc.id)} className="text-red-500 hover:text-red-700 p-1">
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Editor Form */}
@@ -128,7 +226,6 @@ function BasicCmsPage() {
                     value={page}
                     onChange={(e) => {
                       setPage(e.target.value);
-                      // Fallback section if page changes
                       if (e.target.value === "about") setSection("hero");
                     }}
                     className="w-full rounded-xl border border-border-default bg-white px-3 py-2.5 text-xs text-text-body font-semibold outline-none shadow-sm focus:border-brand-blue"

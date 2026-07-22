@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
+} from "@/shared/ui/dialog";
 import {
   Puzzle,
   Brain,
@@ -21,10 +21,13 @@ import {
   CheckCircle2,
   PlayCircle,
   BookOpen,
+  AlertCircle
 } from "lucide-react";
 import { motion } from "motion/react";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { useState, useMemo } from "react";
+import { cn } from "@/shared/utils/utils";
+import { useAuth } from "@/app/providers/auth-context";
+import { useCompetencyProfile } from "@/features/learning-dna/queries/useLearningDna";
 
 export const Route = createFileRoute("/dashboard/student/skillset")({
   component: SkillsPage,
@@ -44,138 +47,151 @@ interface SkillEntry {
   resources: { title: string; type: string }[];
 }
 
-function levelFor(score: number): SkillEntry["level"] {
-  if (score >= 85) return "Expert";
-  if (score >= 70) return "Advanced";
-  if (score >= 50) return "Intermediate";
-  return "Beginner";
-}
-
-const skillEntries: SkillEntry[] = [
-  {
-    id: "critical-thinking",
-    name: "Critical Thinking",
-    category: "Academic & Thinking",
-    icon: Brain,
-    score: 88,
-    level: levelFor(88),
-    color: "text-brand-blue bg-blue-50 border-brand-blue/15",
-    description: "Looking at problems step by step, asking good questions, and reaching smart answers.",
-    subSkills: ["Logical thinking", "Spotting patterns", "Finding the real cause"],
-    resources: [
-      { title: "Puzzle-based reasoning drills (Vedhkrit Lab)", type: "Practice" },
-      { title: "Case Study: Solving Real-world Word Problems", type: "Video" },
-    ],
-  },
-  {
-    id: "communication",
-    name: "Communication",
-    category: "People Skills",
-    icon: MessageCircle,
-    score: 74,
-    level: levelFor(74),
-    color: "text-brand-teal bg-teal-50 border-brand-teal/15",
-    description: "Speaking and writing clearly, listening carefully, and presenting with confidence.",
-    subSkills: ["Public speaking", "Clear writing", "Good listening"],
-    resources: [
-      { title: "Weekly School Debate Prep Circle", type: "Activity" },
-      { title: "Voice Modulation & Pacing Workshop", type: "Video" },
-    ],
-  },
-  {
-    id: "collaboration",
-    name: "Collaboration",
-    category: "People Skills",
-    icon: Users,
-    score: 81,
-    level: levelFor(81),
-    color: "text-purple-600 bg-purple-50 border-purple-500/15",
-    description: "Working well in a team, sharing credit, and sorting out disagreements calmly.",
-    subSkills: ["Team work", "Sorting out fights", "Helping friends improve"],
-    resources: [
-      { title: "Group Robotics Exhibition Project", type: "Activity" },
-      { title: "Giving & Receiving Feedback", type: "Video" },
-    ],
-  },
-  {
-    id: "creativity",
-    name: "Creativity & Innovation",
-    category: "Thinking",
-    icon: Lightbulb,
-    score: 85,
-    level: levelFor(85),
-    color: "text-brand-orange bg-orange-50 border-brand-orange/15",
-    description: "Coming up with fresh ideas and finding new ways to solve problems.",
-    subSkills: ["New ideas", "Design thinking", "Storytelling"],
-    resources: [
-      { title: "Monthly Coding Puzzle Challenge", type: "Practice" },
-      { title: "Design Thinking for Young Innovators", type: "Video" },
-    ],
-  },
-  {
-    id: "leadership",
-    name: "Leadership",
-    category: "People Skills",
-    icon: Compass,
-    score: 68,
-    level: levelFor(68),
-    color: "text-emerald-600 bg-emerald-50 border-emerald-500/15",
-    description: "Taking the lead, motivating friends, and taking responsibility for team work.",
-    subSkills: ["Sharing out tasks", "Making decisions", "Guiding friends"],
-    resources: [
-      { title: "Student Council Shadowing Program", type: "Activity" },
-      { title: "Leading Without a Title", type: "Video" },
-    ],
-  },
-  {
-    id: "digital-literacy",
-    name: "Digital Literacy",
-    category: "Tech",
-    icon: Laptop,
-    score: 79,
-    level: levelFor(79),
-    color: "text-brand-blue bg-blue-50 border-brand-blue/15",
-    description: "Being comfortable with digital tools, staying safe online, and thinking like a coder.",
-    subSkills: ["Coding logic", "Searching online", "Staying safe online"],
-    resources: [
-      { title: "Python Loop Controls Practice", type: "Practice" },
-      { title: "Intro to Computational Thinking", type: "Video" },
-    ],
-  },
-  {
-    id: "emotional-intelligence",
-    name: "Emotional Intelligence",
-    category: "Wellbeing",
-    icon: HeartHandshake,
-    score: 71,
-    level: levelFor(71),
-    color: "text-rose-600 bg-rose-50 border-rose-500/15",
-    description: "Understanding your own feelings and caring about how other people feel.",
-    subSkills: ["Managing feelings", "Caring for others", "Handling stress"],
-    resources: [
-      { title: "Wellbeing Check-in Circle", type: "Activity" },
-      { title: "Managing Exam Anxiety", type: "Video" },
-    ],
-  },
-  {
-    id: "time-management",
-    name: "Time Management",
-    category: "Academic & Thinking",
-    icon: Clock,
-    score: 66,
-    level: levelFor(66),
-    color: "text-slate-600 bg-slate-100 border-slate-300",
-    description: "Planning your study time, doing important tasks first, and not leaving things to the last minute.",
-    subSkills: ["First things first", "Planning ahead", "Staying focused"],
-    resources: [
-      { title: "Daily Planner Workspace", type: "Activity" },
-      { title: "Pomodoro Technique Explained", type: "Video" },
-    ],
-  },
-];
-
 function SkillsPage() {
+  const { user } = useAuth();
+  const studentId = user?.id || 'student-123';
+  const { data: compProfile, isLoading, isError, refetch } = useCompetencyProfile(studentId);
+
   const [activeSkill, setActiveSkill] = useState<SkillEntry | null>(null);
+
+  const skillEntries = useMemo(() => {
+    if (!compProfile) return [];
+
+    const levelFor = (score: number): SkillEntry["level"] => {
+      if (score >= 85) return "Expert";
+      if (score >= 70) return "Advanced";
+      if (score >= 50) return "Intermediate";
+      return "Beginner";
+    };
+
+    return [
+      {
+        id: "critical-thinking",
+        name: "Critical Thinking",
+        category: "Academic & Thinking",
+        icon: Brain,
+        score: compProfile.criticalThinking ?? 88,
+        level: levelFor(compProfile.criticalThinking ?? 88),
+        color: "text-brand-blue bg-blue-50 border-brand-blue/15",
+        description: "Looking at problems step by step, asking good questions, and reaching smart answers.",
+        subSkills: ["Logical thinking", "Spotting patterns", "Finding the real cause"],
+        resources: [
+          { title: "Puzzle-based reasoning drills (Vedhkrit Lab)", type: "Practice" },
+          { title: "Case Study: Solving Real-world Word Problems", type: "Video" },
+        ],
+      },
+      {
+        id: "communication",
+        name: "Communication",
+        category: "People Skills",
+        icon: MessageCircle,
+        score: compProfile.communication ?? 74,
+        level: levelFor(compProfile.communication ?? 74),
+        color: "text-brand-teal bg-teal-50 border-brand-teal/15",
+        description: "Speaking and writing clearly, listening carefully, and presenting with confidence.",
+        subSkills: ["Public speaking", "Clear writing", "Good listening"],
+        resources: [
+          { title: "Weekly School Debate Prep Circle", type: "Activity" },
+          { title: "Voice Modulation & Pacing Workshop", type: "Video" },
+        ],
+      },
+      {
+        id: "collaboration",
+        name: "Collaboration",
+        category: "People Skills",
+        icon: Users,
+        score: (compProfile as any).collaboration ?? 81,
+        level: levelFor((compProfile as any).collaboration ?? 81),
+        color: "text-purple-600 bg-purple-55 border-purple-500/15",
+        description: "Working well in a team, sharing credit, and sorting out disagreements calmly.",
+        subSkills: ["Team work", "Sorting out fights", "Helping friends improve"],
+        resources: [
+          { title: "Group Robotics Exhibition Project", type: "Activity" },
+          { title: "Giving & Receiving Feedback", type: "Video" },
+        ],
+      },
+      {
+        id: "creativity",
+        name: "Creativity & Innovation",
+        category: "Thinking",
+        icon: Lightbulb,
+        score: compProfile.creativity ?? 85,
+        level: levelFor(compProfile.creativity ?? 85),
+        color: "text-brand-orange bg-orange-50 border-brand-orange/15",
+        description: "Coming up with fresh ideas and finding new ways to solve problems.",
+        subSkills: ["New ideas", "Design thinking", "Storytelling"],
+        resources: [
+          { title: "Monthly Coding Puzzle Challenge", type: "Practice" },
+          { title: "Design Thinking for Young Innovators", type: "Video" },
+        ],
+      },
+      {
+        id: "leadership",
+        name: "Leadership",
+        category: "People Skills",
+        icon: Compass,
+        score: compProfile.leadership ?? 68,
+        level: levelFor(compProfile.leadership ?? 68),
+        color: "text-emerald-600 bg-emerald-50 border-emerald-500/15",
+        description: "Taking the lead, motivating friends, and taking responsibility for team work.",
+        subSkills: ["Sharing out tasks", "Making decisions", "Guiding friends"],
+        resources: [
+          { title: "Student Council Shadowing Program", type: "Activity" },
+          { title: "Leading Without a Title", type: "Video" },
+        ],
+      },
+      {
+        id: "digital-literacy",
+        name: "Digital Literacy",
+        category: "Tech",
+        icon: Laptop,
+        score: (compProfile as any).digitalLiteracy ?? 79,
+        level: levelFor((compProfile as any).digitalLiteracy ?? 79),
+        color: "text-brand-blue bg-blue-50 border-brand-blue/15",
+        description: "Being comfortable with digital tools, staying safe online, and thinking like a coder.",
+        subSkills: ["Coding logic", "Searching online", "Staying safe online"],
+        resources: [
+          { title: "Python Loop Controls Practice", type: "Practice" },
+          { title: "Intro to Computational Thinking", type: "Video" },
+        ],
+      },
+      {
+        id: "emotional-intelligence",
+        name: "Emotional Intelligence",
+        category: "Wellbeing",
+        icon: HeartHandshake,
+        score: (compProfile as any).emotionalIntelligence ?? 71,
+        level: levelFor((compProfile as any).emotionalIntelligence ?? 71),
+        color: "text-rose-600 bg-rose-50 border-rose-500/15",
+        description: "Understanding your own feelings and caring about how other people feel.",
+        subSkills: ["Managing feelings", "Caring for others", "Handling stress"],
+        resources: [
+          { title: "Wellbeing Check-in Circle", type: "Activity" },
+          { title: "Managing Exam Anxiety", type: "Video" },
+        ],
+      },
+      {
+        id: "time-management",
+        name: "Time Management",
+        category: "Academic & Thinking",
+        icon: Clock,
+        score: (compProfile as any).timeManagement ?? 66,
+        level: levelFor((compProfile as any).timeManagement ?? 66),
+        color: "text-slate-600 bg-slate-100 border-slate-300",
+        description: "Planning your study time, doing important tasks first, and not leaving things to the last minute.",
+        subSkills: ["First things first", "Planning ahead", "Staying focused"],
+        resources: [
+          { title: "Daily Planner Workspace", type: "Activity" },
+          { title: "Pomodoro Technique Explained", type: "Video" },
+        ],
+      }
+    ];
+  }, [compProfile]);
+
+  const overallScore = useMemo(() => {
+    if (skillEntries.length === 0) return 0;
+    return Math.round(skillEntries.reduce((sum, s) => sum + s.score, 0) / skillEntries.length);
+  }, [skillEntries]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -186,7 +202,41 @@ function SkillsPage() {
     show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } },
   };
 
-  const overallScore = Math.round(skillEntries.reduce((sum, s) => sum + s.score, 0) / skillEntries.length);
+  if (isLoading) {
+    return (
+      <div className="space-y-6 text-left">
+        <PageHeader title="Skills" subtitle="Loading your core competencies..." />
+        <GlassCard className="p-5 border border-slate-100 bg-white h-20 animate-pulse">
+          <div />
+        </GlassCard>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((n) => (
+            <GlassCard key={n} className="p-5 border bg-white h-48 animate-pulse">
+              <div />
+            </GlassCard>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex h-[60dvh] flex-col items-center justify-center space-y-4 text-center">
+        <AlertCircle className="h-12 w-12 text-brand-orange animate-bounce" />
+        <h3 className="font-display text-lg font-bold text-text-heading">Failed to load skills</h3>
+        <p className="text-xs text-text-muted max-w-sm">
+          Something went wrong while connecting to the server. Please check your connection and try again.
+        </p>
+        <button
+          onClick={() => refetch()}
+          className="px-4 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold hover:bg-brand-navy transition-all cursor-pointer shadow-sm"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6 text-left">

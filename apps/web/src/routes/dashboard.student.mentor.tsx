@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
 import {
   Users,
   Video,
@@ -23,8 +23,8 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import { mentorAvatar } from "@/lib/avatars";
+import { cn } from "@/shared/utils/utils";
+import { mentorAvatar } from "@/shared/utils/avatars";
 
 export const Route = createFileRoute("/dashboard/student/mentor")({
   component: StudentMentorPage,

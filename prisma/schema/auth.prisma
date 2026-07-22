@@ -1,0 +1,193 @@
+// prisma/schema/auth.prisma
+
+model User {
+  id                  String          @id @default(uuid())
+  email               String          @unique
+  phoneNumber         String?         @unique
+  name                String
+  passwordHash        String
+  role                RoleName        @default(STUDENT)
+  status              AccountStatus   @default(PENDING_VERIFICATION)
+  emailVerified       Boolean         @default(false)
+  phoneVerified       Boolean         @default(false)
+  lastLoginAt         DateTime?
+  failedLoginAttempts Int             @default(0)
+  lockedUntil         DateTime?
+  organizationId      String?
+  schoolId            String?
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  deletedAt           DateTime?
+  createdBy           String?
+  updatedBy           String?
+
+  // Profiles relations
+  studentProfile      StudentProfile?
+  parentProfile       ParentProfile?
+  schoolProfile       SchoolProfile?
+  mentorProfile       MentorProfile?
+  teacherProfile      TeacherProfile?
+  staffProfile        StaffProfile?
+
+  // Auth & Session relations
+  sessions            Session[]       @relation("UserSessions")
+  refreshTokens       RefreshToken[]  @relation("UserRefreshTokens")
+  otps                OTP[]           @relation("UserOTPs")
+  userRoles           UserRole[]      @relation("UserRoles")
+  auditLogs           AuditLog[]      @relation("ActorAuditLogs")
+
+  @@index([organizationId])
+  @@index([schoolId])
+  @@index([email])
+  @@index([phoneNumber])
+}
+
+model Role {
+  id              String           @id @default(uuid())
+  name            String           @unique
+  description     String?
+  type            RoleType?        @default(STUDENT)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  deletedAt       DateTime?
+
+  userRoles       UserRole[]       @relation("RoleUsers")
+  rolePermissions RolePermission[] @relation("RolePermissions")
+
+  @@index([name])
+}
+
+model Permission {
+  id              String           @id @default(uuid())
+  resource        String
+  action          PermissionAction
+  description     String?
+  module          String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  rolePermissions RolePermission[] @relation("PermissionRoles")
+
+  @@unique([resource, action, module])
+  @@index([resource])
+  @@index([module])
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("UserRoles", fields: [userId], references: [id], onDelete: Cascade)
+  roleId    String
+  role      Role     @relation("RoleUsers", fields: [roleId], references: [id], onDelete: Restrict)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+}
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  roleId       String
+  role         Role       @relation("RolePermissions", fields: [roleId], references: [id], onDelete: Restrict)
+  permissionId String
+  permission   Permission @relation("PermissionRoles", fields: [permissionId], references: [id], onDelete: Restrict)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model Session {
+  id            String         @id @default(uuid())
+  userId        String
+  user          User           @relation("UserSessions", fields: [userId], references: [id], onDelete: Cascade)
+  device        String?
+  browser       String?
+  os            String?
+  ip            String?
+  country       String?
+  expiresAt     DateTime
+  lastActivity  DateTime       @default(now())
+  revoked       Boolean        @default(false)
+  status        SessionStatus  @default(ACTIVE)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  refreshTokens RefreshToken[] @relation("SessionRefreshTokens")
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model RefreshToken {
+  id              String   @id @default(uuid())
+  tokenHash       String   @unique
+  userId          String
+  user            User     @relation("UserRefreshTokens", fields: [userId], references: [id], onDelete: Cascade)
+  sessionId       String
+  session         Session  @relation("SessionRefreshTokens", fields: [sessionId], references: [id], onDelete: Cascade)
+  parentTokenHash String?
+  isRevoked       Boolean  @default(false)
+  expiresAt       DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([tokenHash])
+}
+
+model OTP {
+  id           String     @id @default(uuid())
+  userId       String?
+  user         User?      @relation("UserOTPs", fields: [userId], references: [id], onDelete: SetNull)
+  codeHash     String
+  channel      OtpChannel
+  purpose      OtpPurpose
+  target       String
+  expiresAt    DateTime
+  verifiedAt   DateTime?
+  attempts     Int        @default(0)
+  maxAttempts  Int        @default(3)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([userId])
+  @@index([target])
+  @@index([expiresAt])
+}
+
+model AuditLog {
+  id            String      @id @default(uuid())
+  actorId       String?
+  actor         User?       @relation("ActorAuditLogs", fields: [actorId], references: [id], onDelete: SetNull)
+  entity        String
+  entityId      String?
+  action        AuditAction
+  before        Json?
+  after         Json?
+  ip            String?
+  userAgent     String?
+  correlationId String?
+  timestamp     DateTime    @default(now())
+
+  @@index([actorId])
+  @@index([entity, entityId])
+  @@index([correlationId])
+  @@index([timestamp])
+}
+
+enum RoleName {
+  STUDENT
+  PARENT
+  TEACHER
+  MENTOR
+  SCHOOL_ADMIN
+  ORGANIZATION_ADMIN
+  ADMIN
+  SUPERADMIN
+}

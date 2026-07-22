@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShieldCheck, Compass, GitMerge, FileCheck, Award, ArrowRight, LayoutGrid, Rocket } from "lucide-react";
 import { motion } from "motion/react";
-import { GlassCard } from "@/components/glass-card";
+import { GlassCard } from "@/shared/ui/glass-card";
 
 export const Route = createFileRoute("/_marketing/framework")({
   component: Framework,
@@ -11,68 +11,68 @@ export const Route = createFileRoute("/_marketing/framework")({
 const frameworkPhases = [
   {
     num: 1,
-    stage: "Discover Phase",
+    stage: "Discover Phase (Grades 8-9)",
     color: "#3b82f6",
     colorBg: "bg-blue-500/10",
     colorText: "text-blue-600",
     colorBorder: "border-blue-200/50",
     icon: ShieldCheck,
-    objective: "Identify innate cognitive strengths and passions.",
-    diagnostics: "Cognitive Twin Detector, DBDA Battery",
-    playbook: "Strengths Profile Mapping Template",
-    metrics: "Initial Baseline Index Score (out of 100)"
+    objective: "Find natural strengths and learning styles early.",
+    diagnostics: "Cognitive Strengths Map & Learning Style Profile",
+    playbook: "Personalized Study Habits Playbook",
+    metrics: "Baseline Aptitude Score"
   },
   {
     num: 2,
-    stage: "Explore Phase",
+    stage: "Explore Phase (Grades 9-10)",
     color: "#06b6d4",
     colorBg: "bg-cyan-500/10",
     colorText: "text-cyan-600",
     colorBorder: "border-cyan-200/50",
     icon: Compass,
-    objective: "Expose to future identities and real-world roles.",
-    diagnostics: " Holland Interest & Competency Inventory",
-    playbook: "Identity Option Alignment Checklist",
-    metrics: "Identity Match affinity scores"
+    objective: "Explore modern career paths and real-world roles.",
+    diagnostics: "Career Interest Assessment",
+    playbook: "Career Pathway Exploration Guide",
+    metrics: "Career Match Affinity Score"
   },
   {
     num: 3,
-    stage: "Align Phase",
+    stage: "Align Phase (Grades 10-11)",
     color: "#10b981",
     colorBg: "bg-emerald-500/10",
     colorText: "text-emerald-600",
     colorBorder: "border-emerald-200/50",
     icon: GitMerge,
-    objective: "Synchronize strengths with academic choices.",
-    diagnostics: "Subject Diagnostic & Board Matching",
-    playbook: "Stream Choice & Curriculum Blueprint",
-    metrics: "Predictive Grade Alignment Matrix"
+    objective: "Confidently select academic streams and subjects.",
+    diagnostics: "Class 10 Stream Selection Diagnostic",
+    playbook: "Stream Selection & Board Alignment Blueprint",
+    metrics: "Subject Match Index"
   },
   {
     num: 4,
-    stage: "Prepare Phase",
+    stage: "Prepare Phase (Grades 11-12)",
     color: "#84cc16",
     colorBg: "bg-lime-500/10",
     colorText: "text-lime-600",
     colorBorder: "border-lime-200/50",
     icon: FileCheck,
-    objective: "Build targeted skills, projects, and active portfolios.",
-    diagnostics: "21st Century Competency Assessments",
-    playbook: "Growth Project Implementation Manual",
-    metrics: "Portfolio completion progress percentage"
+    objective: "Build skills, practical projects, and active portfolios.",
+    diagnostics: "21st Century Skills Assessment",
+    playbook: "Hands-on Project & Profile Builder Guide",
+    metrics: "Portfolio Strength Score"
   },
   {
     num: 5,
-    stage: "Transition Phase",
+    stage: "Launch Phase (Grade 12)",
     color: "#f59e0b",
     colorBg: "bg-amber-500/10",
     colorText: "text-amber-600",
     colorBorder: "border-amber-200/50",
     icon: Award,
-    objective: "Execute final placement strategies and transitions.",
-    diagnostics: "Readiness & Simulation Assessments",
-    playbook: "Final Transition Application Guide",
-    metrics: "Acceptance Probability Index"
+    objective: "Prepare for board exams and university entrance.",
+    diagnostics: "University Readiness Review",
+    playbook: "College Admissions & Entrance Prep Tracker",
+    metrics: "College Application Readiness Score"
   }
 ];
 
@@ -124,7 +124,7 @@ function Framework() {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-brand-teal">Blueprint.</span>
             </h1>
             <p className="mt-6 text-sm sm:text-base leading-relaxed text-text-muted max-w-2xl mx-auto">
-              A structured lifecycle guiding students from initial self-discovery to successful career transitions, underpinned by data and active mentorship.
+              A structured, step-by-step roadmap tailored for students in Grades 8 to 12. We guide you from early strength discovery to stream selection, profile building, and college readiness.
             </p>
           </motion.div>
 
@@ -135,7 +135,7 @@ function Framework() {
             
             <motion.div variants={containerVariants} className="space-y-8">
               {frameworkPhases.map((phase, idx) => (
-                <motion.div key={phase.num} variants={itemVariants} className="relative sm:pl-20">
+                <motion.div key={phase.num} id={`phase-${phase.num}`} variants={itemVariants} className="relative sm:pl-20">
                   {/* Step Number Badge */}
                   <div className="absolute left-0 top-6 w-16 h-16 rounded-2xl bg-white border-2 shadow-sm flex items-center justify-center font-black text-2xl z-10 hidden sm:flex" style={{ borderColor: phase.color, color: phase.color }}>
                     0{phase.num}
@@ -189,8 +189,8 @@ function Framework() {
           {/* CTA Section */}
           <motion.div variants={itemVariants} className="mt-20 w-full max-w-4xl mx-auto text-center">
             <GlassCard className="bg-gradient-to-r from-brand-blue/10 to-brand-teal/10 p-10">
-              <h2 className="text-2xl font-black text-text-heading mb-3">Ready to deploy the ILDF?</h2>
-              <p className="text-text-muted mb-8 text-sm">Integrate our end-to-end framework into your school's curriculum today.</p>
+              <h2 className="text-2xl font-black text-text-heading mb-3">Ready to start your structured roadmap?</h2>
+              <p className="text-text-muted mb-8 text-sm">Empower your high school journey with customized insights and expert mentorship.</p>
               <Link to="/contact" className="inline-flex items-center justify-center gap-2 rounded-xl gradient-brand px-6 py-3 text-sm font-bold text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
                 Partner With Us <ArrowRight className="h-4 w-4" />
               </Link>

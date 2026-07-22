@@ -1,0 +1,13 @@
+export const ACADEMICS_REPOSITORY_TOKEN = Symbol('IAcademicsRepository');
+
+export enum AcademicEntityType {
+  SCHOOL = 'SCHOOL',
+  CAMPUS = 'CAMPUS',
+  ACADEMIC_YEAR = 'ACADEMIC_YEAR',
+  ACADEMIC_TERM = 'ACADEMIC_TERM',
+  CLASS = 'CLASS',
+  SECTION = 'SECTION',
+  SUBJECT = 'SUBJECT',
+  BATCH = 'BATCH',
+  ENROLLMENT = 'ENROLLMENT',
+}
