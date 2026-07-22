@@ -6,7 +6,7 @@ import {
   CheckCircle2, Cpu, Rocket, Gamepad2, Leaf, Bot, Briefcase, Brain,
   BarChart3, Compass, UsersRound, Check, ChevronRight
 } from "lucide-react";
-import { FadeIn } from "@/components/fade-in";
+import { FadeIn } from "@/shared/ui/fade-in";
 
 export const Route = createFileRoute("/_marketing/")({
   component: HomePage,

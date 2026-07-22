@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GraduationCap, Users, Briefcase, Shield } from "lucide-react";
-import { PageHeader } from "@/components/dashboard-shell";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
 import { motion } from "motion/react";
 
 export const Route = createFileRoute("/dashboard/")({

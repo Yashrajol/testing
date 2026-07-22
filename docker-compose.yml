@@ -1,82 +1,71 @@
 version: '3.8'
-name: vedhkrit-yash
-
-x-app-build: &app-build
-  context: .
-  dockerfile: Dockerfile.dev
-
-# node_modules are named volumes so the Windows bind mount below doesn't shadow
-# the Linux-built packages. They only seed from the image on first creation, so
-# after changing any package.json run:
-#   docker compose down && docker volume rm vedhkrit_node_modules vedhkrit_web_node_modules vedhkrit_platform_node_modules vedhkrit_database_node_modules && docker compose up -d --build
-x-app-volumes: &app-volumes
-  - .:/app
-  - node_modules:/app/node_modules
-  - web_node_modules:/app/apps/web/node_modules
-  - platform_node_modules:/app/apps/platform/node_modules
-  - database_node_modules:/app/packages/database/node_modules
 
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: vedhkrit-db-yash
+    container_name: vedhkrit-postgres
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: vedhkrit
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: vedhkrit_prod
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: vedhkrit-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: vedhkrit-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   api:
-    build: *app-build
-    image: vedhkrit-app:dev
-    container_name: vedhkrit-api-yash
-    command: npm run dev --workspace=@vedhkrit/platform
-    env_file:
-      - apps/platform/.env
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/vedhkrit?schema=public
-      WEB_ORIGIN: http://localhost:8081
-      CHOKIDAR_USEPOLLING: "true"
-      TSC_WATCHFILE: PriorityPollingInterval
-      TSC_WATCHDIRECTORY: DynamicPriorityPolling
-      # "true" auto-activates new signups (no email provider needed). Locally we
-      # leave it off so the real OTP flow stays exercised.
-      DEMO_MODE: "${DEMO_MODE:-false}"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vedhkrit-api-server
     ports:
-      - "5001:5000"
-    volumes: *app-volumes
+      - "4000:4000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password123@postgres:5432/vedhkrit_prod?schema=public
+      - REDIS_URL=redis://redis:6379
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
+      - PORT=4000
     depends_on:
       postgres:
         condition: service_healthy
-    restart: unless-stopped
-
-  web:
-    build: *app-build
-    image: vedhkrit-app:dev
-    container_name: vedhkrit-web-yash
-    command: npm run dev --workspace=@vedhkrit/web
-    environment:
-      VITE_API_URL: http://localhost:5001
-      CHOKIDAR_USEPOLLING: "true"
-    ports:
-      - "8081:8080"
-    volumes: *app-volumes
-    depends_on:
-      - api
-    restart: unless-stopped
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
 volumes:
   pgdata:
-  node_modules:
-  web_node_modules:
-  platform_node_modules:
-  database_node_modules:
+  redisdata:

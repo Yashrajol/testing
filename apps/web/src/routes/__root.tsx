@@ -10,7 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+import { reportLovableError } from "@/shared/utils/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
@@ -85,8 +85,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "VEDHKRIT — From Potential to Purpose" },
       { name: "twitter:description", content: "Integrated learner development platform combining assessment, mentoring, career guidance, skill development, and AI-powered insights." },
+      { name: "theme-color", content: "#0f172a" },
+      { httpEquiv: "X-Content-Type-Options", content: "nosniff" },
+      { httpEquiv: "X-Frame-Options", content: "DENY" },
+      { name: "referrer", content: "strict-origin-when-cross-origin" },
+      { httpEquiv: "Content-Security-Policy", content: "default-src 'self' http://localhost:* https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https: data:; connect-src 'self' http://localhost:* https: wss:;" }
     ],
     links: [
+      { rel: "manifest", href: "/manifest.json" },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/jpeg", href: "/assets/brand/veda-logo.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -115,9 +121,10 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
-import { ThemeProvider } from "@/components/theme-provider";
-import { AuthProvider } from "@/contexts/auth-context";
-import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/app/providers/theme-provider";
+import { AuthProvider } from "@/app/providers/auth-context";
+import { Toaster } from "@/shared/ui/sonner";
+import { PwaInstallBanner, PwaUpdateBanner, OfflineIndicator } from "@/features/pwa";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
@@ -126,8 +133,11 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="default">
         <AuthProvider>
+          <OfflineIndicator />
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
+          <PwaInstallBanner />
+          <PwaUpdateBanner />
           {/* Without this every toast() call in the app is a silent no-op. */}
           <Toaster richColors closeButton position="top-center" />
         </AuthProvider>

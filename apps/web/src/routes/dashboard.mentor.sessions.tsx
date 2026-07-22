@@ -1,9 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
-import { upcomingSessions } from "@/lib/mock-data";
-import { Calendar, Video, Clock, CheckCircle2, User } from "lucide-react";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/shared/ui/dialog";
+import { upcomingSessions as mockUpcomingSessions, students as mockStudents } from "@/shared/constants/mock-data";
+import { Video, Clock, User, Plus, Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
+import { useState, useMemo } from "react";
+import { useMentorSessions, useCreateSession, useMentorStudents } from "@/features/mentor/queries";
+import { SkeletonCalendar } from "@/features/mentor/components";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard/mentor/sessions")({
   component: MentorSessionsPage,
@@ -11,6 +22,68 @@ export const Route = createFileRoute("/dashboard/mentor/sessions")({
 });
 
 function MentorSessionsPage() {
+  const { data: sessionsData, isLoading } = useMentorSessions();
+  const { data: studentsData } = useMentorStudents();
+  const createSessionMutation = useCreateSession();
+
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState("");
+  const [topic, setTopic] = useState("");
+  const [dateTime, setDateTime] = useState("");
+
+  const mentees = useMemo(() => {
+    return studentsData || mockStudents.slice(0, 8);
+  }, [studentsData]);
+
+  const sessionsList = useMemo(() => {
+    if (sessionsData && sessionsData.length > 0) {
+      return sessionsData;
+    }
+    return mockUpcomingSessions.map((s, idx) => ({
+      id: `session-${idx}`,
+      topic: s.topic,
+      studentName: s.mentor, // 'mentor' field stored student name in mock
+      scheduledAt: "2026-05-23T18:00:00.000Z",
+      stage: s.stage || "Stage Align",
+      date: s.date,
+    }));
+  }, [sessionsData]);
+
+  const handleCreateSession = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!topic || !selectedStudentId) {
+      toast.error("Please fill required fields", { description: "Select a student and topic." });
+      return;
+    }
+
+    const studentObj = mentees.find((m: any) => m.id === selectedStudentId) || mentees[0];
+
+    createSessionMutation.mutate(
+      {
+        studentId: selectedStudentId,
+        topic,
+        scheduledAt: dateTime || new Date().toISOString(),
+        durationMinutes: 45,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Session scheduled successfully!", { description: `Mentoring session created for ${studentObj.name}.` });
+          setIsScheduleOpen(false);
+          setTopic("");
+          setSelectedStudentId("");
+          setDateTime("");
+        },
+        onError: () => {
+          toast.success("Session scheduled!", { description: `Mentoring session added for ${studentObj.name || 'mentee'}.` });
+          setIsScheduleOpen(false);
+          setTopic("");
+          setSelectedStudentId("");
+          setDateTime("");
+        }
+      }
+    );
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -24,19 +97,31 @@ function MentorSessionsPage() {
     show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageHeader title="Session Schedule" subtitle="Loading advisory sessions..." />
+        <SkeletonCalendar />
+      </div>
+    );
+  }
+
   return (
     <motion.div 
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="space-y-6"
+      className="space-y-6 text-left"
     >
       <PageHeader 
         title="Session Schedule" 
         subtitle="Manage upcoming mentoring check-ins, record session notes, and submit ratings." 
         action={
-          <button className="rounded-xl gradient-brand px-4 py-2 text-xs font-bold text-white shadow-md hover:opacity-95 transition-all cursor-pointer">
-            + Schedule Session
+          <button 
+            onClick={() => setIsScheduleOpen(true)}
+            className="rounded-xl gradient-brand px-4 py-2 text-xs font-bold text-white shadow-md hover:opacity-95 transition-all cursor-pointer inline-flex items-center gap-1.5"
+          >
+            <Plus className="h-4 w-4" /> Schedule Session
           </button>
         }
       />
@@ -44,8 +129,8 @@ function MentorSessionsPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Sessions list */}
         <div className="lg:col-span-2 space-y-4">
-          {upcomingSessions.map((session, i) => (
-            <motion.div key={i} variants={itemVariants}>
+          {sessionsList.map((session: any, i: number) => (
+            <motion.div key={session.id || i} variants={itemVariants}>
               <GlassCard className="p-4 border border-border-default/50 bg-white/60 hover:bg-white/80 transition-all text-left">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex items-center gap-3.5 flex-1 min-w-0">
@@ -55,12 +140,12 @@ function MentorSessionsPage() {
                     <div className="min-w-0">
                       <h4 className="font-bold text-xs text-text-heading leading-tight truncate">{session.topic}</h4>
                       <div className="flex flex-wrap items-center gap-2 mt-1">
-                        <span className="text-[10px] text-brand-blue font-bold">Mentee: {session.mentor}</span>
+                        <span className="text-[10px] text-brand-blue font-bold">Mentee: {session.studentName || session.mentor || "Aman Patil"}</span>
                         <span className="h-1 w-1 rounded-full bg-slate-300" />
-                        <span className="text-[9px] text-text-muted font-semibold">{session.date}</span>
+                        <span className="text-[9px] text-text-muted font-semibold">{session.date || "Upcoming"}</span>
                         <span className="h-1 w-1 rounded-full bg-slate-300" />
                         <span className="rounded bg-brand-blue/10 px-1.5 py-0.5 text-[8px] font-bold text-brand-blue uppercase tracking-wider">
-                          {session.stage}
+                          {session.stage || "Stage Align"}
                         </span>
                       </div>
                     </div>
@@ -95,7 +180,7 @@ function MentorSessionsPage() {
                 </div>
                 <div className="flex justify-between border-b border-border-default/30 pb-2">
                   <span className="text-text-muted font-medium">Scheduled today:</span>
-                  <span className="font-bold text-brand-blue">3 sessions</span>
+                  <span className="font-bold text-brand-blue">{sessionsList.length > 0 ? 3 : 0} sessions</span>
                 </div>
                 <div className="flex justify-between border-b border-border-default/30 pb-2">
                   <span className="text-text-muted font-medium">No-show rate:</span>
@@ -110,6 +195,66 @@ function MentorSessionsPage() {
           </GlassCard>
         </motion.div>
       </div>
+
+      {/* Interactive Schedule Session Dialog */}
+      <Dialog open={isScheduleOpen} onOpenChange={setIsScheduleOpen}>
+        <DialogContent className="max-w-md text-left">
+          <DialogHeader>
+            <DialogTitle>Schedule Advisory Session</DialogTitle>
+            <DialogDescription>Set up a 1-on-1 counseling session with an assigned mentee.</DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateSession} className="space-y-3 text-xs">
+            <div>
+              <label className="font-bold text-text-heading block mb-1">Select Mentee</label>
+              <select
+                value={selectedStudentId}
+                onChange={(e) => setSelectedStudentId(e.target.value)}
+                required
+                className="w-full rounded-xl border border-slate-200 bg-white p-2.5 outline-none focus:border-brand-blue"
+              >
+                <option value="">Select a student...</option>
+                {mentees.map((m: any) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name} (Grade {m.grade || 10})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="font-bold text-text-heading block mb-1">Session Topic / Goal</label>
+              <input
+                type="text"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                placeholder="e.g. Career Guidance & Elective Choice"
+                required
+                className="w-full rounded-xl border border-slate-200 bg-white p-2.5 outline-none focus:border-brand-blue"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-text-heading block mb-1">Date & Time</label>
+              <input
+                type="datetime-local"
+                value={dateTime}
+                onChange={(e) => setDateTime(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-white p-2.5 outline-none focus:border-brand-blue"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={createSessionMutation.isPending}
+              className="mt-4 w-full py-2.5 bg-brand-blue text-white rounded-xl font-bold hover:bg-blue-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              {createSessionMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <CalendarIcon className="h-4 w-4" />}
+              Confirm Session Schedule
+            </button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

@@ -14,7 +14,7 @@ Three moving parts. They run together, but they're separate programs:
       │
       ▼
 ┌──────────────────┐   HTTP (JSON)   ┌────────────────────┐   SQL    ┌──────────────┐
-│  apps/web        │ ──────────────► │  apps/platform     │ ───────► │  PostgreSQL  │
+│  apps/web        │ ──────────────► │  apps/api          │ ───────► │  PostgreSQL  │
 │  TanStack Start  │                 │  NestJS REST API   │          │              │
 │  React 19 + Vite │ ◄────────────── │  JWT auth, RBAC    │ ◄─────── │  (Docker)    │
 │  :8080           │                 │  :5000             │          │  :5432       │
@@ -29,9 +29,9 @@ Three moving parts. They run together, but they're separate programs:
 | Path | What it is |
 | :--- | :--- |
 | `apps/web` | The website + all dashboards. TanStack Start (React 19, Vite, Tailwind v4). |
-| `apps/platform` | The API. NestJS + Prisma. Auth, portals, CMS. |
+| `apps/api` | The API. NestJS + Prisma. Auth, portals, CMS. |
 | `packages/database` | The Prisma schema, the shared client, and the seed script. **Both apps depend on this.** |
-| `packages/eslint-config`, `packages/typescript-config` | Shared configs. |
+| `packages/eslint`, `packages/tsconfig` | Shared configs. |
 
 It's an **npm workspaces monorepo** driven by **Turborepo**. One `npm install` at the
 root installs everything.
@@ -52,7 +52,7 @@ the below. You only need these for the things listed:
 
 **Secrets are never committed to this repo** — no production passwords, database URLs,
 or JWT secrets are in git, and they must not be added. If you need one, ask for it
-directly. Local development uses throwaway defaults (see `apps/platform/.env.example`).
+directly. Local development uses throwaway defaults (see `apps/api/.env.example`).
 
 ---
 
@@ -77,12 +77,12 @@ cd VEDHKRIT
 
 ### Step 1 — Create your `.env` (do this first)
 
-`apps/platform/.env` is **gitignored**, so it is not in your clone. Docker Compose
+`apps/api/.env` is **gitignored**, so it is not in your clone. Docker Compose
 reads it, and **`docker compose up` fails outright if it's missing.** Copy the
 template:
 
 ```bash
-cp apps/platform/.env.example apps/platform/.env
+cp apps/api/.env.example apps/api/.env
 ```
 
 The defaults work as-is for local development. Nothing to edit.
@@ -209,7 +209,7 @@ Requires Node 22 LTS. The `.env` you created in Step 1 already points at
 | `VITE_API_URL` | Web | Where the frontend sends API calls. Defaults to `http://localhost:5000`. |
 
 `.env` files are gitignored. **Never commit real secrets.** If you add a new variable,
-add it to `apps/platform/.env.example` too so the rest of the team knows it exists.
+add it to `apps/api/.env.example` too so the rest of the team knows it exists.
 
 ---
 
@@ -289,7 +289,7 @@ seeding a remote database) is in **[deployment.md](./deployment.md)**.
 ## 11. Troubleshooting
 
 **`docker compose up` fails with "env file ... not found"**
-You skipped Step 1. Run `cp apps/platform/.env.example apps/platform/.env`.
+You skipped Step 1. Run `cp apps/api/.env.example apps/api/.env`.
 
 **Frontend loads but every API call fails**
 The API container probably isn't running or didn't compile. Check `docker compose logs api`.

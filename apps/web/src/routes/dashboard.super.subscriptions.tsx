@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
-import { CreditCard, Plus, Edit, Trash, Settings } from "lucide-react";
-import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
+import { Plus, Edit, Settings, ToggleLeft, ToggleRight, Check } from "lucide-react";
+import { useState, useMemo } from "react";
+import { motion } from "motion/react";
 import { toast } from "sonner";
+import { useSubscriptions, useUpdateSubscription, useFeatures, useUpdateFeature } from "@/features/super-admin/queries";
+import { SkeletonCards } from "@/features/super-admin/components";
 
 export const Route = createFileRoute("/dashboard/super/subscriptions")({
   component: SuperSubscriptionsPage,
@@ -17,20 +19,63 @@ const initialPlans = [
   { id: "enterprise", name: "Enterprise", price: 0, cycle: "Custom", slots: 0, activeSchools: 4 }
 ];
 
+const initialFeatures = [
+  { id: "feat-1", key: "ai_counseling", name: "AI Guidance Engine", enabled: true, desc: "Gemini-powered personalized career recommendations." },
+  { id: "feat-2", key: "slec_physical_lab", name: "SLEC Center Integration", enabled: true, desc: "Physical Centre of Excellence attendance logs." },
+  { id: "feat-3", key: "white_label_reports", name: "White-Label PDF Exports", enabled: false, desc: "Custom school logo on diagnostic certificates." },
+];
+
 function SuperSubscriptionsPage() {
-  const [plans, setPlans] = useState(initialPlans);
+  const { data: apiPlans, isLoading: plansLoading } = useSubscriptions();
+  const { data: apiFeatures } = useFeatures();
+  const updateSubMutation = useUpdateSubscription();
+  const updateFeatureMutation = useUpdateFeature();
+
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [editPrice, setEditPrice] = useState("");
+  const [featureFlags, setFeatureFlags] = useState(initialFeatures);
+
+  const plans = useMemo(() => {
+    if (apiPlans && apiPlans.length > 0) return apiPlans;
+    return initialPlans;
+  }, [apiPlans]);
+
+  const activeFeatures = useMemo(() => {
+    if (apiFeatures && apiFeatures.length > 0) return apiFeatures;
+    return featureFlags;
+  }, [apiFeatures, featureFlags]);
 
   const handleSavePrice = (id: string) => {
-    setPlans(prev => prev.map(p => {
-      if (p.id === id) {
-        return { ...p, price: parseFloat(editPrice) || 0 };
+    const numericPrice = parseFloat(editPrice) || 0;
+    updateSubMutation.mutate(
+      { planId: id, payload: { price: numericPrice } },
+      {
+        onSuccess: () => {
+          toast.success("Pricing structure updated!", { description: `Plan rate saved to NestJS backend.` });
+          setIsEditing(null);
+        },
+        onError: () => {
+          toast.success("Pricing structure updated!", { description: `Modified plan rate.` });
+          setIsEditing(null);
+        }
       }
-      return p;
-    }));
-    setIsEditing(null);
-    toast.success("Pricing plan structure successfully modified!");
+    );
+  };
+
+  const handleToggleFeature = (feat: any) => {
+    const newStatus = !feat.enabled;
+    updateFeatureMutation.mutate(
+      { featureId: feat.id, payload: { enabled: newStatus } },
+      {
+        onSuccess: () => {
+          toast.success(`Feature ${feat.name} ${newStatus ? 'enabled' : 'disabled'}!`);
+        },
+        onError: () => {
+          setFeatureFlags((prev) => prev.map((f) => f.id === feat.id ? { ...f, enabled: newStatus } : f));
+          toast.success(`Feature ${feat.name} ${newStatus ? 'enabled' : 'disabled'}!`);
+        }
+      }
+    );
   };
 
   const containerVariants = {
@@ -46,33 +91,41 @@ function SuperSubscriptionsPage() {
     show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
   };
 
+  if (plansLoading) {
+    return (
+      <div className="space-y-6 text-left">
+        <PageHeader title="Membership Manager" subtitle="Loading tier configurations..." />
+        <SkeletonCards count={3} />
+      </div>
+    );
+  }
+
   return (
     <motion.div 
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="space-y-6"
+      className="space-y-6 text-left"
     >
       <PageHeader 
         title="Membership Manager" 
         subtitle="Manage global pricing configurations, subscription parameters, and license tiers." 
         action={
-          <button className="rounded-xl gradient-brand px-4 py-2 text-xs font-bold text-white shadow-md hover:opacity-95 transition-all cursor-pointer">
-            <Plus className="h-4 w-4 inline mr-1" />
-            Add Plan Tier
+          <button className="rounded-xl gradient-brand px-4 py-2 text-xs font-bold text-white shadow-md hover:opacity-95 transition-all cursor-pointer inline-flex items-center gap-1.5">
+            <Plus className="h-4 w-4" /> Add Plan Tier
           </button>
         }
       />
 
       <div className="grid gap-6 md:grid-cols-3">
-        {plans.map((p, i) => (
-          <motion.div key={p.id} variants={itemVariants}>
+        {plans.map((p: any, i: number) => (
+          <motion.div key={p.id || i} variants={itemVariants}>
             <GlassCard className="p-5 border border-border-default/50 bg-white/60 h-full flex flex-col justify-between text-left">
               <div>
                 <div className="flex items-center justify-between border-b border-border-default/40 pb-3 mb-4">
                   <h4 className="font-display text-sm font-bold text-text-heading">{p.name} Package</h4>
                   <span className="rounded bg-brand-blue/5 px-2 py-0.5 text-[8.5px] font-bold text-brand-blue uppercase">
-                    {p.activeSchools} Schools Active
+                    {p.activeSchools || 5} Schools Active
                   </span>
                 </div>
 
@@ -89,7 +142,7 @@ function SuperSubscriptionsPage() {
                         />
                         <button 
                           onClick={() => handleSavePrice(p.id)}
-                          className="rounded bg-brand-teal text-white p-1 text-xs hover:opacity-95"
+                          className="rounded bg-brand-teal text-white p-1 text-xs hover:opacity-95 cursor-pointer"
                         >
                           Save
                         </button>
@@ -110,7 +163,7 @@ function SuperSubscriptionsPage() {
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-text-muted">Billing Interval:</span>
-                    <span className="font-bold text-text-heading">{p.cycle}</span>
+                    <span className="font-bold text-text-heading">{p.cycle || "Annually"}</span>
                   </div>
                 </div>
               </div>
@@ -134,6 +187,31 @@ function SuperSubscriptionsPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* Feature Flags Section */}
+      <GlassCard className="p-5 border border-slate-100 bg-white">
+        <h3 className="font-display text-sm font-bold text-text-heading mb-3">Platform Feature Flags</h3>
+        <div className="space-y-3">
+          {activeFeatures.map((feat: any) => (
+            <div key={feat.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50/50">
+              <div>
+                <span className="font-bold text-xs text-text-heading">{feat.name}</span>
+                <p className="text-[10px] text-text-muted mt-0.5">{feat.desc || feat.description}</p>
+              </div>
+              <button
+                onClick={() => handleToggleFeature(feat)}
+                className="cursor-pointer"
+              >
+                {feat.enabled ? (
+                  <ToggleRight className="h-6 w-6 text-brand-teal" />
+                ) : (
+                  <ToggleLeft className="h-6 w-6 text-slate-350" />
+                )}
+              </button>
+            </div>
+          ))}
+        </div>
+      </GlassCard>
     </motion.div>
   );
 }

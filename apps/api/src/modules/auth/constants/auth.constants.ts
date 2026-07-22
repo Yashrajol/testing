@@ -1,0 +1,8 @@
+export const AUTH_REPOSITORY_TOKEN = Symbol('IAuthRepository');
+
+export const AUTH_DEFAULTS = {
+  OTP_MAX_ATTEMPTS: 3,
+  OTP_EXPIRY_MINUTES: 10,
+  SESSION_EXPIRY_DAYS: 30,
+  REFRESH_TOKEN_EXPIRY_DAYS: 30,
+} as const;

@@ -5,7 +5,7 @@ The platform is three pieces and they deploy to different places:
 | Piece | Host | Why |
 | :--- | :--- | :--- |
 | `apps/web` (TanStack Start) | **Vercel** | What it's built for. |
-| `apps/platform` (NestJS) | **Render** | Needs a long-running server, not a serverless function. Ships as a Docker container. |
+| `apps/api` (NestJS) | **Render** | Needs a long-running server, not a serverless function. Ships as a Docker container. |
 | PostgreSQL | **Render** (managed) | Provisioned by `render.yaml` alongside the API. |
 
 The backend is deliberately *not* on Vercel. Vercel is serverless, and two things in
@@ -121,7 +121,7 @@ entirely, so anyone you share the link with can register and get straight in.
 
 **This is a demo-only compromise.** Before real users touch this, set
 `DEMO_MODE=false` and wire an actual email provider (Resend, SES, Postmark) into
-`AuthService.register` in [`auth.service.ts`](../apps/platform/src/auth/auth.service.ts).
+`AuthService.register` in [`auth.service.ts`](../apps/api/src/auth/auth.service.ts).
 
 ---
 

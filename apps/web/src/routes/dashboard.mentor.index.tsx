@@ -1,10 +1,12 @@
+import { useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GlassCard } from "@/components/glass-card";
-import { Users, Calendar, AlertTriangle, Star, CheckSquare, Sparkles, MessageSquare, ArrowRight, User, GraduationCap, Video, Plus, FileText, Send, BookOpen, ClipboardCheck } from "lucide-react";
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
-import { students } from "@/lib/mock-data";
-import { useMentorOverview } from "@/lib/api";
-import { BANNER_PHOTOS } from "@/lib/avatars";
+import { GlassCard } from "@/shared/ui/glass-card";
+import { Users, Calendar, Star, GraduationCap, Video, Plus, FileText, Send, CheckSquare, ClipboardCheck, RefreshCw, AlertCircle } from "lucide-react";
+import { ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { students as mockStudents } from "@/shared/constants/mock-data";
+import { BANNER_PHOTOS } from "@/shared/utils/avatars";
+import { useMentorDashboard, useMentorStudents, useMentorSessions, useMentorAssessments } from "@/features/mentor/queries";
+import { SkeletonCards, SkeletonCharts, SkeletonTables, AIMentorInsightsWidget } from "@/features/mentor/components";
 
 export const Route = createFileRoute("/dashboard/mentor/")({
   component: MentorDashboardOverview,
@@ -18,32 +20,91 @@ const pieData = [
 ];
 
 function MentorDashboardOverview() {
-  const { data: apiData, isLoading } = useMentorOverview();
+  const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError, refetch: refetchDashboard } = useMentorDashboard();
+  const { data: studentsData, isLoading: studentsLoading } = useMentorStudents();
+  const { data: sessionsData, isLoading: sessionsLoading } = useMentorSessions();
+  const { data: assessmentsData } = useMentorAssessments();
+
+  const isLoading = dashboardLoading || studentsLoading || sessionsLoading;
+
+  const mentorName = dashboardData?.mentor?.name || "Neha Mehta";
+
+  const myStudents = useMemo(() => {
+    if (dashboardData?.students && dashboardData.students.length > 0) {
+      return dashboardData.students;
+    }
+    if (studentsData && studentsData.length > 0) {
+      return studentsData;
+    }
+    return mockStudents.slice(0, 4);
+  }, [dashboardData, studentsData]);
+
+  const stats = useMemo(() => {
+    if (dashboardData?.stats) {
+      return {
+        totalStudents: dashboardData.stats.assignedStudents ?? dashboardData.stats.totalStudents ?? myStudents.length,
+        sessionsConducted: dashboardData.stats.sessionsConducted ?? dashboardData.stats.activeSessions ?? 16,
+        avgProgress: dashboardData.stats.avgProgress ?? dashboardData.stats.avgStudentScore ?? 81,
+        rating: dashboardData.stats.rating ?? 4.8,
+      };
+    }
+    return {
+      totalStudents: myStudents.length || 48,
+      sessionsConducted: 16,
+      avgProgress: 81,
+      rating: 4.8,
+    };
+  }, [dashboardData, myStudents]);
+
+  const nextSession = useMemo(() => {
+    if (dashboardData?.nextSession) return dashboardData.nextSession;
+    if (sessionsData && sessionsData.length > 0) return sessionsData[0];
+    return {
+      topic: "Career Guidance",
+      studentName: "Yash Rajole",
+      scheduledAt: "2026-05-23T18:00:00.000Z",
+    };
+  }, [dashboardData, sessionsData]);
 
   if (isLoading) {
     return (
-      <div className="flex h-[60dvh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+      <div className="space-y-6 text-left">
+        <SkeletonCards count={4} />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-6">
+            <SkeletonTables rows={4} />
+          </div>
+          <div className="lg:col-span-1">
+            <SkeletonCharts />
+          </div>
+        </div>
       </div>
     );
   }
 
-  const mentorName = apiData?.mentor?.name || "Neha Mehta";
-  const stats = apiData?.stats || {
-    totalStudents: 48,
-    sessionsConducted: 16,
-    avgProgress: 81,
-    rating: 4.8,
-  };
-  const myStudents = apiData?.students || students.slice(0, 4);
-  const nextSession = apiData?.nextSession || {
-    topic: "Career Guidance",
-    studentName: "Yash Rajole",
-    scheduledAt: "2026-05-23T18:00:00.000Z",
-  };
+  if (dashboardError) {
+    return (
+      <GlassCard className="p-8 border border-red-100 bg-red-50/30 text-center space-y-3 my-8">
+        <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
+        <h3 className="text-base font-bold text-text-heading">Failed to Load Dashboard Data</h3>
+        <p className="text-xs text-text-muted">We encountered an issue connecting to the NestJS backend services.</p>
+        <button
+          onClick={() => refetchDashboard()}
+          className="px-4 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold inline-flex items-center gap-1.5 hover:bg-blue-800 transition-colors"
+        >
+          <RefreshCw className="h-3.5 w-3.5" /> Retry Connection
+        </button>
+      </GlassCard>
+    );
+  }
 
-  const nextSessionDate = new Date(nextSession.scheduledAt);
-  const formattedNextSessionTime = nextSessionDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' • ' + nextSessionDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+  const nextSessionDate = new Date(nextSession.scheduledAt || Date.now());
+  const formattedNextSessionTime =
+    isNaN(nextSessionDate.getTime())
+      ? "Today • 06:00 PM"
+      : nextSessionDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) +
+        ' • ' +
+        nextSessionDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
     <div className="space-y-6 text-left">
@@ -169,18 +230,18 @@ function MentorDashboardOverview() {
                 </div>
 
                 <div className="space-y-4">
-                  {myStudents.map((s: any, idx: number) => (
-                    <div key={idx} className="flex items-center gap-3">
-                      <img src={s.avatar} alt="" className="h-7 w-7 rounded-full object-cover bg-slate-100" />
+                  {myStudents.slice(0, 4).map((s: any, idx: number) => (
+                    <div key={s.id || idx} className="flex items-center gap-3">
+                      <img src={s.avatar || mockStudents[idx % mockStudents.length].avatar} alt="" className="h-7 w-7 rounded-full object-cover bg-slate-100" />
                       <div className="text-left flex-1 min-w-0">
                         <div className="flex justify-between text-xs font-bold text-text-heading mb-1.5">
                           <span className="truncate">{s.name}</span>
-                          <span className="shrink-0">{s.growthScore}%</span>
+                          <span className="shrink-0">{s.growthScore || s.academic || 85}%</span>
                         </div>
                         <div className="w-full bg-slate-100 h-1.5 rounded-full">
                           <div className={`h-1.5 rounded-full ${
                             idx === 0 ? "bg-brand-blue" : idx === 1 ? "bg-brand-teal" : idx === 2 ? "bg-purple-500" : "bg-brand-blue"
-                          }`} style={{ width: `${s.growthScore}%` }} />
+                          }`} style={{ width: `${s.growthScore || s.academic || 85}%` }} />
                         </div>
                       </div>
                     </div>
@@ -205,25 +266,31 @@ function MentorDashboardOverview() {
                 </div>
 
                 <div className="space-y-3.5">
-                  {[
-                    { m: "MAY", d: "22", title: "AI Assessment Review", sub: "Yash Rajole", time: "10:00 AM" },
-                    { m: "MAY", d: "23", title: "Career Guidance", sub: "Aman Patil", time: "04:00 PM" },
-                    { m: "MAY", d: "25", title: "Project Discussion", sub: "Neha Mahajan", time: "11:30 AM" }
-                  ].map((ev, idx) => (
-                    <div key={idx} className="flex gap-3 items-center">
-                      <div className="h-10 w-10 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-center items-center text-center shrink-0">
-                        <span className="text-[7.5px] text-slate-400 font-bold leading-none">{ev.m}</span>
-                        <span className="text-xs font-black text-text-heading leading-none mt-1">{ev.d}</span>
+                  {(sessionsData && sessionsData.length > 0 ? sessionsData.slice(0, 3) : [
+                    { topic: "AI Assessment Review", studentName: "Yash Rajole", scheduledAt: "2026-05-22T10:00:00.000Z" },
+                    { topic: "Career Guidance", studentName: "Aman Patil", scheduledAt: "2026-05-23T16:00:00.000Z" },
+                    { topic: "Project Discussion", studentName: "Neha Mahajan", scheduledAt: "2026-05-25T11:30:00.000Z" }
+                  ]).map((ev: any, idx: number) => {
+                    const dt = new Date(ev.scheduledAt || Date.now());
+                    const m = dt.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+                    const d = dt.getDate();
+                    const time = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    return (
+                      <div key={idx} className="flex gap-3 items-center">
+                        <div className="h-10 w-10 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-center items-center text-center shrink-0">
+                          <span className="text-[7.5px] text-slate-400 font-bold leading-none">{m}</span>
+                          <span className="text-xs font-black text-text-heading leading-none mt-1">{d}</span>
+                        </div>
+                        <div className="text-left min-w-0 flex-1">
+                          <h4 className="text-xs font-bold text-text-heading truncate leading-tight">{ev.topic || ev.title}</h4>
+                          <p className="text-[10px] text-text-muted truncate mt-0.5">{ev.studentName || ev.sub}</p>
+                        </div>
+                        <div className="text-right text-[9px] font-bold text-slate-400 shrink-0">
+                          {time}
+                        </div>
                       </div>
-                      <div className="text-left min-w-0 flex-1">
-                        <h4 className="text-xs font-bold text-text-heading truncate leading-tight">{ev.title}</h4>
-                        <p className="text-[10px] text-text-muted truncate mt-0.5">{ev.sub}</p>
-                      </div>
-                      <div className="text-right text-[9px] font-bold text-slate-400 shrink-0">
-                        {ev.time}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
               <p className="text-[9px] text-slate-400 mt-4">Make sure to review diagnostic prep sheets before starting sessions.</p>
@@ -241,14 +308,14 @@ function MentorDashboardOverview() {
               <Link to="/dashboard/mentor/assessments" className="text-[10px] text-brand-blue font-bold hover:underline">Review All Reports</Link>
             </div>
             <div className="flex flex-wrap gap-3">
-              {myStudents.filter((s: any) => s.assessmentDone === false).slice(0, 5).map((s: any, idx: number) => (
+              {myStudents.filter((s: any) => s.assessmentDone === false || s.status === 'pending').slice(0, 5).map((s: any, idx: number) => (
                 <div key={idx} className="flex items-center gap-2 pr-3 pl-1.5 py-1.5 rounded-full border border-brand-orange/20 bg-orange-50/50">
-                  <img src={s.avatar} alt="" className="h-6 w-6 rounded-full object-cover bg-slate-100" />
-                  <span className="text-[10px] font-bold text-text-heading">{s.name}</span>
+                  <img src={s.avatar || mockStudents[idx % mockStudents.length].avatar} alt="" className="h-6 w-6 rounded-full object-cover bg-slate-100" />
+                  <span className="text-[10px] font-bold text-text-heading">{s.name || s.studentName}</span>
                   <span className="text-[8.5px] font-bold text-brand-orange uppercase">Pending</span>
                 </div>
               ))}
-              {myStudents.filter((s: any) => s.assessmentDone === false).length === 0 && (
+              {myStudents.filter((s: any) => s.assessmentDone === false || s.status === 'pending').length === 0 && (
                 <p className="text-xs text-emerald-600 font-semibold">All assigned mentees have completed their self-assessment.</p>
               )}
             </div>
@@ -259,6 +326,9 @@ function MentorDashboardOverview() {
         {/* Sidebar */}
         <div className="lg:col-span-1 space-y-6">
           
+          {/* AI Insights Widget */}
+          <AIMentorInsightsWidget />
+
           {/* Recent Feedback */}
           <GlassCard className="p-5 border border-slate-100 bg-white flex flex-col justify-between h-full">
             <div>
@@ -389,7 +459,7 @@ function MentorDashboardOverview() {
                 </ResponsiveContainer>
                 
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs font-black text-text-heading leading-none">48 <span className="text-[7.5px] block font-bold text-text-muted mt-0.5 uppercase">Mentees</span></span>
+                  <span className="text-xs font-black text-text-heading leading-none">{stats.totalStudents} <span className="text-[7.5px] block font-bold text-text-muted mt-0.5 uppercase">Mentees</span></span>
                 </div>
               </div>
 

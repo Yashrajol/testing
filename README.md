@@ -17,7 +17,7 @@ git clone https://github.com/SARTHAKSONAWANE01/VEDHKRIT.git
 cd VEDHKRIT
 
 # 1. Create your env file — docker compose FAILS without this
-cp apps/platform/.env.example apps/platform/.env
+cp apps/api/.env.example apps/api/.env
 
 # 2. Start Postgres + API + web
 docker compose up -d --build
@@ -48,11 +48,11 @@ set real passwords via env vars.
 ```
 apps/
   web/                TanStack Start (React 19, Vite, Tailwind v4) — site + all dashboards
-  platform/           NestJS REST API — auth, RBAC, portals, CMS
+  api/                NestJS REST API — auth, RBAC, portals, CMS
 packages/
   database/           Prisma schema, shared client, seed script
-  eslint-config/      Shared ESLint config
-  typescript-config/  Shared tsconfig
+  eslint/             Shared ESLint config
+  tsconfig/           Shared tsconfig
 ```
 
 npm workspaces + Turborepo. One `npm install` at the root covers everything.

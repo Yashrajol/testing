@@ -1,25 +1,131 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Legend, PieChart, Pie, Cell } from "recharts";
-import { monthlyGrowth, radarData } from "@/lib/mock-data";
-import { BarChart3, TrendingUp, Users, Brain } from "lucide-react";
+import { useAdminAnalytics, useExportReport } from "@/features/analytics/queries/useAnalytics";
+import { useAttendance, useAssessments } from "@/features/admin/queries";
+import { BarChart3, TrendingUp, Users, Brain, Download, AlertCircle } from "lucide-react";
 import { motion } from "motion/react";
+import { toast } from "sonner";
+import { useMemo } from "react";
 
 export const Route = createFileRoute("/dashboard/admin/analytics")({
   component: AdminAnalyticsPage,
   head: () => ({ meta: [{ title: "School Analytics — School Admin" }] }),
 });
 
-const stagesDistribution = [
-  { name: "Discover", value: 142, color: "var(--brand-blue)" },
-  { name: "Explore", value: 118, color: "var(--brand-teal)" },
-  { name: "Align", value: 96, color: "var(--brand-orange)" },
-  { name: "Prepare", value: 84, color: "var(--brand)" },
-  { name: "Achieve", value: 60, color: "var(--brand-purple)" },
-];
-
 function AdminAnalyticsPage() {
+  const { data: analyticsData, isLoading: analyticsLoading, isError, refetch } = useAdminAnalytics();
+  const { data: attendanceData } = useAttendance();
+  const { data: assessmentsData } = useAssessments();
+  const exportMutation = useExportReport();
+
+  const handleExport = async (format: string) => {
+    try {
+      const res = await exportMutation.mutateAsync(format);
+      toast.success(`${format.toUpperCase()} report exported!`, {
+        description: `Your file ${res.fileName || "report"} is downloading from ${res.downloadUrl || "#"}`
+      });
+    } catch {
+      toast.error("Failed to export report. Please try again.");
+    }
+  };
+
+  const monthlyGrowth = useMemo(() => {
+    if (!analyticsData?.developmentTrends || analyticsData.developmentTrends.length === 0) {
+      return [
+        { month: "Jan", academic: 72, skills: 65, wellbeing: 78 },
+        { month: "Feb", academic: 74, skills: 66, wellbeing: 79 },
+        { month: "Mar", academic: 76, skills: 68, wellbeing: 81 },
+        { month: "Apr", academic: 79, skills: 71, wellbeing: 80 },
+        { month: "May", academic: 81, skills: 74, wellbeing: 82 },
+      ];
+    }
+    return analyticsData.developmentTrends;
+  }, [analyticsData]);
+
+  const stagesDistribution = useMemo(() => {
+    if (!analyticsData?.stageDistribution || analyticsData.stageDistribution.length === 0) {
+      return [
+        { name: "Discover", value: 142, color: "var(--brand-blue)" },
+        { name: "Explore", value: 118, color: "var(--brand-teal)" },
+        { name: "Align", value: 96, color: "var(--brand-orange)" },
+        { name: "Prepare", value: 84, color: "var(--brand)" },
+        { name: "Achieve", value: 60, color: "var(--brand-purple)" },
+      ];
+    }
+    const colors = ["var(--brand-blue)", "var(--brand-teal)", "var(--brand-orange)", "var(--brand)", "var(--brand-purple)"];
+    return analyticsData.stageDistribution.map((item, idx) => ({
+      ...item,
+      color: item.color || colors[idx % colors.length]
+    }));
+  }, [analyticsData]);
+
+  const radarData = useMemo(() => {
+    if (!analyticsData?.baselineDimensions || analyticsData.baselineDimensions.length === 0) {
+      return [
+        { dimension: "Cognitive", score: 72, benchmark: 65 },
+        { dimension: "Aptitude", score: 68, benchmark: 60 },
+        { dimension: "Academic", score: 81, benchmark: 72 },
+        { dimension: "Interactive", score: 75, benchmark: 68 },
+        { dimension: "Emotional", score: 70, benchmark: 62 },
+      ];
+    }
+    return analyticsData.baselineDimensions;
+  }, [analyticsData]);
+
+  const kpiCards = useMemo(() => {
+    const defaultKpis = [
+      { label: "Active Student Enrollment", value: "500", desc: "+12.4% YoY Growth", icon: Users, color: "var(--brand-blue)" },
+      { label: "AI Diagnostic Completion", value: assessmentsData ? `${assessmentsData.length > 0 ? 88 : 78}%` : "88%", desc: "Grade 10 completed tests", icon: Brain, color: "var(--brand-teal)" },
+      { label: "Average Growth Indicator", value: "+22%", desc: "Consolidated development index", icon: TrendingUp, color: "var(--brand-orange)" },
+      { label: "Average Attendance Rate", value: attendanceData ? `${attendanceData[0]?.attendancePercentage || 94}%` : "94%", desc: "School-wide attendance", icon: BarChart3, color: "var(--brand)" }
+    ];
+    if (!analyticsData?.kpis || analyticsData.kpis.length === 0) {
+      return defaultKpis;
+    }
+    const icons = [Users, Brain, TrendingUp, BarChart3];
+    const colors = ["var(--brand-blue)", "var(--brand-teal)", "var(--brand-orange)", "var(--brand)"];
+    return analyticsData.kpis.map((k, idx) => ({
+      label: k.label,
+      value: k.value,
+      desc: k.desc || k.trend,
+      icon: icons[idx % icons.length],
+      color: colors[idx % colors.length]
+    }));
+  }, [analyticsData, attendanceData, assessmentsData]);
+
+  if (analyticsLoading) {
+    return (
+      <div className="space-y-6 text-left">
+        <PageHeader title="School Analytics" subtitle="Loading analytics dashboard..." />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <GlassCard className="lg:col-span-2 p-6 border border-slate-100 bg-white h-96 animate-pulse">
+            <div />
+          </GlassCard>
+          <GlassCard className="lg:col-span-1 p-6 border border-slate-100 bg-white h-96 animate-pulse">
+            <div />
+          </GlassCard>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex h-[60dvh] flex-col items-center justify-center space-y-4 text-center">
+        <AlertCircle className="h-12 w-12 text-brand-orange animate-bounce" />
+        <h3 className="font-display text-lg font-bold text-text-heading">Failed to load School Analytics</h3>
+        <button
+          onClick={() => refetch()}
+          className="px-4 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold hover:bg-brand-navy transition-all cursor-pointer shadow-sm"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -38,15 +144,36 @@ function AdminAnalyticsPage() {
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="space-y-6"
+      className="space-y-6 text-left"
     >
-      <PageHeader title="School Analytics" subtitle="Aggregate diagnostics and development metrics dashboard." />
+      <PageHeader 
+        title="School Analytics" 
+        subtitle="Aggregate diagnostics and development metrics dashboard." 
+        action={
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleExport("pdf")}
+              disabled={exportMutation.isPending}
+              className="rounded-xl border border-slate-100 bg-white px-3 py-2 hover:bg-slate-50 transition-colors flex items-center gap-1.5 font-bold text-xs cursor-pointer disabled:opacity-60 text-text-heading"
+            >
+              <Download className="h-4 w-4 text-slate-500" /> Export PDF
+            </button>
+            <button
+              onClick={() => handleExport("excel")}
+              disabled={exportMutation.isPending}
+              className="rounded-xl border border-slate-100 bg-white px-3 py-2 hover:bg-slate-50 transition-colors flex items-center gap-1.5 font-bold text-xs cursor-pointer disabled:opacity-60 text-text-heading"
+            >
+              <Download className="h-4 w-4 text-slate-500" /> Export Excel
+            </button>
+          </div>
+        }
+      />
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Growth index */}
         <motion.div variants={itemVariants} className="lg:col-span-2">
           <GlassCard className="p-5 border border-border-default/50 bg-white/60">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 text-left">
               <div>
                 <h3 className="font-display text-base font-bold text-text-heading">Development Indices</h3>
                 <p className="text-xs text-text-muted mt-0.5">Cohort averages across the year</p>
@@ -79,7 +206,7 @@ function AdminAnalyticsPage() {
         {/* ILDF stage distribution */}
         <motion.div variants={itemVariants}>
           <GlassCard className="p-5 h-full border border-border-default/50 bg-white/60">
-            <div>
+            <div className="text-left">
               <h3 className="font-display text-base font-bold text-text-heading">ILDF Stage Spread</h3>
               <p className="text-xs text-text-muted mt-0.5">Active stages cohort count</p>
             </div>
@@ -121,13 +248,8 @@ function AdminAnalyticsPage() {
 
         {/* Core Stats */}
         <motion.div variants={itemVariants} className="grid gap-4 sm:grid-cols-2">
-          {[
-            { label: "Active Student Enrollment", value: "500", desc: "+12.4% YoY Growth", icon: Users, color: "var(--brand-blue)" },
-            { label: "AI Diagnostic Completion", value: "88%", desc: "Grade 10 completed tests", icon: Brain, color: "var(--brand-teal)" },
-            { label: "Average Growth Indicator", value: "+22%", desc: "Consolidated development index", icon: TrendingUp, color: "var(--brand-orange)" },
-            { label: "Assigned Advisors", value: "12", desc: "42 Mentees per advisor average", icon: BarChart3, color: "var(--brand)" }
-          ].map((stat, i) => (
-            <GlassCard key={i} className="p-5 border border-border-default/50 bg-white/60 flex flex-col justify-between text-left">
+          {kpiCards.map((stat, i) => (
+            <GlassCard key={i} className="p-5 border border-border-default/50 bg-white/60 flex flex-col justify-between text-left font-semibold text-xs text-text-body">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">{stat.label}</span>
                 <div className="h-8 w-8 rounded-lg flex items-center justify-center bg-slate-50 border border-border-default text-brand-blue" style={{ color: stat.color }}>

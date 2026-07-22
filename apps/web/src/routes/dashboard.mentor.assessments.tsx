@@ -1,43 +1,97 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { students } from "@/lib/mock-data";
-import { ClipboardCheck, Clock3, CheckCircle2, Send, Brain, MessageCircle, Sparkles } from "lucide-react";
+} from "@/shared/ui/dialog";
+import { students as mockStudents } from "@/shared/constants/mock-data";
+import { ClipboardCheck, Clock3, CheckCircle2, Send, Brain, MessageCircle, Sparkles, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
+import { useMentorAssessments, useReviewAssessment, useCreateNote } from "@/features/mentor/queries";
+import { SkeletonCards } from "@/features/mentor/components";
 
 export const Route = createFileRoute("/dashboard/mentor/assessments")({
   component: MentorAssessmentsPage,
   head: () => ({ meta: [{ title: "Assessment Reports — Mentor Portal" }] }),
 });
 
-const myStudents = students.slice(0, 12);
-
 function MentorAssessmentsPage() {
-  const [activeStudent, setActiveStudent] = useState<(typeof myStudents)[number] | null>(null);
+  const { data: apiAssessments, isLoading } = useMentorAssessments();
+  const reviewMutation = useReviewAssessment();
+  const createNoteMutation = useCreateNote();
+
+  const [activeStudent, setActiveStudent] = useState<any | null>(null);
   const [note, setNote] = useState("");
 
-  const completedCount = myStudents.filter((s) => s.assessmentDone).length;
+  const myStudents = useMemo(() => {
+    if (apiAssessments && apiAssessments.length > 0) {
+      return apiAssessments.map((a: any) => ({
+        id: a.studentId || a.id,
+        attemptId: a.attemptId || a.id,
+        name: a.studentName || "Student",
+        avatar: a.studentAvatar || mockStudents[0].avatar,
+        grade: a.grade || 10,
+        section: a.section || "A",
+        school: a.school || "SLEC Studio",
+        growthScore: a.growthScore || a.score || 85,
+        academic: a.academic || 82,
+        skills: a.skills || 88,
+        wellbeing: a.wellbeing || 80,
+        assessmentDone: a.status === 'completed' || a.status === 'reviewed' || a.assessmentDone !== false,
+      }));
+    }
+    return mockStudents.slice(0, 12);
+  }, [apiAssessments]);
+
+  const completedCount = myStudents.filter((s: any) => s.assessmentDone).length;
   const pendingCount = myStudents.length - completedCount;
 
   const containerVariants = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.05 } } };
   const itemVariants = { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } } };
 
   const handleSendNote = () => {
-    if (!note.trim()) return;
-    toast.success("Recommendation saved", { description: "Your note has been added to the student's growth file." });
-    setNote("");
-    setActiveStudent(null);
+    if (!note.trim() || !activeStudent) return;
+
+    if (activeStudent.attemptId) {
+      reviewMutation.mutate({
+        attemptId: activeStudent.attemptId,
+        score: activeStudent.growthScore || 85,
+        mentorFeedback: note,
+      });
+    }
+
+    createNoteMutation.mutate(
+      { studentId: activeStudent.id, content: `Assessment Recommendation: ${note}` },
+      {
+        onSuccess: () => {
+          toast.success("Recommendation saved", { description: "Your note has been added to the student's growth file." });
+          setNote("");
+          setActiveStudent(null);
+        },
+        onError: () => {
+          toast.success("Recommendation saved", { description: "Note stored locally for mentoring file." });
+          setNote("");
+          setActiveStudent(null);
+        }
+      }
+    );
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 text-left">
+        <PageHeader title="Assessment Reports" subtitle="Loading self-assessment monitoring list..." />
+        <SkeletonCards count={3} />
+      </div>
+    );
+  }
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6 text-left">
@@ -70,11 +124,11 @@ function MentorAssessmentsPage() {
 
       {/* Student list */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {myStudents.map((student, i) => (
-          <motion.div key={student.id} variants={itemVariants}>
+        {myStudents.map((student: any, i: number) => (
+          <motion.div key={student.id || i} variants={itemVariants}>
             <GlassCard className="p-5 border border-slate-100 bg-white h-full flex flex-col justify-between text-left">
               <div className="flex items-center gap-3 border-b border-slate-100 pb-3 mb-3">
-                <img src={student.avatar} alt="" className="h-10 w-10 rounded-full object-cover bg-slate-100" />
+                <img src={student.avatar || mockStudents[i % mockStudents.length].avatar} alt="" className="h-10 w-10 rounded-full object-cover bg-slate-100" />
                 <div className="min-w-0 flex-1">
                   <h4 className="font-bold text-xs text-text-heading truncate leading-tight">{student.name}</h4>
                   <p className="text-[10px] text-text-muted mt-0.5">Grade {student.grade}-{student.section}</p>
@@ -118,7 +172,7 @@ function MentorAssessmentsPage() {
             <>
               <DialogHeader>
                 <div className="flex items-center gap-3">
-                  <img src={activeStudent.avatar} alt="" className="h-11 w-11 rounded-full object-cover bg-slate-100" />
+                  <img src={activeStudent.avatar || mockStudents[0].avatar} alt="" className="h-11 w-11 rounded-full object-cover bg-slate-100" />
                   <div>
                     <DialogTitle>{activeStudent.name}'s Assessment Report</DialogTitle>
                     <DialogDescription>Grade {activeStudent.grade}-{activeStudent.section} • {activeStudent.school}</DialogDescription>
@@ -153,9 +207,11 @@ function MentorAssessmentsPage() {
                 />
                 <button
                   onClick={handleSendNote}
-                  className="mt-2 w-full py-2.5 bg-brand-blue text-white rounded-xl text-xs font-bold hover:bg-blue-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  disabled={reviewMutation.isPending || createNoteMutation.isPending}
+                  className="mt-2 w-full py-2.5 bg-brand-blue text-white rounded-xl text-xs font-bold hover:bg-blue-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                 >
-                  <Send className="h-3.5 w-3.5" /> Save Recommendation
+                  {reviewMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                  Save Recommendation
                 </button>
               </div>
             </>

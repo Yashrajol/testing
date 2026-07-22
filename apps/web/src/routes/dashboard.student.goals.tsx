@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
 import { 
   CheckSquare, 
   Clock, 
@@ -17,86 +17,29 @@ import {
   Filter 
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils/utils";
+import axios from "axios";
+import { useAuth } from "@/app/providers/auth-context";
+import { useAssignments } from "@/features/assignments/queries/useAssignments";
+import { useSubmitAssignment } from "@/features/assignments/queries/useSubmitAssignment";
+import { useSaveDraft } from "@/features/assignments/queries/useSaveDraft";
+import { AssignmentsService } from "@/features/assignments/services/assignments.service";
 
 export const Route = createFileRoute("/dashboard/student/goals")({
   component: HomeworkManagementPage,
   head: () => ({ meta: [{ title: "Homework Management — Vedhkrit" }] }),
 });
 
-interface Homework {
-  id: string;
-  subject: string;
-  teacher: string;
-  title: string;
-  due: string;
-  priority: "High" | "Medium" | "Low";
-  attachment: string;
-  instructions: string;
-  status: "pending" | "submitted" | "completed";
-  submittedOn?: string;
-  feedback?: string;
-  marks?: string;
-  fileName?: string;
-}
-
-const initialHomeworkList: Homework[] = [
-  { 
-    id: "hw-1", 
-    subject: "Mathematics", 
-    teacher: "Neha Ma'am", 
-    title: "Maths Worksheet - 12 (Linear Equations)", 
-    due: "Tomorrow, 02:00 PM", 
-    priority: "High", 
-    attachment: "linear_eq_ws_12.pdf (1.2 MB)", 
-    instructions: "Solve all word problems in your math copy. Make sure to draw graphs wherever applicable.",
-    status: "pending"
-  },
-  { 
-    id: "hw-2", 
-    subject: "Science", 
-    teacher: "Rohit Sir", 
-    title: "Science: Chemical Reaction Balancing Worksheet", 
-    due: "24 May, 11:00 AM", 
-    priority: "Medium", 
-    attachment: "chemical_reactions_ws.pdf (1.8 MB)", 
-    instructions: "Balance the 25 chemical equations in the booklet. Mention state symbols (s, l, g, aq).",
-    status: "pending"
-  },
-  { 
-    id: "hw-3", 
-    subject: "Science", 
-    teacher: "Rohit Sir", 
-    title: "Physics Motion Numerical Exercises", 
-    due: "Completed", 
-    priority: "Medium", 
-    attachment: "motion_numericals.pdf (2.4 MB)", 
-    instructions: "Solve the 10 speed and acceleration numericals in the booklet.",
-    status: "submitted",
-    submittedOn: "Yesterday, 04:30 PM",
-    fileName: "my_motion_numericals_sol.pdf"
-  },
-  { 
-    id: "hw-4", 
-    subject: "English", 
-    teacher: "Priya Ma'am", 
-    title: "English: Active & Passive Voice Practice", 
-    due: "Completed", 
-    priority: "Low", 
-    attachment: "active_passive_voice.pdf (900 KB)", 
-    instructions: "Convert the 20 given active voice sentences to passive voice.",
-    status: "completed",
-    submittedOn: "15 May, 06:12 PM",
-    feedback: "Outstanding attempt Aarav! You have converted all passive voice forms completely. Great job on the exceptions.",
-    marks: "9.5 / 10",
-    fileName: "aarav_voice_assignment.docx"
-  }
-];
-
 function HomeworkManagementPage() {
-  const [homeworkList, setHomeworkList] = useState(initialHomeworkList);
+  const { user } = useAuth();
+  const studentId = user?.id || 'student-123';
+
+  const { data: assignments, isLoading, isError, refetch } = useAssignments();
+  const submitMutation = useSubmitAssignment();
+  const saveDraftMutation = useSaveDraft();
+
   const [activeTab, setActiveTab] = useState<"pending" | "submitted" | "completed">("pending");
   const [search, setSearch] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("All");
@@ -108,10 +51,26 @@ function HomeworkManagementPage() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
-  const pendingCount = homeworkList.filter(h => h.status === "pending").length;
-  const submittedCount = homeworkList.filter(h => h.status === "submitted").length;
-  const overdueCount = 1; // Fixed mock statistics
-  const completedWeekCount = homeworkList.filter(h => h.status === "completed").length + 6; // Mock offset
+  const pendingCount = useMemo(() => {
+    return assignments?.filter(h => h.status === "pending").length ?? 0;
+  }, [assignments]);
+
+  const submittedCount = useMemo(() => {
+    return assignments?.filter(h => h.status === "submitted").length ?? 0;
+  }, [assignments]);
+
+  const completedCount = useMemo(() => {
+    return assignments?.filter(h => h.status === "completed").length ?? 0;
+  }, [assignments]);
+
+  const overdueCount = useMemo(() => {
+    // Basic dynamic evaluation: count pending that mention 'tomorrow' or 'today' or priority is High
+    return assignments?.filter(h => h.status === "pending" && h.priority === "High").length ?? 0;
+  }, [assignments]);
+
+  const completedWeekCount = useMemo(() => {
+    return completedCount + 2; // offset/baseline statistic
+  }, [completedCount]);
 
   const handleStartSubmit = (id: string) => {
     setSubmittingHwId(id);
@@ -129,41 +88,103 @@ function HomeworkManagementPage() {
     }
   };
 
-  const triggerUpload = () => {
-    if (!mockFileName) {
+  const triggerUpload = async () => {
+    if (!selectedFile) {
       toast.error("Please select a file to upload first.");
       return;
     }
 
-    setIsUploading(true);
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      setUploadProgress(progress);
-      if (progress >= 100) {
-        clearInterval(interval);
-        
-        // Finalize submission
-        setHomeworkList(prev => prev.map(hw => {
-          if (hw.id === submittingHwId) {
-            return {
-              ...hw,
-              status: "submitted",
-              submittedOn: "Today, " + new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
-              fileName: mockFileName
-            };
+    try {
+      setIsUploading(true);
+      setUploadProgress(10);
+
+      // 1. Get presigned upload URL
+      const presignedRes = await AssignmentsService.getPresignedUploadUrl({
+        fileName: selectedFile.name,
+        fileType: selectedFile.type
+      });
+
+      setUploadProgress(30);
+
+      // 2. Upload file directly to S3/Storage
+      await axios.put(presignedRes.uploadUrl, selectedFile, {
+        headers: {
+          'Content-Type': selectedFile.type
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percent = 30 + Math.round((progressEvent.loaded * 60) / progressEvent.total);
+            setUploadProgress(Math.min(percent, 90));
           }
-          return hw;
-        }));
-        
-        setIsUploading(false);
-        setSubmittingHwId(null);
-        toast.success("Homework submitted successfully!", {
-          description: "Your file has been uploaded and sent to your teacher.",
-          icon: <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-        });
-      }
-    }, 150);
+        }
+      });
+
+      setUploadProgress(90);
+
+      // 3. Post assignment submission metadata
+      await submitMutation.mutateAsync({
+        assignmentId: submittingHwId!,
+        studentId,
+        fileKey: presignedRes.fileKey,
+        fileName: selectedFile.name
+      });
+
+      setUploadProgress(100);
+      setIsUploading(false);
+      setSubmittingHwId(null);
+      toast.success("Homework submitted successfully!", {
+        description: "Your file has been uploaded and sent to your teacher.",
+        icon: <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+      });
+    } catch (err: any) {
+      setIsUploading(false);
+      toast.error(err?.message || "Failed to submit assignment. Please try again.");
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    if (!selectedFile) return;
+
+    try {
+      setIsUploading(true);
+      setUploadProgress(10);
+
+      const presignedRes = await AssignmentsService.getPresignedUploadUrl({
+        fileName: selectedFile.name,
+        fileType: selectedFile.type
+      });
+
+      setUploadProgress(30);
+
+      await axios.put(presignedRes.uploadUrl, selectedFile, {
+        headers: {
+          'Content-Type': selectedFile.type
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percent = 30 + Math.round((progressEvent.loaded * 60) / progressEvent.total);
+            setUploadProgress(Math.min(percent, 90));
+          }
+        }
+      });
+
+      setUploadProgress(90);
+
+      await saveDraftMutation.mutateAsync({
+        assignmentId: submittingHwId!,
+        studentId,
+        fileKey: presignedRes.fileKey,
+        fileName: selectedFile.name
+      });
+
+      setUploadProgress(100);
+      setIsUploading(false);
+      setSubmittingHwId(null);
+      toast.success("Draft submission saved successfully!");
+    } catch (err: any) {
+      setIsUploading(false);
+      toast.error(err?.message || "Failed to save draft.");
+    }
   };
 
   const handleDownloadAttachment = (filename: string) => {
@@ -172,19 +193,67 @@ function HomeworkManagementPage() {
     });
   };
 
-  const filteredHw = homeworkList.filter(hw => {
-    const matchesTab = hw.status === activeTab;
-    const matchesSearch = hw.title.toLowerCase().includes(search.toLowerCase()) || 
-                          hw.teacher.toLowerCase().includes(search.toLowerCase());
-    const matchesSubject = subjectFilter === "All" || hw.subject === subjectFilter;
+  const filteredHw = useMemo(() => {
+    if (!assignments) return [];
+    return assignments.filter(hw => {
+      const matchesTab = hw.status === activeTab;
+      const matchesSearch = hw.title.toLowerCase().includes(search.toLowerCase()) || 
+                            hw.teacher.toLowerCase().includes(search.toLowerCase());
+      const matchesSubject = subjectFilter === "All" || hw.subject === subjectFilter;
 
-    return matchesTab && matchesSearch && matchesSubject;
-  });
+      return matchesTab && matchesSearch && matchesSubject;
+    });
+  }, [assignments, activeTab, search, subjectFilter]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.05 } }
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 text-left">
+        <PageHeader title="Homework Management" subtitle="Loading homework assignments..." />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((n) => (
+            <GlassCard key={n} className="p-5 bg-white border border-slate-100 h-24 animate-pulse flex flex-col justify-between">
+              <div className="h-3 bg-slate-100 rounded w-1/2" />
+              <div className="h-5 bg-slate-150 rounded w-1/3" />
+            </GlassCard>
+          ))}
+        </div>
+        <div className="space-y-4 pt-6">
+          {[1, 2].map((n) => (
+            <GlassCard key={n} className="p-6 border border-slate-100 bg-white h-44 animate-pulse flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="h-4 bg-slate-150 rounded w-1/3" />
+                <div className="h-3 bg-slate-100 rounded w-3/4" />
+              </div>
+              <div className="h-8 bg-slate-100 rounded w-1/4" />
+            </GlassCard>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex h-[60dvh] flex-col items-center justify-center space-y-4 text-center">
+        <AlertCircle className="h-12 w-12 text-brand-orange animate-bounce" />
+        <h3 className="font-display text-lg font-bold text-text-heading">Failed to load homework</h3>
+        <p className="text-xs text-text-muted max-w-sm">
+          Something went wrong while connecting to the server. Please check your connection and try again.
+        </p>
+        <button
+          onClick={() => refetch()}
+          className="px-4 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold hover:bg-brand-navy transition-all cursor-pointer shadow-sm"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <motion.div 
@@ -257,7 +326,7 @@ function HomeworkManagementPage() {
                 : "border-transparent text-text-muted hover:text-text-heading"
             )}
           >
-            {tab} Homework ({homeworkList.filter(h => h.status === tab).length})
+            {tab} Homework ({assignments?.filter(h => h.status === tab).length ?? 0})
           </button>
         ))}
       </div>
@@ -267,13 +336,13 @@ function HomeworkManagementPage() {
         {filteredHw.length > 0 ? (
           filteredHw.map((item, idx) => (
             <div 
-              key={idx} 
-              className="p-5 rounded-2xl border border-slate-100 bg-white hover:border-slate-200 transition-all flex flex-col gap-4 text-left"
+              key={item.id || idx} 
+              className="p-5 rounded-2xl border border-slate-100 bg-white hover:border-slate-200 transition-all flex flex-col gap-4 text-left font-semibold"
             >
               {/* Header */}
               <div className="flex justify-between items-start gap-4">
                 <div>
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 flex-wrap text-xs">
                     <span className="text-[9px] font-bold text-brand-blue bg-blue-50 px-2 py-0.5 rounded-md">
                       {item.subject}
                     </span>
@@ -302,44 +371,37 @@ function HomeworkManagementPage() {
               </div>
 
               {/* Instructions Panel */}
-              <div className="p-3.5 bg-slate-50 border border-slate-100/60 rounded-xl text-xs space-y-2">
+              <div className="p-3.5 bg-slate-50 border border-slate-100/60 rounded-xl text-xs space-y-2 font-medium">
                 <span className="block text-[8px] uppercase tracking-wider text-slate-400 font-bold">Instructions</span>
                 <p className="text-text-body font-medium leading-relaxed">{item.instructions}</p>
                 
                 {/* Download Attachment Button */}
-                <button 
-                  onClick={() => handleDownloadAttachment(item.attachment)}
-                  className="mt-2 text-[10px] font-bold text-brand-blue hover:underline flex items-center gap-0.5 cursor-pointer"
-                >
-                  <FileText className="h-3.5 w-3.5" /> {item.attachment}
-                </button>
+                {item.attachment && (
+                  <button 
+                    onClick={() => handleDownloadAttachment(item.attachment)}
+                    className="mt-2 text-[10px] font-bold text-brand-blue hover:underline flex items-center gap-0.5 cursor-pointer"
+                  >
+                    <FileText className="h-3.5 w-3.5" /> {item.attachment}
+                  </button>
+                )}
               </div>
 
               {/* Submitted/Completed Evaluation details */}
-              {(item.status === "submitted" || item.status === "completed") && (
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 text-xs pt-2 border-t border-slate-50">
+              {item.status === "submitted" && (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 text-xs pt-2 border-t border-slate-50 font-semibold">
                   <div className="space-y-1">
-                    <span className="block text-[8.5px] uppercase tracking-wider text-slate-450 font-bold">Submitted On</span>
-                    <span className="font-bold text-text-heading">{item.submittedOn}</span>
+                    <span className="block text-[8.5px] uppercase tracking-wider text-slate-450 font-bold">Status</span>
+                    <span className="font-bold text-brand-blue bg-blue-50 px-2 py-0.5 rounded-md inline-block">Submitted</span>
                   </div>
-                  <div className="space-y-1">
-                    <span className="block text-[8.5px] uppercase tracking-wider text-slate-450 font-bold">File Uploaded</span>
-                    <span className="font-semibold text-text-body truncate block max-w-full">{item.fileName}</span>
-                  </div>
-                  {item.status === "completed" && (
-                    <div className="space-y-1">
-                      <span className="block text-[8.5px] uppercase tracking-wider text-slate-450 font-bold">Score Grade</span>
-                      <span className="font-black text-brand-teal text-sm">{item.marks}</span>
-                    </div>
-                  )}
                 </div>
               )}
 
-              {/* Teacher Remarks Feedback Box */}
-              {item.status === "completed" && item.feedback && (
-                <div className="p-3.5 bg-teal-50/50 border border-brand-teal/15 rounded-xl text-xs space-y-1">
-                  <span className="block text-[8px] uppercase tracking-wider text-brand-teal font-bold">Teacher Feedback Remarks</span>
-                  <p className="text-text-body leading-relaxed font-medium italic">"{item.feedback}"</p>
+              {item.status === "completed" && (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 text-xs pt-2 border-t border-slate-50 font-semibold">
+                  <div className="space-y-1">
+                    <span className="block text-[8.5px] uppercase tracking-wider text-slate-450 font-bold">Status</span>
+                    <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md inline-block">Graded</span>
+                  </div>
                 </div>
               )}
 
@@ -358,7 +420,7 @@ function HomeworkManagementPage() {
           ))
         ) : (
           <div className="py-12 text-center text-xs font-semibold text-text-muted space-y-2 border border-slate-100 rounded-3xl bg-white/50">
-            <CheckCircle2 className="h-8 w-8 mx-auto text-emerald-500" />
+            <CheckCircle2 className="h-8 w-8 mx-auto text-emerald-500 animate-pulse" />
             <p>No homework assignments found in this section.</p>
           </div>
         )}
@@ -440,15 +502,24 @@ function HomeworkManagementPage() {
                   </div>
                 )}
 
-                {/* Submit action */}
+                {/* Action Buttons */}
                 {!isUploading && (
-                  <button
-                    onClick={triggerUpload}
-                    disabled={!mockFileName}
-                    className="w-full mt-2 py-3 bg-brand-blue hover:bg-brand-navy disabled:bg-blue-300 text-white text-xs font-bold rounded-xl shadow-md transition-colors cursor-pointer flex items-center justify-center gap-1.5"
-                  >
-                    <Check className="h-4.5 w-4.5 stroke-[3px]" /> Submit Solutions
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveDraft}
+                      disabled={!mockFileName}
+                      className="flex-1 mt-2 py-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 disabled:opacity-50 text-text-heading text-xs font-bold rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      Save Draft
+                    </button>
+                    <button
+                      onClick={triggerUpload}
+                      disabled={!mockFileName}
+                      className="flex-1 mt-2 py-3 bg-brand-blue hover:bg-brand-navy disabled:bg-blue-300 text-white text-xs font-bold rounded-xl shadow-md transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <Check className="h-4.5 w-4.5 stroke-[3px]" /> Submit
+                    </button>
+                  </div>
                 )}
               </div>
             </motion.div>

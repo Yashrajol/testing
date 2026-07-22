@@ -1,25 +1,75 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageHeader } from "@/components/dashboard-shell";
-import { GlassCard } from "@/components/glass-card";
-import { students } from "@/lib/mock-data";
-import { ClipboardList, Plus, AlertCircle, Edit, Check } from "lucide-react";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
+import { GlassCard } from "@/shared/ui/glass-card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/shared/ui/dialog";
+import { students as mockStudents } from "@/shared/constants/mock-data";
+import { Plus, Edit, Loader2, Check } from "lucide-react";
 import { motion } from "motion/react";
+import { useState, useMemo } from "react";
+import { useMentorStudents, useCreateNote } from "@/features/mentor/queries";
+import { SkeletonCards } from "@/features/mentor/components";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard/mentor/plans")({
   component: MentorPlansPage,
   head: () => ({ meta: [{ title: "Action Plans — Mentor Portal" }] }),
 });
 
-const myStudents = students.slice(0, 8);
+export function MentorPlansPage() {
+  const { data: studentsData, isLoading } = useMentorStudents();
+  const createNoteMutation = useCreateNote();
 
-const activePlans = [
-  { s: myStudents[0].name, p: "Stage Align: pick stream-fit electives by Apr 15", status: "In Progress", progress: 75 },
-  { s: myStudents[3].name, p: "Stage Explore: complete 2 career-exploration tasks", status: "In Progress", progress: 40 },
-  { s: myStudents[5].name, p: "Stage Discover: VAK assessment + reflection journal", status: "Completed", progress: 100 },
-  { s: myStudents[7].name, p: "Stage Prepare: build mock-interview confidence", status: "Not Started", progress: 0 },
-];
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState("");
+  const [planTitle, setPlanTitle] = useState("");
+  const [stage, setStage] = useState("Stage Align");
 
-function MentorPlansPage() {
+  const [localPlans, setLocalPlans] = useState([
+    { s: "Yash Rajole", p: "Stage Align: pick stream-fit electives by Apr 15", status: "In Progress", progress: 75 },
+    { s: "Aman Patil", p: "Stage Explore: complete 2 career-exploration tasks", status: "In Progress", progress: 40 },
+    { s: "Neha Mahajan", p: "Stage Discover: VAK assessment + reflection journal", status: "Completed", progress: 100 },
+    { s: "Riya Sharma", p: "Stage Prepare: build mock-interview confidence", status: "Not Started", progress: 0 },
+  ]);
+
+  const mentees = useMemo(() => {
+    return studentsData || mockStudents.slice(0, 8);
+  }, [studentsData]);
+
+  const handleCreatePlan = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!planTitle || !selectedStudentId) {
+      toast.error("Required fields missing");
+      return;
+    }
+
+    const studentObj = mentees.find((m: any) => m.id === selectedStudentId) || mentees[0];
+
+    const newPlan = {
+      s: studentObj.name,
+      p: `${stage}: ${planTitle}`,
+      status: "In Progress",
+      progress: 25,
+    };
+
+    setLocalPlans([newPlan, ...localPlans]);
+
+    createNoteMutation.mutate({
+      studentId: selectedStudentId,
+      content: `Created Action Plan [${stage}]: ${planTitle}`,
+    });
+
+    toast.success("Action Plan created!", { description: `New plan assigned to ${studentObj.name}.` });
+    setIsModalOpen(false);
+    setPlanTitle("");
+    setSelectedStudentId("");
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -33,26 +83,38 @@ function MentorPlansPage() {
     show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6 text-left">
+        <PageHeader title="Action Plans Builder" subtitle="Loading action plans..." />
+        <SkeletonCards count={4} />
+      </div>
+    );
+  }
+
   return (
     <motion.div 
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="space-y-6"
+      className="space-y-6 text-left"
     >
       <PageHeader 
         title="Action Plans Builder" 
         subtitle="Construct milestones and skill-development plans for your assigned mentees." 
         action={
-          <button className="rounded-xl gradient-brand px-4 py-2 text-xs font-bold text-white shadow-md hover:opacity-95 transition-all cursor-pointer">
-            <Plus className="h-4 w-4 inline mr-1" />
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="rounded-xl gradient-brand px-4 py-2 text-xs font-bold text-white shadow-md hover:opacity-95 transition-all cursor-pointer inline-flex items-center gap-1.5"
+          >
+            <Plus className="h-4 w-4" />
             Create Action Plan
           </button>
         }
       />
 
       <div className="grid gap-4">
-        {activePlans.map((plan, i) => (
+        {localPlans.map((plan, i) => (
           <motion.div key={i} variants={itemVariants}>
             <GlassCard className="p-5 border border-border-default/50 bg-white/60 text-left">
               <div className="flex flex-wrap items-center justify-between gap-4">
@@ -93,6 +155,69 @@ function MentorPlansPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* Modal for Creating Action Plan */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-md text-left">
+          <DialogHeader>
+            <DialogTitle>Create Mentee Action Plan</DialogTitle>
+            <DialogDescription>Set milestone goals for personalized development.</DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleCreatePlan} className="space-y-3 text-xs">
+            <div>
+              <label className="font-bold text-text-heading block mb-1">Assigned Student</label>
+              <select
+                value={selectedStudentId}
+                onChange={(e) => setSelectedStudentId(e.target.value)}
+                required
+                className="w-full rounded-xl border border-slate-200 bg-white p-2.5 outline-none focus:border-brand-blue"
+              >
+                <option value="">Select a mentee...</option>
+                {mentees.map((m: any) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name} (Grade {m.grade || 10})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="font-bold text-text-heading block mb-1">Framework Stage</label>
+              <select
+                value={stage}
+                onChange={(e) => setStage(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-white p-2.5 outline-none focus:border-brand-blue"
+              >
+                <option value="Stage Discover">Stage Discover</option>
+                <option value="Stage Align">Stage Align</option>
+                <option value="Stage Explore">Stage Explore</option>
+                <option value="Stage Prepare">Stage Prepare</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="font-bold text-text-heading block mb-1">Action Goal Description</label>
+              <textarea
+                value={planTitle}
+                onChange={(e) => setPlanTitle(e.target.value)}
+                placeholder="e.g. Complete VAK diagnostic reflection and select PCM electives"
+                required
+                className="w-full rounded-xl border border-slate-200 bg-white p-2.5 outline-none focus:border-brand-blue min-h-20 resize-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={createNoteMutation.isPending}
+              className="mt-3 w-full py-2.5 bg-brand-blue text-white rounded-xl font-bold hover:bg-blue-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              {createNoteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+              Save & Dispatch Plan
+            </button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

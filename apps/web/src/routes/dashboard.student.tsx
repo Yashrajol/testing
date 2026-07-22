@@ -1,5 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { DashboardShell } from "@/components/dashboard-shell";
+import { DashboardShell } from "@/app/layouts/dashboard-shell";
+import { useAuth } from "@/app/providers/auth-context";
+import { RouteGuard } from "@/shared/security/route-guard";
 import {
   LayoutDashboard,
   BookOpen,
@@ -11,10 +13,7 @@ import {
   Target,
   Users,
   Award,
-  Calendar,
-  MessageSquare,
   User,
-  Settings,
   CalendarDays,
   Compass,
   Puzzle
@@ -43,9 +42,12 @@ const items = [
 ];
 
 function StudentDashboardLayout() {
+  const { user } = useAuth();
   return (
-    <DashboardShell role="student" roleLabel="Student" userName="Aarav Sharma" items={items}>
-      <Outlet />
-    </DashboardShell>
+    <RouteGuard allowedRoles={["student", "admin", "super"]}>
+      <DashboardShell role="student" roleLabel="Student" userName={user?.name || "Student"} items={items}>
+        <Outlet />
+      </DashboardShell>
+    </RouteGuard>
   );
 }

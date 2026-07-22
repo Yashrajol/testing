@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShieldCheck, Compass, GitMerge, FileCheck, Award, ArrowRight, LayoutGrid, Rocket } from "lucide-react";
 import { motion } from "motion/react";
-import { GlassCard } from "@/components/glass-card";
+import { GlassCard } from "@/shared/ui/glass-card";
 
 export const Route = createFileRoute("/_marketing/framework")({
   component: Framework,

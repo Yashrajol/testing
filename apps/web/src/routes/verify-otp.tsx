@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { AuthShell, AuthInput, AuthButton } from "@/components/auth-shell";
-import { FormError } from "@/components/form-error";
+import { AuthShell, AuthInput, AuthButton } from "@/app/layouts/auth-shell";
+import { FormError } from "@/shared/ui/form-error";
 import { useVerifyOtpMutation } from "@/lib/api";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/app/providers/auth-context";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";

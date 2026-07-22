@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GlassCard } from "@/components/glass-card";
-import { Logo } from "@/components/logo";
-import { assessments, ildfStages } from "@/lib/mock-data";
+import { GlassCard } from "@/shared/ui/glass-card";
+import { Logo } from "@/shared/ui/logo";
+import { assessments, ildfStages } from "@/shared/constants/mock-data";
 import { Brain, Target, Sparkles, Heart, Compass, Users, ArrowRight, Clock, CheckCircle2, PlayCircle } from "lucide-react";
 
 export const Route = createFileRoute("/assessments")({

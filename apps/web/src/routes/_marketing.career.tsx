@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from "recharts";
 import { Compass, Sparkles, BookOpen, GraduationCap, ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion } from "motion/react";
-import { GlassCard } from "@/components/glass-card";
+import { GlassCard } from "@/shared/ui/glass-card";
 
 export const Route = createFileRoute("/_marketing/career")({
   component: Career,

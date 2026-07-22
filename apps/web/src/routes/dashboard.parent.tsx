@@ -1,5 +1,7 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { DashboardShell } from "@/components/dashboard-shell";
+import { DashboardShell } from "@/app/layouts/dashboard-shell";
+import { useAuth } from "@/app/providers/auth-context";
+import { RouteGuard } from "@/shared/security/route-guard";
 import { LayoutDashboard, TrendingUp, UserCheck, Calendar, MessageSquare, FileText, User, Sparkles, ClipboardCheck, Target } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/parent")({
@@ -21,9 +23,12 @@ const items = [
 ];
 
 function ParentDashboardLayout() {
+  const { user } = useAuth();
   return (
-    <DashboardShell role="parent" roleLabel="Parent Portal" userName="Mr. Rohan Sharma" items={items}>
-      <Outlet />
-    </DashboardShell>
+    <RouteGuard allowedRoles={["parent", "admin", "super"]}>
+      <DashboardShell role="parent" roleLabel="Parent Portal" userName={user?.name || "Parent"} items={items}>
+        <Outlet />
+      </DashboardShell>
+    </RouteGuard>
   );
 }
