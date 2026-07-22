@@ -22,9 +22,9 @@ function AdminAnalyticsPage() {
 
   const handleExport = async (format: string) => {
     try {
-      const res = await exportMutation.mutateAsync(format);
+      const res = await exportMutation.mutateAsync({ reportType: 'admin', format: format as any });
       toast.success(`${format.toUpperCase()} report exported!`, {
-        description: `Your file ${res.fileName || "report"} is downloading from ${res.downloadUrl || "#"}`
+        description: `Your file ${res.fileName || "report"} is downloading from ${res.fileUrl || "#"}`
       });
     } catch {
       toast.error("Failed to export report. Please try again.");
@@ -32,46 +32,47 @@ function AdminAnalyticsPage() {
   };
 
   const monthlyGrowth = useMemo(() => {
-    if (!analyticsData?.developmentTrends || analyticsData.developmentTrends.length === 0) {
-      return [
-        { month: "Jan", academic: 72, skills: 65, wellbeing: 78 },
-        { month: "Feb", academic: 74, skills: 66, wellbeing: 79 },
-        { month: "Mar", academic: 76, skills: 68, wellbeing: 81 },
-        { month: "Apr", academic: 79, skills: 71, wellbeing: 80 },
-        { month: "May", academic: 81, skills: 74, wellbeing: 82 },
-      ];
-    }
-    return analyticsData.developmentTrends;
+    const defaultData = [
+      { month: "Jan", academic: 72, skills: 65, wellbeing: 78 },
+      { month: "Feb", academic: 74, skills: 66, wellbeing: 79 },
+      { month: "Mar", academic: 76, skills: 68, wellbeing: 81 },
+      { month: "Apr", academic: 79, skills: 71, wellbeing: 80 },
+      { month: "May", academic: 81, skills: 74, wellbeing: 82 },
+    ];
+    if (!analyticsData || !('developmentTrends' in analyticsData)) return defaultData;
+    const trends = (analyticsData as any).developmentTrends;
+    return Array.isArray(trends) && trends.length > 0 ? trends : defaultData;
   }, [analyticsData]);
 
   const stagesDistribution = useMemo(() => {
-    if (!analyticsData?.stageDistribution || analyticsData.stageDistribution.length === 0) {
-      return [
-        { name: "Discover", value: 142, color: "var(--brand-blue)" },
-        { name: "Explore", value: 118, color: "var(--brand-teal)" },
-        { name: "Align", value: 96, color: "var(--brand-orange)" },
-        { name: "Prepare", value: 84, color: "var(--brand)" },
-        { name: "Achieve", value: 60, color: "var(--brand-purple)" },
-      ];
-    }
+    const defaultData = [
+      { name: "Discover", value: 142, color: "var(--brand-blue)" },
+      { name: "Explore", value: 118, color: "var(--brand-teal)" },
+      { name: "Align", value: 96, color: "var(--brand-orange)" },
+      { name: "Prepare", value: 84, color: "var(--brand)" },
+      { name: "Achieve", value: 60, color: "var(--brand-purple)" },
+    ];
+    if (!analyticsData || !('stageDistribution' in analyticsData)) return defaultData;
+    const dist = (analyticsData as any).stageDistribution;
+    if (!Array.isArray(dist) || dist.length === 0) return defaultData;
     const colors = ["var(--brand-blue)", "var(--brand-teal)", "var(--brand-orange)", "var(--brand)", "var(--brand-purple)"];
-    return analyticsData.stageDistribution.map((item, idx) => ({
+    return dist.map((item: any, idx: number) => ({
       ...item,
       color: item.color || colors[idx % colors.length]
     }));
   }, [analyticsData]);
 
   const radarData = useMemo(() => {
-    if (!analyticsData?.baselineDimensions || analyticsData.baselineDimensions.length === 0) {
-      return [
-        { dimension: "Cognitive", score: 72, benchmark: 65 },
-        { dimension: "Aptitude", score: 68, benchmark: 60 },
-        { dimension: "Academic", score: 81, benchmark: 72 },
-        { dimension: "Interactive", score: 75, benchmark: 68 },
-        { dimension: "Emotional", score: 70, benchmark: 62 },
-      ];
-    }
-    return analyticsData.baselineDimensions;
+    const defaultData = [
+      { dimension: "Cognitive", score: 72, benchmark: 65 },
+      { dimension: "Aptitude", score: 68, benchmark: 60 },
+      { dimension: "Academic", score: 81, benchmark: 72 },
+      { dimension: "Interactive", score: 75, benchmark: 68 },
+      { dimension: "Emotional", score: 70, benchmark: 62 },
+    ];
+    if (!analyticsData || !('baselineDimensions' in analyticsData)) return defaultData;
+    const dims = (analyticsData as any).baselineDimensions;
+    return Array.isArray(dims) && dims.length > 0 ? dims : defaultData;
   }, [analyticsData]);
 
   const kpiCards = useMemo(() => {
@@ -86,10 +87,10 @@ function AdminAnalyticsPage() {
     }
     const icons = [Users, Brain, TrendingUp, BarChart3];
     const colors = ["var(--brand-blue)", "var(--brand-teal)", "var(--brand-orange)", "var(--brand)"];
-    return analyticsData.kpis.map((k, idx) => ({
+    return analyticsData.kpis.map((k: any, idx: number) => ({
       label: k.label,
       value: k.value,
-      desc: k.desc || k.trend,
+      desc: k.desc || k.change || k.period || k.trend,
       icon: icons[idx % icons.length],
       color: colors[idx % colors.length]
     }));

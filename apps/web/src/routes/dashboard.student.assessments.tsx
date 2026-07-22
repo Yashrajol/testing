@@ -166,17 +166,17 @@ function AssessmentsPage() {
         <PageHeader title="Assessments" subtitle="Loading tests and performance data..." />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((n) => (
-            <GlassCard key={n} className="p-5 bg-white border border-slate-100 h-24 animate-pulse flex flex-col justify-between" />
+            <GlassCard key={n} className="p-5 bg-white border border-slate-100 h-24 animate-pulse flex flex-col justify-between"><div /></GlassCard>
           ))}
         </div>
         <div className="grid gap-6 lg:grid-cols-3 pt-6">
           <div className="lg:col-span-2 space-y-4">
             {[1, 2].map((n) => (
-              <GlassCard key={n} className="p-6 border border-slate-100 bg-white h-44 animate-pulse flex flex-col justify-between" />
+              <GlassCard key={n} className="p-6 border border-slate-100 bg-white h-44 animate-pulse flex flex-col justify-between"><div /></GlassCard>
             ))}
           </div>
           <div className="lg:col-span-1 space-y-6">
-            <GlassCard className="p-5 border border-slate-100 bg-white h-48 animate-pulse" />
+            <GlassCard className="p-5 border border-slate-100 bg-white h-48 animate-pulse"><div /></GlassCard>
           </div>
         </div>
       </div>
