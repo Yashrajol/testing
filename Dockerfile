@@ -7,22 +7,18 @@ RUN apk add --no-cache openssl python3 make g++
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
-COPY turbo.json ./
-COPY packages/ ./packages/
-COPY apps/api/package*.json ./apps/api/
-COPY apps/api/ ./apps/api/
-COPY .npmrc ./
+# Copy the entire monorepo source code
+COPY . .
 
-# Install packages
-RUN npm ci
+# Install packages, then dedupe so @nestjs/common/core hoist to the root
+# node_modules. Without this, npm nests per-workspace copies and root-level
+# packages (@nestjs/config, throttler, schedule) fail to resolve @nestjs/common.
+RUN npm install
+RUN npm dedupe
 
 # Run prisma generate and build the API and its dependencies
 RUN npm run db:generate --workspace=@vedhkrit/database
 RUN npx turbo run build --filter=@vedhkrit/api...
-
-# Drop dev dependencies, keeping the generated Prisma client.
-RUN npm prune --omit=dev
 
 
 FROM node:20-alpine AS runner
@@ -33,13 +29,10 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 
-COPY --from=builder /usr/src/app/node_modules node_modules/
-COPY --from=builder /usr/src/app/package.json package.json
-COPY --from=builder /usr/src/app/packages packages/
-COPY --from=builder /usr/src/app/apps/api/dist apps/api/dist/
-COPY --from=builder /usr/src/app/apps/api/package.json apps/api/package.json
+# Copy the entire workspace build output and dependencies from builder stage
+COPY --from=builder /usr/src/app ./
 
 # Render injects PORT; main.ts falls back to 5000 locally.
 EXPOSE 5000
 
-CMD ["node", "apps/api/dist/main.js"]
+CMD ["node", "apps/api/dist/apps/api/src/main.js"]

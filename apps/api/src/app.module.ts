@@ -17,6 +17,10 @@ import { AssessmentsModule } from './assessments/assessments.module';
 import { GoalsModule } from './goals/goals.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { AuthModule } from './modules/auth/auth.module';
+// Legacy global auth module: provides AuthService consumed by the portal
+// controllers' AuthGuard (src/auth/auth.guard). Global, so AuthService is
+// available app-wide without each module importing it explicitly.
+import { AuthModule as LegacyAuthModule } from './auth/auth.module';
 import { OrganizationModule } from './modules/organization/organization.module';
 import { IdentityModule } from './modules/identity/identity.module';
 import { AcademicsModule } from './modules/academics/academics.module';
@@ -51,6 +55,7 @@ import { IntegrationsModule } from './modules/integrations/integrations.module';
     AssessmentsModule,
     GoalsModule,
     SessionsModule,
+    LegacyAuthModule,
     AuthModule,
     OrganizationModule,
     IdentityModule,
