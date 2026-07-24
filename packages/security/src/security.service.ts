@@ -1,5 +1,3 @@
-import { Injectable, Logger } from '@nestjs/common';
-
 export interface SecurityConfigOptions {
   enableHelmet?: boolean;
   enableCors?: boolean;
@@ -9,10 +7,7 @@ export interface SecurityConfigOptions {
   rateLimitMaxRequests?: number;
 }
 
-@Injectable()
 export class SecurityService {
-  private readonly logger = new Logger(SecurityService.name);
-
   getRecommendedOptions(): SecurityConfigOptions {
     return {
       enableHelmet: true,
@@ -28,3 +23,5 @@ export class SecurityService {
     return input.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
   }
 }
+
+export const securityService = new SecurityService();

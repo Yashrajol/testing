@@ -1,5 +1,3 @@
-import { Injectable } from '@nestjs/common';
-
 export interface AuditRecord {
   userId?: string;
   action: string;
@@ -12,7 +10,6 @@ export interface AuditRecord {
   timestamp: Date;
 }
 
-@Injectable()
 export class AuditService {
   private readonly records: AuditRecord[] = [];
 
@@ -24,3 +21,5 @@ export class AuditService {
     return [...this.records];
   }
 }
+
+export const auditService = new AuditService();

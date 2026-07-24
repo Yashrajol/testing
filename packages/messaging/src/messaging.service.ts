@@ -1,4 +1,3 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { EventEmitter } from 'events';
 
 export interface OutboxMessage {
@@ -9,11 +8,10 @@ export interface OutboxMessage {
   publishedAt?: Date;
 }
 
-@Injectable()
-export class MessageBus implements OnModuleInit, OnModuleDestroy {
+export class MessageBus {
   private readonly emitter = new EventEmitter();
 
-  async onModuleInit() {
+  constructor() {
     this.emitter.setMaxListeners(100);
   }
 
@@ -33,7 +31,9 @@ export class MessageBus implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  async onModuleDestroy() {
+  destroy() {
     this.emitter.removeAllListeners();
   }
 }
+
+export const messageBus = new MessageBus();

@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -16,7 +15,6 @@ export interface IStorageDriver {
   delete(filename: string): Promise<void>;
 }
 
-@Injectable()
 export class LocalStorageDriver implements IStorageDriver {
   private readonly uploadDir: string;
 
@@ -51,9 +49,8 @@ export class LocalStorageDriver implements IStorageDriver {
   }
 }
 
-@Injectable()
 export class StorageService {
-  constructor(private readonly driver: LocalStorageDriver) {}
+  constructor(private readonly driver: IStorageDriver = new LocalStorageDriver()) {}
 
   async uploadFile(file: Buffer, filename: string, mimeType: string): Promise<FileMetadata> {
     return this.driver.upload(file, filename, mimeType);
@@ -67,3 +64,5 @@ export class StorageService {
     return this.driver.delete(filename);
   }
 }
+
+export const storageService = new StorageService();

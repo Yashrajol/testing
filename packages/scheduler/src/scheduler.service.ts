@@ -1,5 +1,3 @@
-import { Injectable, Logger } from '@nestjs/common';
-
 export interface JobDefinition {
   id: string;
   name: string;
@@ -9,14 +7,12 @@ export interface JobDefinition {
   task: () => Promise<void>;
 }
 
-@Injectable()
 export class SchedulerService {
-  private readonly logger = new Logger(SchedulerService.name);
   private readonly activeJobs = new Map<string, JobDefinition>();
 
   registerJob(job: JobDefinition): void {
     this.activeJobs.set(job.id, job);
-    this.logger.log(`Registered background job: ${job.name} (${job.id})`);
+    console.log(`[SchedulerService] Registered background job: ${job.name} (${job.id})`);
   }
 
   async executeWithRetry(jobId: string): Promise<void> {
@@ -32,12 +28,12 @@ export class SchedulerService {
     while (attempt < maxRetries && !success) {
       try {
         attempt++;
-        this.logger.log(`Executing job ${job.name} (Attempt ${attempt}/${maxRetries})`);
+        console.log(`[SchedulerService] Executing job ${job.name} (Attempt ${attempt}/${maxRetries})`);
         await job.task();
         success = true;
-        this.logger.log(`Job ${job.name} completed successfully`);
+        console.log(`[SchedulerService] Job ${job.name} completed successfully`);
       } catch (err: any) {
-        this.logger.error(`Job ${job.name} failed on attempt ${attempt}: ${err.message}`, err.stack);
+        console.error(`[SchedulerService] Job ${job.name} failed on attempt ${attempt}: ${err.message}`, err.stack);
         if (attempt >= maxRetries) {
           throw err;
         }
@@ -50,3 +46,5 @@ export class SchedulerService {
     return Array.from(this.activeJobs.values());
   }
 }
+
+export const schedulerService = new SchedulerService();

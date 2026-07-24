@@ -12,26 +12,23 @@
     }
   },
   "scripts": {
-    "build": "prisma generate --schema ../../prisma/schema && tsc && node -e \"require('fs').cpSync('./generated', './dist/generated', {recursive: true})\"",
-    "generate": "prisma generate --schema ../../prisma/schema",
-    "db:generate": "prisma generate --schema ../../prisma/schema",
-    "db:push": "prisma db push --schema ../../prisma/schema",
-    "db:migrate": "prisma migrate dev --schema ../../prisma/schema",
-    "db:studio": "prisma studio --schema ../../prisma/schema",
+    "build": "prisma generate --schema ../../backend/prisma/schema && tsc && node -e \"require('fs').cpSync('./generated', './dist/generated', {recursive: true})\"",
+    "generate": "prisma generate --schema ../../backend/prisma/schema",
+    "db:generate": "prisma generate --schema ../../backend/prisma/schema",
+    "db:push": "prisma db push --schema ../../backend/prisma/schema",
+    "db:migrate": "prisma migrate dev --schema ../../backend/prisma/schema",
+    "db:studio": "prisma studio --schema ../../backend/prisma/schema",
     "db:seed": "ts-node seed.ts",
-    "db:reset": "prisma migrate reset --schema ../../prisma/schema --force",
-    "db:format": "prisma format --schema ../../prisma/schema",
-    "db:validate": "prisma validate --schema ../../prisma/schema"
+    "db:reset": "prisma migrate reset --schema ../../backend/prisma/schema --force",
+    "db:format": "prisma format --schema ../../backend/prisma/schema",
+    "db:validate": "prisma validate --schema ../../backend/prisma/schema"
   },
   "prisma": {
     "seed": "ts-node seed.ts"
   },
   "dependencies": {
-    "@nestjs/common": "^11.0.0",
-    "@nestjs/core": "^11.0.0",
     "@prisma/client": "^5.22.0",
-    "bcryptjs": "^2.4.3",
-    "rxjs": "^7.8.1"
+    "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

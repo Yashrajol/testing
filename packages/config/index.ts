@@ -3,7 +3,6 @@ export * from './types';
 export * from './configuration';
 export * from './env.validation';
 export * from './config.service';
-export * from './config.module';
 export * from './schemas/app.schema';
 export * from './schemas/auth.schema';
 export * from './schemas/database.schema';

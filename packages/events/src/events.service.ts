@@ -1,4 +1,3 @@
-import { Injectable } from '@nestjs/common';
 import { EventEmitter } from 'events';
 
 export interface EventMetadata {
@@ -18,7 +17,6 @@ export interface IntegrationEvent extends DomainEvent {
   boundedContext: string;
 }
 
-@Injectable()
 export class EventDispatcher {
   private readonly emitter: EventEmitter;
 
@@ -35,3 +33,5 @@ export class EventDispatcher {
     this.emitter.on(eventName, handler);
   }
 }
+
+export const eventDispatcher = new EventDispatcher();

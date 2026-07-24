@@ -1,8 +1,16 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+export enum HttpStatus {
+  BAD_REQUEST = 400,
+  UNAUTHORIZED = 401,
+  FORBIDDEN = 403,
+  NOT_FOUND = 404,
+  CONFLICT = 409,
+  INTERNAL_SERVER_ERROR = 500,
+}
 
-export abstract class BaseBusinessException extends HttpException {
+export class BaseBusinessException extends Error {
   public readonly errorType: string;
   public readonly errorTitle: string;
+  public readonly statusCode: number;
   public readonly detail: string;
   public readonly instance?: string;
   public readonly invalidParams?: any[];
@@ -10,27 +18,23 @@ export abstract class BaseBusinessException extends HttpException {
   constructor(
     type: string,
     title: string,
-    statusCode: HttpStatus,
+    statusCode: number,
     detail: string,
     instance?: string,
     invalidParams?: any[],
   ) {
-    super(
-      {
-        type,
-        title,
-        status: statusCode,
-        detail,
-        instance,
-        invalidParams,
-      },
-      statusCode,
-    );
+    super(detail);
+    this.name = this.constructor.name;
     this.errorType = type;
     this.errorTitle = title;
+    this.statusCode = statusCode;
     this.detail = detail;
     this.instance = instance;
     this.invalidParams = invalidParams;
+  }
+
+  getStatus(): number {
+    return this.statusCode;
   }
 }
 

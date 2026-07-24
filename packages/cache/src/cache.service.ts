@@ -1,12 +1,9 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
-
 interface CacheEntry {
   value: any;
   expiresAt?: number;
 }
 
-@Injectable()
-export class CacheService implements OnModuleDestroy {
+export class CacheService {
   private readonly store = new Map<string, CacheEntry>();
 
   async get<T>(key: string): Promise<T | null> {
@@ -37,7 +34,9 @@ export class CacheService implements OnModuleDestroy {
     }
   }
 
-  async onModuleDestroy() {
+  clear() {
     this.store.clear();
   }
 }
+
+export const cacheService = new CacheService();

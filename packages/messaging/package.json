@@ -2,20 +2,21 @@
   "name": "@vedhkrit/messaging",
   "version": "1.0.0",
   "private": true,
+  "description": "Production-grade Messaging & Queue Bus for VEDHKRIT Platform",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "build": "tsc",
-    "clean": "rimraf dist"
+    "build": "tsc"
   },
-  "dependencies": {
-    "@nestjs/common": "^11.0.0",
-    "@nestjs/core": "^11.0.0",
-    "amqplib": "^0.10.5"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/amqplib": "^0.10.5",
-    "@types/node": "^22.0.0",
-    "typescript": "^5.7.0"
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
   }
 }

@@ -1,6 +1,3 @@
-import { Injectable } from '@nestjs/common';
-
-@Injectable()
 export class MetricsService {
   private requestsTotal = 0;
 
@@ -19,4 +16,20 @@ export class MetricsService {
       `process_heap_bytes ${memory.heapUsed}`,
     ].join('\n');
   }
+
+  getHealthStatus() {
+    const memory = process.memoryUsage();
+    return {
+      status: 'ok',
+      info: {
+        memory: {
+          status: memory.heapUsed < 300 * 1024 * 1024 ? 'up' : 'down',
+          heapUsedMb: Math.round(memory.heapUsed / 1024 / 1024),
+        },
+      },
+      timestamp: new Date().toISOString(),
+    };
+  }
 }
+
+export const metricsService = new MetricsService();

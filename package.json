@@ -4,27 +4,22 @@
   "private": true,
   "description": "Production-Grade VEDKHRIT Learner Development Platform Monorepo Workspace",
   "workspaces": [
-    "apps/*",
+    "backend",
+    "frontend",
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "npm run dev --workspace=@vedhkrit/frontend",
+    "dev:backend": "node backend/src/main.js",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\""
   },
   "dependencies": {
-    "@nestjs/common": "11.1.28",
-    "@nestjs/core": "11.1.28",
-    "@nestjs/platform-express": "11.1.28",
+    "@rolldown/binding-win32-x64-msvc": "1.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "rxjs": "^7.8.1"
-  },
-  "overrides": {
-    "@nestjs/common": "11.1.28",
-    "@nestjs/core": "11.1.28",
-    "@nestjs/platform-express": "11.1.28"
+    "rolldown": "1.2.0"
   },
   "devDependencies": {
     "prettier": "^3.2.5",

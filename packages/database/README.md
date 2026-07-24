@@ -1,43 +1,14 @@
 # @vedhkrit/database
 
-Production-grade shared database package for VEDHKRIT monorepo backend applications.
+Production-grade shared database package for VEDHKRIT monorepo backend services.
 
-## Usage in NestJS
-
-```typescript
-import { Module } from '@nestjs/common';
-import { PrismaModule } from '@vedhkrit/database';
-
-@Module({
-  imports: [PrismaModule],
-})
-export class AppModule {}
-```
-
-Injecting `PrismaService`:
-
-```typescript
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@vedhkrit/database';
-
-@Injectable()
-export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
-
-  async findUser(id: string) {
-    return this.prisma.user.findUnique({ where: { id } });
-  }
-}
-```
-
-## Usage in Standalone Scripts
+## Usage in Node.js & Express.js
 
 ```typescript
 import { prisma } from '@vedhkrit/database';
 
-async function main() {
-  const users = await prisma.user.findMany();
-  console.log(users);
+async function getUser(id: string) {
+  return await prisma.user.findUnique({ where: { id } });
 }
 ```
 

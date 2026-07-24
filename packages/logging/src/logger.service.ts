@@ -1,7 +1,4 @@
-import { Injectable, LoggerService as NestLoggerService } from '@nestjs/common';
-
-@Injectable()
-export class LoggerService implements NestLoggerService {
+export class LoggerService {
   private formatLog(level: string, message: string, context?: string, metadata?: Record<string, any>) {
     return JSON.stringify({
       level,
@@ -32,3 +29,5 @@ export class LoggerService implements NestLoggerService {
     process.stdout.write(this.formatLog('trace', message, context, metadata) + '\n');
   }
 }
+
+export const logger = new LoggerService();

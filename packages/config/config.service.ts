@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService as NestConfigService } from '@nestjs/config';
+import configuration from './configuration';
 import {
+  AllConfig,
   AppConfig,
   AuthConfig,
   DatabaseConfig,
@@ -11,39 +11,44 @@ import {
   StorageConfig,
 } from './types';
 
-@Injectable()
 export class AppConfigService {
-  constructor(private readonly nestConfigService: NestConfigService) {}
+  private readonly config: AllConfig;
+
+  constructor() {
+    this.config = configuration();
+  }
 
   get app(): AppConfig {
-    return this.nestConfigService.get<AppConfig>('app')!;
+    return this.config.app;
   }
 
   get auth(): AuthConfig {
-    return this.nestConfigService.get<AuthConfig>('auth')!;
+    return this.config.auth;
   }
 
   get database(): DatabaseConfig {
-    return this.nestConfigService.get<DatabaseConfig>('database')!;
+    return this.config.database;
   }
 
   get mail(): MailConfig {
-    return this.nestConfigService.get<MailConfig>('mail')!;
+    return this.config.mail;
   }
 
   get redis(): RedisConfig {
-    return this.nestConfigService.get<RedisConfig>('redis')!;
+    return this.config.redis;
   }
 
   get rabbitmq(): RabbitMQConfig {
-    return this.nestConfigService.get<RabbitMQConfig>('rabbitmq')!;
+    return this.config.rabbitmq;
   }
 
   get ai(): AiConfig {
-    return this.nestConfigService.get<AiConfig>('ai')!;
+    return this.config.ai;
   }
 
   get storage(): StorageConfig {
-    return this.nestConfigService.get<StorageConfig>('storage')!;
+    return this.config.storage;
   }
 }
+
+export const appConfig = new AppConfigService();
