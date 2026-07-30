@@ -23,7 +23,15 @@ export interface ParentOverview {
     time: string;
     category: string;
   }>;
+  sessions?: Array<{
+    id?: string;
+    title?: string;
+    mentorName?: string;
+    scheduledAt?: string;
+    notes?: string;
+  }>;
 }
+
 
 export interface AttendanceSummary {
   studentId: string;

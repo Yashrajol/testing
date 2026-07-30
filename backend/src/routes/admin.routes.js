@@ -1,12 +1,17 @@
-import { Router } from "express";
-import { AdminController } from "../controllers/admin.controller.js";
-import { authMiddleware } from "../middleware/auth.middleware.js";
+import { Router } from 'express';
+import { getUsers, updateUserStatus, getSystemStats, getStudentsList, getMentorsList, getParentsList } from '../controllers/admin.controller.js';
+import { authenticateToken, authorizeRoles } from '../middleware/auth.js';
 
 const router = Router();
 
-router.use(authMiddleware);
-router.get("/dashboard", AdminController.getDashboard);
-router.get("/students", AdminController.getStudents);
-router.get("/mentors", AdminController.getMentors);
+// Protect specific admin routes for SCHOOL_ADMIN and SUPERADMIN roles
+const adminAuth = [authenticateToken, authorizeRoles('SCHOOL_ADMIN', 'SUPERADMIN')];
+
+router.get('/users', ...adminAuth, getUsers);
+router.get('/students', ...adminAuth, getStudentsList);
+router.get('/mentors', ...adminAuth, getMentorsList);
+router.get('/parents', ...adminAuth, getParentsList);
+router.patch('/users/:id/status', ...adminAuth, updateUserStatus);
+router.get('/stats', ...adminAuth, getSystemStats);
 
 export default router;

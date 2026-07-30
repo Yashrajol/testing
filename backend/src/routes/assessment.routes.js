@@ -1,12 +1,11 @@
-import { Router } from "express";
-import { AssessmentController } from "../controllers/assessment.controller.js";
-import { authMiddleware } from "../middleware/auth.middleware.js";
+import { Router } from 'express';
+import { getAssessments, getAssessmentById, submitAssessmentAnswer } from '../controllers/assessment.controller.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = Router();
 
-router.use(authMiddleware);
-router.get("/", AssessmentController.getAssessments);
-router.get("/:id", AssessmentController.getAssessmentById);
-router.post("/:id/submit", AssessmentController.submitAssessment);
+router.get('/assessments', authenticateToken, getAssessments);
+router.get('/assessments/:id', authenticateToken, getAssessmentById);
+router.post('/attempts/:attemptId/answer', authenticateToken, submitAssessmentAnswer);
 
 export default router;

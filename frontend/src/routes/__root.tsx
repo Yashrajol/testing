@@ -88,7 +88,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#0f172a" },
       { httpEquiv: "X-Content-Type-Options", content: "nosniff" },
       { name: "referrer", content: "strict-origin-when-cross-origin" },
-      { httpEquiv: "Content-Security-Policy", content: "default-src 'self' http://localhost:* https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https: data:; connect-src 'self' http://localhost:* https: wss: ws:;" }
+      { httpEquiv: "Content-Security-Policy", content: "default-src 'self' http://localhost:* https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https:; worker-src 'self' blob: http://localhost:* https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https: data:; connect-src 'self' http://localhost:* https: wss: ws:;" }
     ],
     links: [
       { rel: "manifest", href: "/manifest.json" },

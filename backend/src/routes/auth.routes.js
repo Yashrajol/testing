@@ -1,15 +1,32 @@
-import { Router } from "express";
-import { AuthController } from "../controllers/auth.controller.js";
-import { authMiddleware } from "../middleware/auth.middleware.js";
+import { Router } from 'express';
+import {
+  register,
+  registerSchool,
+  registerMentor,
+  verifyOtp,
+  login,
+  me,
+  refreshToken,
+  forgotPassword,
+  resetPassword,
+  updateProfile,
+  completeOnboarding,
+} from '../controllers/auth.controller.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = Router();
 
-router.post("/login", AuthController.login);
-router.post("/register", AuthController.register);
-router.post("/refresh", AuthController.refresh);
-router.get("/me", authMiddleware, AuthController.me);
-router.post("/verify-otp", AuthController.verifyOtp);
-router.post("/forgot-password", AuthController.forgotPassword);
-router.post("/reset-password", AuthController.resetPassword);
+router.post('/register', register);
+router.post('/register-school', registerSchool);
+router.post('/register-mentor', registerMentor);
+router.post('/verify-otp', verifyOtp);
+router.post('/login', login);
+router.post('/refresh', refreshToken);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPassword);
+router.post('/onboarding', completeOnboarding);
+
+router.get('/me', authenticateToken, me);
+router.put('/profile', authenticateToken, updateProfile);
 
 export default router;

@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GlassCard } from "@/shared/ui/glass-card";
+import { PageHeader } from "@/app/layouts/dashboard-shell";
 import {
-  User, Calendar, CheckCircle2, Clock, MessageSquare,
-  BookOpen, Sparkles, ChevronRight, Award, FileText, ArrowRight,
-  Star, Video, ClipboardCheck, Bell, AlertCircle
+  Calendar, CheckCircle2, Clock, MessageSquare,
+  Sparkles, Award, FileText, ArrowRight,
+  Star, Video, Bell, AlertCircle
 } from "lucide-react";
 import { useAuth } from "@/app/providers/auth-context";
 import { useParentOverview } from "@/features/parent/queries/useParent";
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/dashboard/parent/")({
 
 function ParentDashboard() {
   const { user } = useAuth();
-  const studentId = user?.studentId || user?.children?.[0]?.id || 'student-123';
+  const studentId = user?.studentId || user?.children?.[0]?.id;
   const { data: overviewData, isLoading, isError, refetch } = useParentOverview(studentId);
 
   function UsersIcon({ className }: { className?: string }) {
@@ -28,32 +29,25 @@ function ParentDashboard() {
     );
   }
 
-  const parentName = user?.name || overviewData?.parentName || "Rohan Sharma";
+  const parentName = user?.name || overviewData?.parentName || "Parent";
 
   const child = useMemo(() => {
     return {
-      id: overviewData?.studentId || studentId,
-      name: overviewData?.studentName || "Yash Rajole",
-      grade: overviewData?.grade || "10th Grade",
-      school: overviewData?.school || "Delhi Public School Bangalore",
+      id: overviewData?.studentId || studentId || "",
+      name: overviewData?.studentName || user?.name || "Student Learner",
+      grade: overviewData?.grade || "Grade Level Unspecified",
+      school: overviewData?.school || "Independent / Direct Registration",
       avatar: overviewData?.avatar || studentAvatar(0),
-      vedhkritIndex: overviewData?.vedhkritIndex || 82,
-      attendance: overviewData?.attendancePercentage || 94,
-      academicAvg: overviewData?.academicAverage || 85,
-      assessmentDone: overviewData?.assessmentDone !== false,
+      vedhkritIndex: overviewData?.vedhkritIndex || 80,
+      attendance: overviewData?.attendancePercentage || 0,
+      academicAvg: overviewData?.academicAverage || 0,
+      assessmentDone: Boolean(overviewData?.assessmentDone),
     };
-  }, [overviewData, studentId]);
+  }, [overviewData, studentId, user]);
 
   const activities = useMemo(() => {
     if (!overviewData?.recentActivities || overviewData.recentActivities.length === 0) {
-      return [
-        { title: "Homework Submitted", desc: "Mathematics: Calculus Practice Sheet", time: "1h ago", icon: FileText, color: "text-brand-blue bg-brand-blue/10" },
-        { title: "Science Test Completed", desc: "Scored 18/20 in Physics Quiz 2", time: "3h ago", icon: Award, color: "text-purple-600 bg-purple-50" },
-        { title: "Attendance Marked", desc: "Marked Present at 8:30 AM today", time: "5h ago", icon: CheckCircle2, color: "text-emerald-600 bg-emerald-50" },
-        { title: "Mentor Added Feedback", desc: "New advisory notes uploaded by Priya Iyer", time: "Yesterday", icon: MessageSquare, color: "text-brand-teal bg-brand-teal/10" },
-        { title: "Certificate Earned", desc: "Logical Reasoning Master Badge", time: "2 days ago", icon: Star, color: "text-amber-500 bg-amber-50" },
-        { title: "Competition Registered", desc: "Inter-School Coding Hackathon (Junior)", time: "3 days ago", icon: Sparkles, color: "text-brand-orange bg-brand-orange/10" },
-      ];
+      return [];
     }
     return overviewData.recentActivities.map((act) => ({
       title: act.title,
@@ -66,14 +60,7 @@ function ParentDashboard() {
 
   const upcomingEvents = useMemo(() => {
     if (!overviewData?.upcomingEvents || overviewData.upcomingEvents.length === 0) {
-      return [
-        { date: "May 22", time: "10:00 AM", title: "Science Test", cat: "Assessment", action: "View Prep Guide", icon: FileText },
-        { date: "May 23", time: "04:00 PM", title: "PTM Meeting", cat: "Meeting", action: "Confirm Attendance", icon: UsersIcon },
-        { date: "May 25", time: "11:30 AM", title: "Mentor Session", cat: "Counseling", action: "Join Call", icon: Video },
-        { date: "Jun 05", time: "09:00 AM", title: "Math Olympiad", cat: "Competition", action: "View Details", icon: Award },
-        { date: "Jun 10", time: "All Day", title: "School Holiday", cat: "Holiday", action: "View Calendar", icon: Calendar },
-        { date: "Jun 15", time: "08:00 AM", title: "Annual Sports Day", cat: "School Event", action: "Register", icon: Star },
-      ];
+      return [];
     }
     return overviewData.upcomingEvents.map((ev) => ({
       date: ev.date,
@@ -83,6 +70,19 @@ function ParentDashboard() {
       action: ev.action,
       icon: ev.cat === "Assessment" ? FileText : ev.cat === "Meeting" ? UsersIcon : Video
     }));
+  }, [overviewData]);
+
+  const mentor = useMemo(() => {
+    if (overviewData?.sessions && overviewData.sessions.length > 0) {
+      const latest = overviewData.sessions[0];
+      return {
+        name: latest.mentorName || "Assigned Counselor",
+        title: "Academic & STEM Counselor",
+        feedback: latest.notes || "No advisory notes uploaded yet.",
+        nextSession: latest.scheduledAt ? new Date(latest.scheduledAt).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) : "Not Scheduled",
+      };
+    }
+    return null;
   }, [overviewData]);
 
   if (isLoading) {
@@ -119,126 +119,98 @@ function ParentDashboard() {
 
   return (
     <div className="space-y-6 text-left">
-      {/* 1. Hero Section */}
-      <GlassCard className="p-6 border border-slate-100 bg-white/80 shadow-card">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div className="space-y-2">
-            <h2 className="font-display text-2xl font-bold text-text-heading">Good Morning, Mr. {parentName.split(' ').pop()}! 👋</h2>
-            <p className="text-xs text-text-muted mt-0.5">Here is a quick look at your child's learning progress today.</p>
-          </div>
+      {/* 1. Dashboard Header */}
+      <PageHeader
+        title={`Welcome, ${parentName}! 👋`}
+        subtitle={`Monitoring academic growth & performance overview for ${child.name}`}
+      />
 
-          <div className="flex flex-wrap items-center gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 flex-1 md:flex-initial w-full md:w-auto">
-            <img src={child.avatar} alt="Child Profile" className="h-14 w-14 rounded-full object-cover bg-white border border-slate-200" />
-            <div className="text-left text-xs space-y-1 min-w-0 flex-1 md:flex-initial">
-              <h4 className="font-bold text-text-heading text-sm leading-tight truncate">{child.name}</h4>
-              <p className="text-[11px] text-text-muted font-medium leading-none">{child.grade} • {child.school}</p>
-              <div className="flex items-center gap-2 mt-1 flex-wrap text-[10px] text-slate-500 font-semibold">
-                <span className="bg-slate-200/50 px-2 py-0.5 rounded-sm font-bold">CBSE</span>
-                <span className="bg-slate-200/50 px-2 py-0.5 rounded-sm font-bold">Sec: A</span>
-                <span className="bg-slate-200/50 px-2 py-0.5 rounded-sm font-bold">Roll: 24</span>
-                <span className="bg-slate-200/50 px-2 py-0.5 rounded-sm font-bold">AY: 2025-26</span>
-                <span className={`flex items-center gap-1 px-2 py-0.5 rounded-sm font-bold ${child.assessmentDone ? "bg-emerald-100 text-emerald-700" : "bg-orange-100 text-brand-orange"}`}>
-                  <ClipboardCheck className="h-3 w-3" />
-                  {child.assessmentDone ? "Self-Assessment Done" : "Self-Assessment Pending"}
+      {/* 2. Top Summary Card */}
+      <GlassCard className="p-6 border border-slate-100 bg-white shadow-card relative overflow-hidden">
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex items-center gap-4">
+            <img
+              src={child.avatar}
+              alt={child.name}
+              className="h-16 w-16 rounded-2xl object-cover bg-slate-100 border border-slate-200"
+            />
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="font-display text-lg font-extrabold text-text-heading">{child.name}</h2>
+                <span className="rounded-full bg-brand-blue/10 px-2.5 py-0.5 text-[10px] font-bold text-brand-blue border border-brand-blue/20">
+                  {child.grade}
                 </span>
               </div>
+              <p className="text-xs text-text-muted mt-0.5 font-medium">{child.school}</p>
+              <div className="flex items-center gap-3 text-[11px] text-text-muted mt-2 font-semibold">
+                <span>Attendance: <strong className="text-emerald-600">{child.attendance}%</strong></span>
+                <span>•</span>
+                <span>Academic Avg: <strong className="text-brand-blue">{child.academicAvg}%</strong></span>
+              </div>
             </div>
-            <Link 
-              to="/dashboard/parent/progress"
-              className="mt-2 md:mt-0 w-full md:w-auto rounded-xl bg-brand-blue text-white px-4 py-2.5 text-center text-xs font-bold shadow-xs hover:bg-blue-800 transition-colors flex items-center justify-center gap-1 shrink-0 cursor-pointer"
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Vedhkrit Index™</span>
+              <span className="text-2xl font-black text-brand-blue">{child.vedhkritIndex}<span className="text-xs font-bold text-slate-400">/100</span></span>
+            </div>
+            <Link
+              to="/dashboard/parent/reports"
+              className="rounded-xl bg-brand-blue hover:bg-blue-700 text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              View Child Profile
-              <ChevronRight className="h-4 w-4" />
+              <FileText className="h-4 w-4" />
+              Full Report
             </Link>
           </div>
         </div>
       </GlassCard>
 
-      {/* 2. Today's Summary Card */}
-      <GlassCard className="p-6 border border-brand-blue/10 bg-gradient-to-br from-white to-blue-50/10 shadow-card">
-        <h3 className="font-display text-sm font-bold text-text-heading mb-4 flex items-center gap-2">
-          <Sparkles className="h-4.5 w-4.5 text-brand-orange animate-pulse" />
-          Today's Summary
-        </h3>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl font-semibold text-xs text-text-body">
-            <span className="text-lg">✅</span>
-            <div>
-              <div className="font-bold text-text-heading">Present at School</div>
-              <p className="text-[10px] text-text-muted">Marked present today</p>
-            </div>
+      {/* 3. Quick Metrics Grid */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <GlassCard className="p-4 border border-slate-100 bg-white shadow-card flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-blue-50 text-brand-blue">
+            <Award className="h-5 w-5" />
           </div>
-          <div className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl font-semibold text-xs text-text-body">
-            <span className="text-lg">📚</span>
-            <div>
-              <div className="font-bold text-text-heading">Attended 5 Classes</div>
-              <p className="text-[10px] text-text-muted">All active periods complete</p>
-            </div>
+          <div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Overall Progress</span>
+            <div className="font-display text-lg font-black text-text-heading">{child.academicAvg}%</div>
+            <span className="text-[9.5px] font-bold text-emerald-600">Great Learning Momentum</span>
           </div>
-          <div className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl font-semibold text-xs text-text-body">
-            <span className="text-lg">📝</span>
-            <div>
-              <div className="font-bold text-text-heading">2 Homework Pending</div>
-              <p className="text-[10px] text-text-muted">Due in next 48 hours</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl font-semibold text-xs text-text-body">
-            <span className="text-lg">📊</span>
-            <div>
-              <div className="font-bold text-text-heading">Science Quiz: 18/20</div>
-              <p className="text-[10px] text-text-muted">Completed earlier today</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-white border border-slate-100 rounded-xl font-semibold text-xs text-text-body">
-            <span className="text-lg">👨‍🏫</span>
-            <div>
-              <div className="font-bold text-text-heading">Mentor Session Tomorrow</div>
-              <p className="text-[10px] text-text-muted">Scheduled for 11:30 AM</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-brand-orange/5 border border-brand-orange/20 rounded-xl sm:col-span-2 lg:col-span-1">
-            <span className="text-lg">🎯</span>
-            <div className="text-xs">
-              <div className="font-bold text-brand-orange">Today's Recommendation</div>
-              <p className="text-[10.5px] text-text-body font-medium mt-0.5 leading-relaxed">
-                Encourage {child.name.split(' ')[0]} to revise Mathematics for 20 minutes today.
-              </p>
-            </div>
-          </div>
-        </div>
-      </GlassCard>
+        </GlassCard>
 
-      {/* 3. Five Metric Overview Cards */}
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-5 text-xs font-semibold text-text-body">
-        <div className="p-5 border border-slate-100 bg-white rounded-2xl shadow-xs text-left">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Attendance</div>
-          <div className="font-display text-2xl font-bold text-text-heading mt-1">{child.attendance}%</div>
-          <p className="text-[9.5px] text-emerald-600 font-semibold mt-1">Excellent Attendance</p>
-        </div>
+        <GlassCard className="p-4 border border-slate-100 bg-white shadow-card flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-emerald-50 text-emerald-600">
+            <CheckCircle2 className="h-5 w-5" />
+          </div>
+          <div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Attendance Rate</span>
+            <div className="font-display text-lg font-black text-text-heading">{child.attendance}%</div>
+            <span className="text-[9.5px] font-bold text-emerald-600">Regular & Consistent</span>
+          </div>
+        </GlassCard>
 
-        <div className="p-5 border border-slate-100 bg-white rounded-2xl shadow-xs text-left">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Overall Performance</div>
-          <div className="font-display text-2xl font-bold text-text-heading mt-1">{child.vedhkritIndex}<span className="text-xs font-semibold text-slate-400">/100</span></div>
-          <p className="text-[9.5px] text-brand-blue font-semibold mt-1">Consistent Growth</p>
-        </div>
+        <GlassCard className="p-4 border border-slate-100 bg-white shadow-card flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-purple-50 text-purple-600">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Vedhkrit Score</span>
+            <div className="font-display text-lg font-black text-text-heading">{child.vedhkritIndex} / 100</div>
+            <span className="text-[9.5px] font-bold text-purple-600">Diagnostic Readiness</span>
+          </div>
+        </GlassCard>
 
-        <div className="p-5 border border-slate-100 bg-white rounded-2xl shadow-xs text-left">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Homework Status</div>
-          <div className="font-display text-2xl font-bold text-text-heading mt-1">2 Pending</div>
-          <p className="text-[9.5px] text-amber-600 font-semibold mt-1">On Track</p>
-        </div>
-
-        <div className="p-5 border border-slate-100 bg-white rounded-2xl shadow-xs text-left">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Confidence Score</div>
-          <div className="font-display text-2xl font-bold text-text-heading mt-1">71<span className="text-xs font-semibold text-slate-400">/100</span></div>
-          <p className="text-[9.5px] text-emerald-600 font-semibold mt-1">Growing Steadily</p>
-        </div>
-
-        <div className="p-5 border border-slate-100 bg-white rounded-2xl shadow-xs text-left col-span-2 md:col-span-1">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mentor Status</div>
-          <div className="font-display text-base font-bold text-text-heading mt-2 truncate">Session Tomorrow</div>
-          <p className="text-[9.5px] text-purple-600 font-semibold mt-1">11:30 AM Session</p>
-        </div>
+        <GlassCard className="p-4 border border-slate-100 bg-white shadow-card flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-amber-50 text-amber-600">
+            <Clock className="h-5 w-5" />
+          </div>
+          <div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Next Advisory</span>
+            <div className="font-display text-xs font-bold text-text-heading mt-1">{mentor?.nextSession ? mentor.nextSession.split(',')[0] : "Not Scheduled"}</div>
+            <span className="text-[9.5px] font-bold text-amber-600">1:1 Counseling</span>
+          </div>
+        </GlassCard>
       </div>
 
       {/* 4. Split Layout */}
@@ -260,7 +232,7 @@ function ParentDashboard() {
                 <div key={idx} className="flex gap-3.5 items-center p-3 bg-slate-50/50 border border-slate-100 rounded-xl hover:border-slate-200 transition-colors">
                   <div className="h-11 w-11 rounded-xl bg-white border border-slate-200 flex flex-col justify-center items-center text-center shrink-0">
                     <span className="text-[8px] text-text-muted font-bold leading-none">{ev.date.split(' ')[0]}</span>
-                    <span className="text-sm font-extrabold text-text-heading leading-none mt-1">{ev.date.split(' ')[1]}</span>
+                    <span className="text-sm font-extrabold text-text-heading leading-none mt-1">{ev.date.split(' ')[1] || "—"}</span>
                   </div>
                   <div className="text-left min-w-0 flex-1 space-y-0.5">
                     <h4 className="text-xs font-bold text-text-heading truncate leading-snug">{ev.title}</h4>
@@ -325,8 +297,8 @@ function ParentDashboard() {
                   className="h-12 w-12 rounded-2xl object-cover bg-slate-100 border border-slate-150"
                 />
                 <div>
-                  <h4 className="font-bold text-xs text-text-heading leading-tight">Priya Iyer</h4>
-                  <p className="text-[10px] text-text-muted font-bold mt-0.5">Lead Counselors Advisor</p>
+                  <h4 className="font-bold text-xs text-text-heading leading-tight">{mentor?.name || "Assigned Counselor"}</h4>
+                  <p className="text-[10px] text-text-muted font-bold mt-0.5">{mentor?.title || "Academic Counselor"}</p>
                   <p className="text-[9px] text-brand-orange font-bold flex items-center gap-0.5 mt-0.5 font-semibold">
                     4.9 ★ <span className="text-[8.5px] text-slate-400">(120+ Sessions)</span>
                   </p>
@@ -335,14 +307,14 @@ function ParentDashboard() {
 
               <div className="mt-4 text-xs text-left space-y-3">
                 <div>
-                  <span className="text-[9.5px] font-bold text-slate-400 block uppercase tracking-wider">Latest Feedback</span>
+                  <span className="text-[9.5px] font-bold text-slate-400 block uppercase tracking-wider">Latest Advisory Feedback</span>
                   <p className="text-xs text-text-body mt-1 leading-relaxed italic bg-slate-50/50 p-3 rounded-xl border border-slate-100/50 font-medium">
-                    "Yash is showing consistent improvements in logical problem-solving tasks. We encourage more out-of-school olympiad exposure."
+                    "{mentor?.feedback || "No advisory feedback uploaded yet."}"
                   </p>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="font-semibold text-text-muted">Next Session:</span>
-                  <span className="font-bold text-brand-blue">Mar 25, 4:30 PM</span>
+                  <span className="font-bold text-brand-blue">{mentor?.nextSession || "Not Scheduled"}</span>
                 </div>
               </div>
             </div>

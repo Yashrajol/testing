@@ -54,6 +54,16 @@ const NAV_GROUPS: {
       ],
     },
     {
+      label: "For Schools",
+      to: "/schools",
+      sections: [
+        { label: "SLEC Labs Setup", desc: "Experiential learning hubs", hash: "benefits" },
+        { label: "AI Diagnostic Engine", desc: "Automated student profiling", hash: "benefits" },
+        { label: "Leadership Dashboard", desc: "School-wide growth insights", hash: "benefits" },
+        { label: "Register School", desc: "Partner with Vedhkrit", hash: "register" },
+      ],
+    },
+    {
       label: "For Parents",
       to: "/parents",
       sections: [
@@ -61,6 +71,16 @@ const NAV_GROUPS: {
         { label: "Live Reports", desc: "Real-time progress", hash: "reports" },
         { label: "Mentor Feedback", desc: "Notes & recommendations", hash: "feedback" },
         { label: "Safe & Private", desc: "Your child's data, protected", hash: "safe" },
+      ],
+    },
+    {
+      label: "Pricing Plans",
+      to: "/pricing",
+      sections: [
+        { label: "V360 Foundation", desc: "₹365 + GST (₹1/day)", hash: "foundation" },
+        { label: "V360 Foundation Premium", desc: "₹3,499 + GST (Popular)", hash: "premium" },
+        { label: "Vedhkrit Campus Model", desc: "₹4,999 + GST (Institutions)", hash: "campus" },
+        { label: "Feature Comparison", desc: "Side-by-side feature matrix", hash: "matrix" },
       ],
     },
     {
@@ -77,6 +97,8 @@ const NAV_GROUPS: {
   ];
 
 const MORE_LINKS = [
+  { to: "/mentors", label: "Become a Mentor" },
+  { to: "/register-school", label: "School Registration" },
   { to: "/stories", label: "Resources" },
   { to: "/about", label: "About Us" },
   { to: "/contact", label: "Contact Us" },
@@ -262,6 +284,9 @@ export function MarketingLayout() {
             </Link>
             <Link to="/career" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
               Career Blueprint
+            </Link>
+            <Link to="/schools" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
+              For Schools
             </Link>
             <Link to="/parents" onClick={() => setOpen(false)} className="block rounded px-2.5 py-1.5 text-xs font-semibold hover:bg-bg-secondary text-text-body">
               For Parents

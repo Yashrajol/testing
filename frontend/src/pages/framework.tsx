@@ -203,4 +203,5 @@ function Framework() {
   );
 }
 
-export default Page;
+export default Framework;
+

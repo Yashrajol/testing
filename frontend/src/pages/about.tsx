@@ -226,4 +226,5 @@ function About() {
   );
 }
 
-export default Page;
+export default About;
+

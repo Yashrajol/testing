@@ -16,6 +16,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianG
 import { useAdminDashboard, useStudents, useMentors, useCreateStudent } from "@/features/admin/queries";
 import { SkeletonCards, SkeletonCharts, SkeletonTables } from "@/features/admin/components";
 import { toast } from "sonner";
+import { useAuth } from "@/app/providers/auth-context";
 
 export const Route = createFileRoute("/dashboard/admin/")({
   component: AdminDashboard,
@@ -31,6 +32,7 @@ const distribution = [
 ];
 
 function AdminDashboard() {
+  const { user } = useAuth();
   const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError, refetch } = useAdminDashboard();
   const { data: apiStudents, isLoading: studentsLoading } = useStudents();
   const { data: apiMentors } = useMentors();
@@ -44,45 +46,64 @@ function AdminDashboard() {
   const isLoading = dashboardLoading || studentsLoading;
 
   const studentsList = useMemo(() => {
-    if (apiStudents && apiStudents.length > 0) return apiStudents;
-    return mockStudents;
+    const list = Array.isArray(apiStudents) 
+      ? apiStudents 
+      : Array.isArray((apiStudents as any)?.data) 
+      ? (apiStudents as any).data 
+      : Array.isArray((apiStudents as any)?.students) 
+      ? (apiStudents as any).students 
+      : [];
+    return list;
   }, [apiStudents]);
 
   const mentorsList = useMemo(() => {
-    if (apiMentors && apiMentors.length > 0) return apiMentors;
-    return mockMentors;
+    const list = Array.isArray(apiMentors) 
+      ? apiMentors 
+      : Array.isArray((apiMentors as any)?.data) 
+      ? (apiMentors as any).data 
+      : Array.isArray((apiMentors as any)?.mentors) 
+      ? (apiMentors as any).mentors 
+      : [];
+    return list;
   }, [apiMentors]);
 
+
   const stats = useMemo(() => {
-    if (dashboardData?.stats) {
+    const dashAny = dashboardData as any;
+    const metrics = dashAny?.metrics || dashAny?.stats;
+    if (metrics) {
       return {
-        totalStudents: dashboardData.stats.totalStudents || studentsList.length,
-        totalTeachers: 42,
-        totalMentors: dashboardData.stats.totalMentors || mentorsList.length,
-        assessmentCompletion: dashboardData.stats.assessmentCompletion || 78,
+        totalStudents: metrics.totalStudents ?? studentsList.length,
+        totalTeachers: metrics.totalTeachers ?? 0,
+        totalMentors: metrics.totalMentors ?? mentorsList.length,
+        assessmentCompletion: metrics.assessmentCompletion ?? 0,
       };
     }
-    const completionRate = Math.round((studentsList.filter((s) => s.assessmentDone).length / Math.max(studentsList.length, 1)) * 100);
+    const completionRate = studentsList.length > 0
+      ? Math.round((studentsList.filter((s: any) => s.assessmentDone).length / studentsList.length) * 100)
+      : 0;
     return {
-      totalStudents: 500,
-      totalTeachers: 42,
-      totalMentors: 12,
-      assessmentCompletion: completionRate || 78,
+      totalStudents: studentsList.length,
+      totalTeachers: 0,
+      totalMentors: mentorsList.length,
+      assessmentCompletion: completionRate,
     };
   }, [dashboardData, studentsList, mentorsList]);
 
   const needsAttention = useMemo(() => {
-    if (dashboardData?.needsAttention && dashboardData.needsAttention.length > 0) {
-      return dashboardData.needsAttention;
+    const dashAny = dashboardData as any;
+    if (dashAny?.needsAttention && dashAny.needsAttention.length > 0) {
+      return dashAny.needsAttention;
     }
     return studentsList
-      .filter((s) => !s.assessmentDone)
-      .sort((a, b) => {
+      .filter((s: any) => !s.assessmentDone)
+      .sort((a: any, b: any) => {
         const rank = { high: 0, medium: 1, low: 2 } as const;
         return (rank[(a.riskLevel || 'low') as keyof typeof rank] || 2) - (rank[(b.riskLevel || 'low') as keyof typeof rank] || 2);
       })
       .slice(0, 6);
   }, [dashboardData, studentsList]);
+
 
   const handleOnboardStudent = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,9 +112,9 @@ function AdminDashboard() {
     createStudentMutation.mutate(
       {
         name: studentName,
-        grade: Number(studentGrade),
+        grade: parseInt(studentGrade, 10) || 10,
         section: studentSection,
-        school: "Delhi Public School Bangalore",
+        school: user?.name || "Vedhkrit Partner School",
         academic: 85,
         growthScore: 80,
         stage: "Stage Align",
@@ -119,7 +140,7 @@ function AdminDashboard() {
   if (isLoading) {
     return (
       <div className="space-y-6 text-left">
-        <PageHeader title="DPS Bangalore — School Dashboard" subtitle="Loading administrative overview..." />
+        <PageHeader title={`${user?.name || "Vedhkrit Partner School"} — Dashboard`} subtitle="Loading administrative overview..." />
         <SkeletonCards count={4} />
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
@@ -138,7 +159,7 @@ function AdminDashboard() {
       <GlassCard className="p-8 border border-red-100 bg-red-50/30 text-center space-y-3 my-8">
         <AlertCircle className="h-10 w-10 text-red-500 mx-auto" />
         <h3 className="text-base font-bold text-text-heading">Failed to Load School Overview</h3>
-        <p className="text-xs text-text-muted">An error occurred connecting to the NestJS backend administration services.</p>
+        <p className="text-xs text-text-muted">An error occurred connecting to the backend administration services.</p>
         <button
           onClick={() => refetch()}
           className="px-4 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold inline-flex items-center gap-1.5 hover:bg-blue-800 transition-colors"
@@ -149,11 +170,13 @@ function AdminDashboard() {
     );
   }
 
+  const schoolTitle = user?.name ? `${user.name} — School Dashboard` : "School Partnership — Dashboard";
+
   return (
     <>
       <PageHeader 
-        title="DPS Bangalore — School Dashboard" 
-        subtitle={`${stats.totalStudents} students • ${stats.totalTeachers} teachers • ${stats.totalMentors} mentors`} 
+        title={schoolTitle}
+        subtitle={`${stats.totalStudents} students enrolled • ${stats.totalTeachers} active teachers • ${stats.totalMentors} certified mentors`} 
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -14,7 +14,7 @@ function RegisterPage() {
   const navigate = useNavigate();
   const registerMutation = useRegisterMutation();
 
-  const [role, setRole] = useState<"STUDENT" | "PARENT">("STUDENT");
+  const role = "STUDENT";
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -45,7 +45,7 @@ function RegisterPage() {
     }
 
     registerMutation.mutate(
-      { email, phone, password, name: `${firstName} ${lastName}`.trim(), role } as any,
+      { email, phoneNumber: phone, password, name: `${firstName} ${lastName}`.trim(), role } as any,
       {
         onSuccess: (data) => {
           if (data?.autoActivated) {
@@ -53,8 +53,8 @@ function RegisterPage() {
             navigate({ to: "/login" });
             return;
           }
-          toast.success("Account created! Verification code sent to your email & mobile number.");
-          navigate({ to: "/verify-otp", search: { email } });
+          toast.success("Account created! Check your mobile for the OTP code.");
+          navigate({ to: "/verify-otp", search: { email, devOtp: data?.devOtp || "" } });
         },
         onError: (err) => {
           setFormError(err);
@@ -68,38 +68,6 @@ function RegisterPage() {
     <AuthShell mode="register">
       <form onSubmit={handleSubmit} className="space-y-3">
         <FormError error={formError} />
-
-        <div className="space-y-1 text-left">
-          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-            I am registering as a
-          </span>
-          <div className="flex rounded-lg bg-slate-100 border border-slate-200/50 p-0.5 mb-1">
-            <button
-              type="button"
-              onClick={() => setRole("STUDENT")}
-              className={`flex-1 text-center py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer ${
-                role === "STUDENT"
-                  ? "bg-white text-slate-800 shadow-xs border border-slate-200/20 font-black"
-                  : "text-slate-400 hover:text-slate-600"
-              }`}
-              disabled={registerMutation.isPending}
-            >
-              Student
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole("PARENT")}
-              className={`flex-1 text-center py-1.5 rounded-md text-xs font-bold transition-all duration-200 cursor-pointer ${
-                role === "PARENT"
-                  ? "bg-white text-slate-800 shadow-xs border border-slate-200/20 font-black"
-                  : "text-slate-400 hover:text-slate-600"
-              }`}
-              disabled={registerMutation.isPending}
-            >
-              Parent
-            </button>
-          </div>
-        </div>
 
         <div className="grid grid-cols-2 gap-3.5">
           <AuthInput
@@ -166,15 +134,26 @@ function RegisterPage() {
         </AuthButton>
       </form>
 
-      <p className="mt-4 text-center text-xs text-slate-400">
-        Already a member?{" "}
-        <Link
-          to="/login"
-          className="font-semibold text-brand-blue hover:text-blue-600 transition-colors"
-        >
-          Sign in
-        </Link>
-      </p>
+      <div className="mt-4 pt-3 border-t border-slate-100 text-center space-y-1.5 text-xs text-slate-400">
+        <p>
+          Already a member?{" "}
+          <Link
+            to="/login"
+            className="font-semibold text-brand-blue hover:text-blue-600 transition-colors"
+          >
+            Sign in
+          </Link>
+        </p>
+        <div className="flex justify-center gap-3 text-[11px] font-semibold text-slate-500 pt-1">
+          <Link to="/register-school" className="hover:text-brand-blue transition-colors">
+            Register School →
+          </Link>
+          <span>•</span>
+          <Link to="/register-mentor" className="hover:text-brand-blue transition-colors">
+            Apply as Mentor →
+          </Link>
+        </div>
+      </div>
     </AuthShell>
   );
 }

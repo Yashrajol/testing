@@ -50,3 +50,118 @@ export function useUpdateCmsSection() {
   });
 }
 
+// ─────────────────────────────────────────────
+// Auth / Me Profile Hooks
+// ─────────────────────────────────────────────
+export function useMe() {
+  return useQuery({
+    queryKey: ['auth', 'me'],
+    queryFn: () => authenticatedFetch('/api/v1/auth/me'),
+    retry: 1,
+  });
+}
+
+export function useUpdateProfileMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) =>
+      authenticatedFetch('/api/v1/auth/profile', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+    },
+  });
+}
+
+// ─────────────────────────────────────────────
+// Growth Goals Hooks
+// ─────────────────────────────────────────────
+export function useStudentGoals(studentId?: string) {
+  return useQuery({
+    queryKey: ['growth', 'goals', studentId],
+    queryFn: () => authenticatedFetch(studentId ? `/api/v1/growth/goals/${studentId}` : '/api/v1/growth/goals/me'),
+    retry: 1,
+  });
+}
+
+export function useCreateGoalMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (goalData: { title: string; description?: string; deadline?: string; category?: string }) =>
+      authenticatedFetch('/api/v1/growth/goals', {
+        method: 'POST',
+        body: JSON.stringify(goalData),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['growth', 'goals'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+}
+
+export function useUpdateGoalMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, ...data }: { id: string; title?: string; status?: string; progress?: number }) =>
+      authenticatedFetch(`/api/v1/growth/goals/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['growth', 'goals'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+}
+
+export function useDeleteGoalMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      authenticatedFetch(`/api/v1/growth/goals/${id}`, {
+        method: 'DELETE',
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['growth', 'goals'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+}
+
+// ─────────────────────────────────────────────
+// Assessments Hooks
+// ─────────────────────────────────────────────
+export function useAssessments() {
+  return useQuery({
+    queryKey: ['assessments', 'list'],
+    queryFn: () => authenticatedFetch('/api/v1/assessments'),
+    retry: 1,
+  });
+}
+
+export function useAssessment(id: string) {
+  return useQuery({
+    queryKey: ['assessments', 'detail', id],
+    queryFn: () => authenticatedFetch(`/api/v1/assessments/${id}`),
+    enabled: !!id,
+  });
+}
+
+export function useSubmitAssessmentMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ attemptId, answer }: { attemptId: string; answer: { questionId: string; selectedOptionId?: string; textAnswer?: string } }) =>
+      authenticatedFetch(`/api/v1/attempts/${attemptId}/answer`, {
+        method: 'POST',
+        body: JSON.stringify(answer),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assessments'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+}
+
+

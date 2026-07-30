@@ -10,10 +10,11 @@ import {
 } from '../types';
 
 export const ParentService = {
-  async getOverview(studentId: string): Promise<ParentOverview> {
-    if (!studentId) return {} as any;
-    return (await apiClient.get(`/api/v1/parent/overview/${studentId}`)) as any;
+  async getOverview(studentId?: string): Promise<ParentOverview> {
+    const url = studentId && studentId !== 'student-123' ? `/api/v1/parent/overview/${studentId}` : `/api/v1/parent/overview`;
+    return (await apiClient.get(url)) as any;
   },
+
 
   async getAttendance(studentId: string): Promise<AttendanceSummary> {
     if (!studentId) return {} as any;

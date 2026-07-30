@@ -32,7 +32,7 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { motion } from "motion/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/app/providers/auth-context";
 import { useStudentDashboard } from "@/features/dashboard/queries/use-student-dashboard";
 import { useNotifications } from "@/features/notifications/queries/useNotifications";
@@ -59,6 +59,13 @@ function StudentDashboard() {
   const studentId = user?.id || 'student-123';
   const { data: dashboardData, isLoading, isError, refetch } = useStudentDashboard(studentId);
   const { data: notificationsData } = useNotifications(studentId);
+
+  const notifList = useMemo(() => {
+    const raw = Array.isArray(notificationsData)
+      ? notificationsData
+      : (notificationsData as any)?.notifications;
+    return Array.isArray(raw) ? raw : [];
+  }, [notificationsData]);
 
   const [homeworkCheck, setHomeworkCheck] = useState<Array<{ id: string | number; text: string; done: boolean }>>([]);
   const [revisionGoals, setRevisionGoals] = useState<Array<{ id: string | number; text: string; done: boolean }>>([]);
@@ -104,7 +111,7 @@ function StudentDashboard() {
     return () => clearInterval(interval);
   }, [pomoRunning]);
 
-  const userName = dashboardData?.studentName || user?.name || "Student";
+  const userName = user?.name || dashboardData?.studentName || "Student";
 
   if (isLoading) {
     return (
@@ -181,6 +188,31 @@ function StudentDashboard() {
     );
   };
 
+  const profileCompletionPct = useMemo(() => {
+    let saved: any = null;
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem("vedhkrit_student_profile");
+        if (raw) saved = JSON.parse(raw);
+      } catch (e) {}
+    }
+    const prof = saved || dashboardData?.profile;
+    const fields = [
+      user?.name || prof?.name,
+      user?.email || prof?.email,
+      user?.phone || prof?.phone,
+      prof?.schoolName || prof?.school_name,
+      prof?.board,
+      prof?.className || prof?.grade,
+      prof?.section,
+      prof?.rollNumber || prof?.roll_number,
+      prof?.fatherName,
+      prof?.parentPhone,
+    ];
+    const filled = fields.filter(f => Boolean(f && String(f).trim().length > 0)).length;
+    return Math.min(100, Math.max(30, Math.round((filled / fields.length) * 100)));
+  }, [user, dashboardData]);
+
   return (
     <motion.div
       variants={containerVariants}
@@ -189,25 +221,41 @@ function StudentDashboard() {
       className="space-y-6 text-left"
     >
       {/* Profile Completion CTA Banner for New / Incomplete Accounts */}
-      <motion.div variants={itemVariants} className="p-4 rounded-2xl bg-gradient-to-r from-blue-500/10 via-brand-teal/10 to-indigo-500/10 border border-brand-blue/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+      <motion.div variants={itemVariants} className={cn(
+        "p-4 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs transition-all",
+        profileCompletionPct === 100
+          ? "bg-emerald-50/70 border-emerald-200"
+          : "bg-gradient-to-r from-blue-500/10 via-brand-teal/10 to-indigo-500/10 border-brand-blue/20"
+      )}>
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-brand-blue text-white shadow-sm shrink-0">
+          <div className={cn("p-2.5 rounded-xl text-white shadow-sm shrink-0", profileCompletionPct === 100 ? "bg-emerald-600" : "bg-brand-blue")}>
             <User className="h-5 w-5" />
           </div>
           <div>
             <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-              Complete Your Student Profile <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-blue-100 text-brand-blue">30% Complete</span>
+              {profileCompletionPct === 100 ? "Student Profile Fully Updated 🎉" : "Complete Your Student Profile"}
+              <span className={cn(
+                "text-[10px] font-extrabold px-1.5 py-0.5 rounded",
+                profileCompletionPct === 100 ? "bg-emerald-100 text-emerald-700" : "bg-blue-100 text-brand-blue"
+              )}>
+                {profileCompletionPct}% Complete
+              </span>
             </h4>
             <p className="text-[11px] text-slate-500 mt-0.5">
-              Update your school, class grade, and learning style to generate your AI career matches & Vedhkrit Index.
+              {profileCompletionPct === 100
+                ? "Your academic, personal, and parental information is verified and up-to-date."
+                : "Update your school details, parent contact, class section, and learning preferences to unlock 100% profile strength."}
             </p>
           </div>
         </div>
         <Link
           to="/dashboard/student/profile"
-          className="px-4 py-2 rounded-xl bg-brand-blue text-white text-xs font-bold hover:bg-brand-navy transition-all shadow-sm shrink-0 cursor-pointer flex items-center gap-1"
+          className={cn(
+            "px-4 py-2 rounded-xl text-white text-xs font-bold transition-all shadow-sm shrink-0 cursor-pointer flex items-center gap-1",
+            profileCompletionPct === 100 ? "bg-emerald-700 hover:bg-emerald-800" : "bg-brand-blue hover:bg-brand-navy"
+          )}
         >
-          Update Profile Now <ArrowRight className="h-3.5 w-3.5" />
+          {profileCompletionPct === 100 ? "View & Edit Profile" : "Update Profile Now"} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </motion.div>
 
@@ -227,25 +275,26 @@ function StudentDashboard() {
             <div className="z-10 grid grid-cols-2 gap-y-3 gap-x-4 pt-6 border-t border-slate-100/60 mt-4 text-[11px] font-medium text-text-muted max-w-[62%]">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-blue-50 text-brand-blue"><BookOpen className="h-3.5 w-3.5" /></div>
-                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">School</span>{dashboardData?.profile?.schoolName || "Delhi Public School"}</div>
+                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">School</span>{dashboardData?.profile?.schoolName || (user ? "Independent / Direct Registration" : "Not Enrolled")}</div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-purple-50 text-purple-600"><GraduationCap className="h-3.5 w-3.5" /></div>
-                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Class & Section</span>{dashboardData?.profile?.className ? `${dashboardData.profile.className} - ${dashboardData.profile.sectionName || ''}` : "Class IX - A"}</div>
+                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Class & Section</span>{dashboardData?.profile?.className ? `${dashboardData.profile.className} - ${dashboardData.profile.sectionName || 'A'}` : "Grade Level Unspecified"}</div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-teal-50 text-brand-teal"><Activity className="h-3.5 w-3.5" /></div>
-                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Batch</span>{dashboardData?.profile?.batchName || "Foundation A1"}</div>
+                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Batch</span>{dashboardData?.profile?.batchName || "Direct Registration"}</div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-orange-50 text-brand-orange"><Award className="h-3.5 w-3.5" /></div>
-                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Roll Number</span>{dashboardData?.profile?.rollNumber || "23"}</div>
+                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Roll Number</span>{dashboardData?.profile?.rollNumber || "N/A"}</div>
               </div>
               <div className="flex items-center gap-2">
                 <div className="p-1.5 rounded-lg bg-slate-50 text-slate-600"><Calendar className="h-3.5 w-3.5" /></div>
-                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Academic Year</span>{dashboardData?.profile?.academicYear || "2026 - 27"}</div>
+                <div><span className="block text-[9px] uppercase tracking-wider text-slate-400 font-bold">Academic Year</span>{dashboardData?.profile?.academicYear || "2026 - 2027"}</div>
               </div>
             </div>
+
 
             {/* Student Portrait Image */}
             <div className="absolute right-6 bottom-0 top-8 w-[28%] flex items-end justify-end pointer-events-none z-0">
@@ -450,11 +499,20 @@ function StudentDashboard() {
                 <button className="text-[10px] text-brand-blue font-bold hover:underline">View All</button>
               </div>
               <div className="space-y-4">
-                {[
-                  { name: "Mathematics", chap: "Chapter 5: Lines and Angles", progress: 68, color: "bg-brand-blue", iconColor: "bg-blue-50 text-brand-blue" },
-                  { name: "Science", chap: "Chapter 8: Motion", progress: 45, color: "bg-brand-teal", iconColor: "bg-teal-50 text-brand-teal" },
-                  { name: "English", chap: "Chapter 3: Honeydew", progress: 30, color: "bg-brand-orange", iconColor: "bg-orange-50 text-brand-orange" }
-                ].map((item, idx) => (
+                {(dashboardData?.recentAssignments && dashboardData.recentAssignments.length > 0 ? (
+
+                  dashboardData.recentAssignments.slice(0, 3).map((item: any, idx: number) => ({
+                    name: item.assignment?.title || `Module ${idx + 1}`,
+                    chap: item.assignment?.description || "Curriculum Chapter",
+                    progress: item.status === "GRADED" ? 100 : item.status === "SUBMITTED" ? 80 : 35,
+                    color: idx % 3 === 0 ? "bg-brand-blue" : idx % 3 === 1 ? "bg-brand-teal" : "bg-brand-orange",
+                    iconColor: idx % 3 === 0 ? "bg-blue-50 text-brand-blue" : idx % 3 === 1 ? "bg-teal-50 text-brand-teal" : "bg-orange-50 text-brand-orange"
+                  }))
+                ) : [
+                  { name: "AI & Data Foundations", chap: "Unit 1: Fundamentals & Prompting", progress: 0, color: "bg-brand-blue", iconColor: "bg-blue-50 text-brand-blue" },
+                  { name: "Logic & Aptitude Lab", chap: "Unit 1: Reasoning Skills", progress: 0, color: "bg-brand-teal", iconColor: "bg-teal-50 text-brand-teal" },
+                  { name: "STEM Core Mastery", chap: "Unit 1: Applied Science & Math", progress: 0, color: "bg-brand-orange", iconColor: "bg-orange-50 text-brand-orange" }
+                ]).map((item, idx) => (
                   <div key={idx} className="p-3.5 rounded-2xl border border-slate-100 bg-white hover:border-slate-200 transition-all flex flex-col justify-between h-22">
                     <div className="flex items-center gap-2.5">
                       <div className={cn("h-7 w-7 rounded-lg flex items-center justify-center shrink-0", item.iconColor)}>
@@ -495,11 +553,11 @@ function StudentDashboard() {
             </h3>
             <div className="grid grid-cols-3 gap-x-2 gap-y-4 text-center">
               {[
-                { label: "Attendance", val: dashboardData?.attendancePercentage ?? 95, color: "text-brand-teal" },
-                { label: "Overall %", val: dashboardData?.assignmentStatus?.overallPercentage ?? 87.4, color: "text-brand-blue" },
-                { label: "Homework", val: dashboardData?.assignmentStatus?.homeworkCompletion ?? 93, color: "text-brand-orange" },
-                { label: "Test Avg", val: dashboardData?.assignmentStatus?.testAverage ?? 84, color: "text-brand-blue" },
-                { label: "Confidence", val: dashboardData?.assignmentStatus?.confidenceIndex ?? 71, color: "text-purple-600" },
+                { label: "Attendance", val: dashboardData?.attendancePercentage ?? 100, color: "text-brand-teal" },
+                { label: "Overall %", val: dashboardData?.assignmentStatus?.overallPercentage ?? 0, color: "text-brand-blue" },
+                { label: "Homework", val: dashboardData?.assignmentStatus?.homeworkCompletion ?? 0, color: "text-brand-orange" },
+                { label: "Test Avg", val: dashboardData?.assignmentStatus?.testAverage ?? 0, color: "text-brand-blue" },
+                { label: "Confidence", val: dashboardData?.assignmentStatus?.confidenceIndex ?? 0, color: "text-purple-600" },
                 { label: "Overall Index", val: dashboardData?.vedhkritIndex?.value ?? 82, color: "text-brand-orange" }
               ].map((g, idx) => (
                 <div key={idx} className="flex flex-col items-center">
@@ -514,16 +572,18 @@ function StudentDashboard() {
           <GlassCard className="p-5 border border-slate-100 bg-white">
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-display text-xs font-bold text-text-heading">Profile Completion</h3>
-              <span className="text-xs font-bold text-brand-blue">85% Complete</span>
+              <span className="text-xs font-bold text-brand-blue">
+                {user ? "85% Complete" : "30% Complete"}
+              </span>
             </div>
 
             <div className="space-y-2 text-[10px] font-semibold text-text-body">
               {[
-                { label: "Basic Information", met: true },
-                { label: "Academic Information", met: true },
-                { label: "Parent / Guardian Details", met: true },
+                { label: "Basic Information", met: !!user?.name },
+                { label: "Academic Information", met: !!user?.studentProfile?.school || !!user?.studentProfile?.gradeLevel },
+                { label: "Parent / Guardian Details", met: !!user?.parentProfile },
                 { label: "Emergency Contact", met: false },
-                { label: "Profile Photo", met: false }
+                { label: "Profile Photo", met: !!user?.studentProfile?.avatarUrl }
               ].map((item, idx) => (
                 <div key={idx} className="flex items-center justify-between p-1.5 rounded border border-slate-50 bg-slate-50/20">
                   <span className={cn(item.met ? "text-slate-400 line-through" : "text-text-heading")}>{item.label}</span>
@@ -535,9 +595,12 @@ function StudentDashboard() {
                 </div>
               ))}
             </div>
-            <button className="w-full mt-4 py-2 bg-slate-50 border border-slate-100 hover:bg-slate-100 text-text-heading font-bold rounded-xl text-xs transition-colors">
+            <Link
+              to="/dashboard/student/profile"
+              className="block w-full mt-4 py-2 bg-slate-50 border border-slate-100 hover:bg-slate-100 text-text-heading text-center font-bold rounded-xl text-xs transition-colors"
+            >
               Complete Profile
-            </button>
+            </Link>
           </GlassCard>
         </motion.div>
       </div>
@@ -554,9 +617,9 @@ function StudentDashboard() {
               </h3>
 
               {/* Daily Streak flame badge */}
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-orange-50 border border-brand-orange/20 rounded-xl text-brand-orange text-xs font-bold animate-pulse">
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-orange-50 border border-brand-orange/20 rounded-xl text-brand-orange text-xs font-bold">
                 <Flame className="h-4 w-4 fill-brand-orange" />
-                <span>5 Days Streak</span>
+                <span>Active Learner Streak</span>
               </div>
             </div>
 
@@ -657,7 +720,7 @@ function StudentDashboard() {
         <div className="lg:col-span-1 space-y-6">
           {/* Pomodoro Timer */}
           <GlassCard className="p-6 border border-slate-100 bg-white text-center space-y-4">
-            <h3 className="font-display text-xs font-bold text-slate-450 uppercase tracking-wider flex items-center justify-center gap-1.5">
+            <h3 className="font-display text-xs font-bold text-slate-455 uppercase tracking-wider flex items-center justify-center gap-1.5">
               <Clock className="h-4.5 w-4.5 text-brand-blue animate-pulse" /> Focus Pomodoro Timer
             </h3>
 
@@ -684,33 +747,49 @@ function StudentDashboard() {
             <div className="text-left pt-4 border-t border-slate-50 mt-4 text-[10.5px] font-bold text-text-muted">
               <div className="flex justify-between mb-1.5">
                 <span>Study Hours Tracker</span>
-                <span className="text-text-heading">2.5 hrs / 4.0 hrs</span>
+                <span className="text-text-heading">
+                  {dashboardData?.stats?.assessmentsCompleted ? `${(dashboardData.stats.assessmentsCompleted * 0.5).toFixed(1)} hrs` : "0.0 hrs / 4.0 hrs"}
+                </span>
               </div>
               <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                <div className="bg-brand-teal h-1.5 rounded-full" style={{ width: "62%" }}></div>
+                <div 
+                  className="bg-brand-teal h-1.5 rounded-full" 
+                  style={{ width: `${Math.min(100, ((dashboardData?.stats?.assessmentsCompleted || 0) * 0.5 / 4.0) * 100)}%` }}
+                />
               </div>
             </div>
           </GlassCard>
 
           {/* Mentor Task of the Day */}
-          <GlassCard className="p-5 border border-brand-orange/20 bg-linear-to-b from-orange-50/20 to-bg-primary text-left space-y-3">
+          <GlassCard className="p-5 border border-brand-orange/20 bg-gradient-to-b from-orange-50/20 to-bg-primary text-left space-y-3">
             <div className="flex items-center gap-2 text-brand-orange">
               <Users className="h-4.5 w-4.5" />
               <span className="text-[10px] uppercase tracking-wider font-black block">Mentor Task of the Day</span>
             </div>
 
-            <div className="bg-white border border-brand-orange/10 rounded-2xl p-4 text-xs shadow-2xs relative">
-              <div className="absolute top-4 left-0 w-1 h-8 bg-brand-orange rounded-r-md"></div>
-              <p className="text-text-body pl-2.5 leading-relaxed font-semibold italic">
-                "Solve 15 practice questions on Lines & Angles and share it with me on chat."
-              </p>
-              <span className="text-[8px] font-bold text-slate-400 block uppercase tracking-wider mt-2 pl-2.5">— Neha Mehta</span>
-            </div>
+            {dashboardData?.mentorTask ? (
+              <div className="bg-white border border-brand-orange/10 rounded-2xl p-4 text-xs shadow-2xs relative">
+                <div className="absolute top-4 left-0 w-1 h-8 bg-brand-orange rounded-r-md"></div>
+                <p className="text-text-body pl-2.5 leading-relaxed font-semibold italic">
+                  "{dashboardData.mentorTask.task}"
+                </p>
+                <span className="text-[8px] font-bold text-slate-400 block uppercase tracking-wider mt-2 pl-2.5">— {dashboardData.mentorTask.mentorName}</span>
+              </div>
+            ) : (
+              <div className="bg-white border border-brand-orange/10 rounded-2xl p-4 text-xs shadow-2xs relative">
+                <div className="absolute top-4 left-0 w-1 h-8 bg-brand-orange rounded-r-md"></div>
+                <p className="text-text-body pl-2.5 leading-relaxed font-semibold italic">
+                  "Complete your initial diagnostic test to get assigned a dedicated 1-on-1 mentor!"
+                </p>
+                <span className="text-[8px] font-bold text-slate-400 block uppercase tracking-wider mt-2 pl-2.5">— Vedhkrit Academic Desk</span>
+              </div>
+            )}
           </GlassCard>
         </div>
       </motion.div>
 
       {/* Row 4: Learning DNA, Career Matches, Recommendations, and Notifications */}
+
       <motion.div variants={itemVariants} className="grid gap-6 lg:grid-cols-3">
         {/* Left Column: Learning DNA */}
         <div className="lg:col-span-1">
@@ -817,17 +896,17 @@ function StudentDashboard() {
               Notifications
             </h3>
             
-            {!notificationsData || notificationsData.length === 0 ? (
+            {notifList.length === 0 ? (
               <div className="text-center py-6 text-xs text-text-muted">You're all caught up.</div>
             ) : (
               <div className="space-y-3 max-h-44 overflow-y-auto pr-1">
-                {notificationsData.map((notif, idx) => (
-                  <div key={notif.id || idx} className={cn("p-2.5 border rounded-xl text-left text-xs", notif.isRead ? "bg-slate-50/30 border-slate-100" : "bg-orange-50/10 border-brand-orange/15")}>
+                {notifList.map((notif: any, idx: number) => (
+                  <div key={notif.id || idx} className={cn("p-2.5 border rounded-xl text-left text-xs", notif.is_read || notif.isRead ? "bg-slate-50/30 border-slate-100" : "bg-orange-50/10 border-brand-orange/15")}>
                     <div className="flex justify-between items-start">
                       <h4 className="font-bold text-text-heading truncate pr-2">{notif.title}</h4>
-                      <span className="text-[9px] font-bold text-slate-400 shrink-0">{notif.createdAt}</span>
+                      <span className="text-[9px] font-bold text-slate-400 shrink-0">{notif.created_at || notif.createdAt || 'Now'}</span>
                     </div>
-                    <p className="text-[10px] text-text-muted mt-1 leading-normal">{notif.content}</p>
+                    <p className="text-[10px] text-text-muted mt-1 leading-normal">{notif.message || notif.content}</p>
                   </div>
                 ))}
               </div>
@@ -889,7 +968,6 @@ function StudentDashboard() {
               to="/assessments"
               onClick={() => {
                 setShowAssessmentPrompt(false);
-                markDone();
               }}
               className="flex-1 text-center py-2.5 rounded-xl bg-gradient-to-r from-brand-teal to-brand-blue text-white text-xs font-bold shadow-md hover:-translate-y-0.5 transition-all cursor-pointer"
             >

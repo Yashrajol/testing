@@ -1,10 +1,10 @@
-import { Router } from "express";
-import { AnalyticsController } from "../controllers/analytics.controller.js";
-import { authMiddleware } from "../middleware/auth.middleware.js";
+import { Router } from 'express';
+import { getStudentAnalytics, getCohortAnalytics } from '../controllers/analytics.controller.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = Router();
 
-router.use(authMiddleware);
-router.get("/overview", AnalyticsController.getOverview);
+router.get('/analytics/student/:id', authenticateToken, getStudentAnalytics);
+router.get('/analytics/overview', authenticateToken, getCohortAnalytics);
 
 export default router;

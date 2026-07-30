@@ -10,6 +10,8 @@ export {
 export {
   useLoginMutation,
   useRegisterMutation,
+  useRegisterSchoolMutation,
+  useRegisterMentorMutation,
   useVerifyOtpMutation,
 } from '@/features/auth/queries/auth.queries';
 
@@ -19,4 +21,14 @@ export {
   useMentorOverview,
   useCmsPage,
   useUpdateCmsSection,
+  useMe,
+  useUpdateProfileMutation,
+  useStudentGoals,
+  useCreateGoalMutation,
+  useUpdateGoalMutation,
+  useDeleteGoalMutation,
+  useAssessments,
+  useAssessment,
+  useSubmitAssessmentMutation,
 } from '@/features/dashboard/queries/dashboard.queries';
+

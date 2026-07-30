@@ -2,26 +2,18 @@
   "name": "@vedhkrit/backend",
   "version": "1.0.0",
   "private": true,
-  "description": "Standard Node.js + Express.js REST API Backend for VEDHKRIT Platform",
   "type": "module",
-  "main": "src/main.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node src/main.js",
-    "build": "echo 'Standard Node.js backend requires no build step'",
-    "db:generate": "prisma generate --schema ./prisma/schema",
-    "db:push": "prisma db push --schema ./prisma/schema",
-    "db:migrate": "prisma migrate dev --schema ./prisma/schema"
+    "start": "node server.js",
+    "dev": "node --watch server.js"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
-    "@vedhkrit/database": "*",
-    "bcryptjs": "^2.4.3",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2"
-  },
-  "devDependencies": {
-    "prisma": "^5.22.0"
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.16.1"
   }
 }

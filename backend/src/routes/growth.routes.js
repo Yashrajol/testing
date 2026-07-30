@@ -1,14 +1,13 @@
-import { Router } from "express";
-import { GrowthController } from "../controllers/growth.controller.js";
-import { authMiddleware } from "../middleware/auth.middleware.js";
+import { Router } from 'express';
+import { getGoals, createGoal, updateGoal, deleteGoal } from '../controllers/growth.controller.js';
+import { authenticateToken } from '../middleware/auth.js';
 
 const router = Router();
 
-router.use(authMiddleware);
-router.get("/index/:userId?", GrowthController.getIndex);
-router.get("/careers/:userId?", GrowthController.getCareers);
-router.get("/insights/:userId?", GrowthController.getInsights);
-router.get("/goals/:userId?", GrowthController.getGoals);
-router.post("/goals", GrowthController.createGoal);
+router.get('/goals/me', authenticateToken, getGoals);
+router.get('/goals/:studentId', authenticateToken, getGoals);
+router.post('/goals', authenticateToken, createGoal);
+router.patch('/goals/:id', authenticateToken, updateGoal);
+router.delete('/goals/:id', authenticateToken, deleteGoal);
 
 export default router;

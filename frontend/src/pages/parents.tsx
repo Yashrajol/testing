@@ -208,4 +208,5 @@ function ParentsPage() {
   );
 }
 
-export default Page;
+export default ParentsPage;
+

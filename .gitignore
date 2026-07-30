@@ -9,3 +9,6 @@ dist/
 .turbo/
 *.tsbuildinfo
 *.log
+*.zip
+query
+

@@ -177,4 +177,5 @@ function Assessment() {
   );
 }
 
-export default Page;
+export default Assessment;
+

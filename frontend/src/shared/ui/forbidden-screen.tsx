@@ -1,13 +1,28 @@
 import React from "react";
 import { GlassCard } from "./glass-card";
-import { Lock, Home, ArrowLeft } from "lucide-react";
+import { Lock, Home, LogOut } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { useAuth } from "@/app/providers/auth-context";
 
 export function ForbiddenScreen({
   message = "You do not have the required role or permissions to view this resource.",
 }: {
   message?: string;
 }) {
+  const { user, logout } = useAuth();
+  const role = (user?.role || "").toLowerCase();
+
+  const userDashboard =
+    role === "parent"
+      ? "/dashboard/parent"
+      : role === "mentor"
+      ? "/dashboard/mentor"
+      : role === "school_admin"
+      ? "/dashboard/school"
+      : role === "admin" || role === "superadmin"
+      ? "/dashboard/super"
+      : "/dashboard/student";
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 text-left">
       <GlassCard className="max-w-md w-full p-6 border border-orange-100 bg-white/90 shadow-xl space-y-4">
@@ -23,18 +38,18 @@ export function ForbiddenScreen({
 
         <p className="text-xs text-text-body leading-relaxed">{message}</p>
 
-        <div className="pt-3 border-t border-slate-100 flex gap-2">
+        <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row gap-2">
           <Link
-            to="/dashboard"
+            to={userDashboard as any}
             className="flex-1 py-2.5 bg-brand-blue text-white rounded-xl text-xs font-bold text-center hover:bg-blue-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            <Home className="h-4 w-4" /> Return to Dashboard
+            <Home className="h-4 w-4" /> Go to My Dashboard
           </Link>
           <button
-            onClick={() => window.history.back()}
-            className="px-4 py-2.5 border border-slate-200 bg-white text-text-heading rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors flex items-center gap-1 cursor-pointer"
+            onClick={() => logout()}
+            className="px-4 py-2.5 border border-slate-200 bg-white text-text-heading rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            <ArrowLeft className="h-4 w-4" /> Back
+            <LogOut className="h-4 w-4" /> Switch Account
           </button>
         </div>
       </GlassCard>

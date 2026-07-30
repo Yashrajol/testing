@@ -103,4 +103,18 @@ export interface StudentDashboardResponse {
   careerMatches: CareerMatch[];
   recommendations: Recommendation[];
   notifications: Notification[];
+  stats?: {
+    assessmentsCompleted?: number;
+    averageScore?: number;
+    unreadNotifications?: number;
+    activeGoals?: number;
+  };
+  mentorTask?: {
+    task: string;
+    mentorName: string;
+  } | null;
+  recentAssignments?: any[];
+  recentAssessments?: any[];
+  goals?: any[];
 }
+

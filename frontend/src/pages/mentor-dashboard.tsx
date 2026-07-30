@@ -7,6 +7,7 @@ import { students as mockStudents } from "@/shared/constants/mock-data";
 import { BANNER_PHOTOS } from "@/shared/utils/avatars";
 import { useMentorDashboard, useMentorStudents, useMentorSessions, useMentorAssessments } from "@/features/mentor/queries";
 import { SkeletonCards, SkeletonCharts, SkeletonTables, AIMentorInsightsWidget } from "@/features/mentor/components";
+import { useAuth } from "@/app/providers/auth-context";
 
 export const Route = createFileRoute("/dashboard/mentor/")({
   component: MentorDashboard,
@@ -20,6 +21,7 @@ const pieData = [
 ];
 
 function MentorDashboard() {
+  const { user } = useAuth();
   const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError, refetch: refetchDashboard } = useMentorDashboard();
   const { data: studentsData, isLoading: studentsLoading } = useMentorStudents();
   const { data: sessionsData, isLoading: sessionsLoading } = useMentorSessions();
@@ -27,43 +29,43 @@ function MentorDashboard() {
 
   const isLoading = dashboardLoading || studentsLoading || sessionsLoading;
 
-  const mentorName = dashboardData?.mentor?.name || "Neha Mehta";
+  const dashAny = dashboardData as any;
+  const mentorName = user?.name || dashAny?.mentorName || dashAny?.mentor?.name || "Certified Mentor";
 
   const myStudents = useMemo(() => {
-    if (dashboardData?.students && dashboardData.students.length > 0) {
-      return dashboardData.students;
-    }
-    if (studentsData && studentsData.length > 0) {
-      return studentsData;
-    }
-    return mockStudents.slice(0, 4);
-  }, [dashboardData, studentsData]);
+    const fromDash = Array.isArray(dashAny?.activeMentees)
+      ? dashAny.activeMentees
+      : Array.isArray(dashAny?.students)
+      ? dashAny.students
+      : Array.isArray(dashAny?.students?.data)
+      ? dashAny.students.data
+      : [];
+    if (fromDash.length > 0) return fromDash;
+
+    const fromQuery = Array.isArray(studentsData)
+      ? studentsData
+      : Array.isArray((studentsData as any)?.data)
+      ? (studentsData as any).data
+      : Array.isArray((studentsData as any)?.students)
+      ? (studentsData as any).students
+      : [];
+    return fromQuery;
+  }, [dashAny, studentsData]);
+
 
   const stats = useMemo(() => {
-    if (dashboardData?.stats) {
-      return {
-        totalStudents: dashboardData.stats.assignedStudents ?? dashboardData.stats.totalStudents ?? myStudents.length,
-        sessionsConducted: dashboardData.stats.sessionsConducted ?? dashboardData.stats.activeSessions ?? 16,
-        avgProgress: dashboardData.stats.avgProgress ?? dashboardData.stats.avgStudentScore ?? 81,
-        rating: dashboardData.stats.rating ?? 4.8,
-      };
-    }
     return {
-      totalStudents: myStudents.length || 48,
-      sessionsConducted: 16,
-      avgProgress: 81,
-      rating: 4.8,
+      totalStudents: dashAny?.assignedMenteesCount ?? dashAny?.totalMenteesCount ?? myStudents.length,
+      sessionsConducted: dashAny?.upcomingSessions?.length ?? 0,
+      avgProgress: 0,
+      rating: dashAny?.rating ?? 5.0,
     };
-  }, [dashboardData, myStudents]);
+  }, [dashAny, myStudents]);
 
   const nextSession = useMemo(() => {
     if (dashboardData?.nextSession) return dashboardData.nextSession;
     if (sessionsData && sessionsData.length > 0) return sessionsData[0];
-    return {
-      topic: "Career Guidance",
-      studentName: "Yash Rajole",
-      scheduledAt: "2026-05-23T18:00:00.000Z",
-    };
+    return null;
   }, [dashboardData, sessionsData]);
 
   if (isLoading) {
@@ -98,13 +100,12 @@ function MentorDashboard() {
     );
   }
 
-  const nextSessionDate = new Date(nextSession.scheduledAt || Date.now());
-  const formattedNextSessionTime =
-    isNaN(nextSessionDate.getTime())
-      ? "Today • 06:00 PM"
-      : nextSessionDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) +
-        ' • ' +
-        nextSessionDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+  const nextSessionDate = nextSession ? new Date(nextSession.scheduledAt || Date.now()) : null;
+  const formattedNextSessionTime = nextSessionDate && !isNaN(nextSessionDate.getTime())
+    ? nextSessionDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) +
+      ' • ' +
+      nextSessionDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })
+    : "No Upcoming Session";
 
   return (
     <div className="space-y-6 text-left">
@@ -137,7 +138,7 @@ function MentorDashboard() {
             </div>
             <div className="text-left text-xs min-w-0">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">My Next Session</span>
-              <h4 className="font-bold text-text-heading mt-1 truncate leading-tight">{nextSession.topic}</h4>
+              <h4 className="font-bold text-text-heading mt-1 truncate leading-tight">{nextSession?.topic || "No Session Scheduled"}</h4>
               <p className="text-[10.5px] text-text-muted mt-1 leading-none">{formattedNextSessionTime}</p>
             </div>
           </div>

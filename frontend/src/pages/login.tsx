@@ -45,9 +45,9 @@ function LoginPage() {
             navigate({ to: "/dashboard/student" });
           } else if (role === "PARENT") {
             navigate({ to: "/dashboard/parent" });
-          } else if (role === "MENTOR") {
+          } else if (role === "MENTOR" || role === "TEACHER" || role === "COACH") {
             navigate({ to: "/dashboard/mentor" });
-          } else if (role === "ADMIN") {
+          } else if (role === "ADMIN" || role === "SCHOOL" || role === "SCHOOL_ADMIN" || role === "INSTITUTION") {
             navigate({ to: "/dashboard/admin" });
           } else if (role === "SUPERADMIN" || role === "SUPER") {
             navigate({ to: "/dashboard/super" });
@@ -106,15 +106,27 @@ function LoginPage() {
         </AuthButton>
       </form>
 
-      <p className="mt-5 text-center text-xs text-slate-400">
-        Don't have an account?{" "}
-        <Link
-          to="/register"
-          className="font-semibold text-brand-blue hover:text-blue-600 transition-colors"
-        >
-          Create one
-        </Link>
-      </p>
+      <div className="mt-5 pt-3 border-t border-slate-100 text-center space-y-2">
+        <p className="text-xs text-slate-400">
+          New Student or Parent?{" "}
+          <Link
+            to="/register"
+            className="font-semibold text-brand-blue hover:text-blue-600 transition-colors"
+          >
+            Sign up here
+          </Link>
+        </p>
+
+        <div className="flex items-center justify-center gap-3 text-[11px] font-semibold text-slate-500 pt-1">
+          <Link to="/register-school" className="hover:text-brand-blue transition-colors">
+            Register School →
+          </Link>
+          <span>•</span>
+          <Link to="/register-mentor" className="hover:text-brand-blue transition-colors">
+            Apply as Mentor →
+          </Link>
+        </div>
+      </div>
     </AuthShell>
   );
 }

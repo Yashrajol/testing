@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { ParentService } from '../services/parent.service';
 
-export function useParentOverview(studentId: string) {
+export function useParentOverview(studentId?: string) {
   return useQuery({
-    queryKey: ['parent-overview', studentId] as const,
+    queryKey: ['parent-overview', studentId || 'default'] as const,
     queryFn: () => ParentService.getOverview(studentId),
-    enabled: !!studentId,
   });
 }
+
 
 export function useParentAttendance(studentId: string) {
   return useQuery({

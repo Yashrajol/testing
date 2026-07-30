@@ -231,7 +231,7 @@ apiClient.interceptors.response.use(
 
       return new Promise((resolve, reject) => {
         axios
-          .post(`${BASE_URL}/auth/refresh`, { refreshToken }, { withCredentials: true })
+          .post(`${BASE_URL}/api/v1/auth/refresh`, { refreshToken }, { withCredentials: true })
           .then((res) => {
             const resData = res.data;
             const dataBlock = resData?.success && resData?.data ? resData.data : resData;

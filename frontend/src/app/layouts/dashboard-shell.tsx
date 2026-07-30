@@ -64,14 +64,27 @@ export function DashboardShell({ role, roleLabel, userName, items, children }: D
   const [selectedNotif, setSelectedNotif] = useState<any | null>(null);
 
   const notifications = useMemo(() => {
-    if (!notificationsData || notificationsData.length === 0) {
+    const rawList = Array.isArray(notificationsData)
+      ? notificationsData
+      : (notificationsData as any)?.notifications;
+
+    if (!Array.isArray(rawList) || rawList.length === 0) {
       return [
         { id: "n-1", title: "New Assignment Released", content: "Chapter 5 Polynomials assignment is now active under your dashboard tasks list.", category: "academic" as const, priority: "high" as const, isRead: false, createdAt: "2 hours ago" },
         { id: "n-2", title: "System Maintenance Scheduled", content: "Server upgrades scheduled for Sunday, July 26th between 02:00 AM and 04:00 AM.", category: "system" as const, priority: "low" as const, isRead: false, createdAt: "1 day ago" },
         { id: "n-3", title: "PTM Invites Dispatched", content: "Live video consulting invites sent to parent credentials.", category: "social" as const, priority: "medium" as const, isRead: true, createdAt: "2 days ago" }
       ];
     }
-    return notificationsData;
+
+    return rawList.map((n: any) => ({
+      id: n.id,
+      title: n.title,
+      content: n.message || n.content || '',
+      category: (n.type?.toLowerCase() || 'academic') as any,
+      priority: 'medium' as const,
+      isRead: Boolean(n.is_read || n.isRead),
+      createdAt: n.created_at || 'Just now',
+    }));
   }, [notificationsData]);
 
   const unreadCount = useMemo(() => {
@@ -119,15 +132,21 @@ export function DashboardShell({ role, roleLabel, userName, items, children }: D
     });
   };
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div className="dashboard-root min-h-screen relative overflow-hidden bg-slate-50/40 text-left font-semibold">
       {/* Dynamic Background Theme */}
-      {theme !== 'default' && (
+      {mounted && theme !== 'default' && (
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center bg-fixed mix-blend-multiply opacity-25"
           style={{ backgroundImage: getBgImage() }}
         />
       )}
+
       
       <div className="flex relative z-10">
         {/* Sidebar - desktop */}

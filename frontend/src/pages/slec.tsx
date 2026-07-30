@@ -272,4 +272,5 @@ function SLECPage() {
   );
 }
 
-export default Page;
+export default SLECPage;
+
